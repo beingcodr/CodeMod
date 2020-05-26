@@ -1,0 +1,1 @@
+*Want to contribute to open-source? Try solving our issues [here](https://github.com/rahul1116/discordbot/issues)*
