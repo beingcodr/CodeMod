@@ -246,7 +246,12 @@ const socialLinksCommand = (message) => {
 // ! Broken command since the limit of Embed exceds {embed: 6000 chars, addField: 1024 chars, name: 256 chars, footer: 2048 chars, author: 256 chars }
 const faqCommand = (message, arguments) => {
     if (arguments.length === 0) {
-        message.author.send('Invalid command execution. Try `/faq your question` on the server');
+        message
+            .delete()
+            .catch(() =>
+                console.log('[Warning]: DM to the bot cannot be deleted with `message.delete()` ')
+            );
+        message.author.send('Invalid command execution. Try `/faq your question`');
         return;
     }
     // The array which stores the results as per the question passed
