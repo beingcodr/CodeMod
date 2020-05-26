@@ -291,7 +291,6 @@ const faqCommand = (message, arguments) => {
             )
             .addField(`${faq.name}`, `${faq.value}`);
 
-        console.log(faq);
         message.author.send(faqEmbed);
     });
 
