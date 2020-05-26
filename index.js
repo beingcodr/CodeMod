@@ -313,20 +313,24 @@ const faqCommand = (message, arguments) => {
 };
 
 const pruneCommand = (message, arguments) => {
-    let amount = parseInt(arguments[0]) + 1;
+    const dm = serverCommand(message);
 
-    if (isNaN(amount)) {
-        message.reply("That doesn't seem to be a valid number.");
-        return;
-    } else if (amount <= 1 || amount > 100) {
-        message.reply('you need to input a number between 2 and 99.');
-        return;
+    if (dm) {
+        let amount = parseInt(arguments[0]) + 1;
+
+        if (isNaN(amount)) {
+            message.author.send("That doesn't seem to be a valid number.");
+            return;
+        } else if (amount <= 1 || amount > 100) {
+            message.author.send('you need to input a number between 2 and 99.');
+            return;
+        }
+
+        message.channel.bulkDelete(amount).catch((err) => {
+            console.error(err);
+            message.channel.send('there was an error trying to prune messages in this channel!');
+        });
     }
-
-    message.channel.bulkDelete(amount).catch((err) => {
-        console.error(err);
-        message.channel.send('there was an error trying to prune messages in this channel!');
-    });
 };
 
 const kickCommand = async (message) => {
