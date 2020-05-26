@@ -115,32 +115,26 @@ const resourcesCommand = (message) => {
 };
 
 const helpCommand = (message) => {
-    const dm = serverCommand(message);
+    let memberEmbed = new MessageEmbed()
+        .setTitle('Member commands')
+        .setColor(colors.green)
+        .addFields([...memberCommands]);
 
-    if (dm) {
-        let memberEmbed = new MessageEmbed()
-            .setTitle('Member commands')
-            .setColor(colors.green)
-            .setThumbnail(message.guild.iconURL())
-            .addFields([...memberCommands]);
+    let adminEmbed = new MessageEmbed()
+        .setTitle('Admin commands')
+        .setColor(colors.green)
+        .addFields([...adminCommands]);
 
-        let adminEmbed = new MessageEmbed()
-            .setTitle('Admin commands')
-            .setColor(colors.green)
-            .setThumbnail(message.guild.iconURL())
-            .addFields([...adminCommands]);
-
-        message
-            .delete()
-            .catch(() =>
-                console.log('[Warning]: DM to the bot cannot be deleted with `message.delete()` ')
-            );
-        if (message.member.hasPermission(['ADMINISTRATOR'])) {
-            message.author.send(memberEmbed);
-            message.author.send(adminEmbed);
-        } else {
-            message.author.send(memberEmbed);
-        }
+    message
+        .delete()
+        .catch(() =>
+            console.log('[Warning]: DM to the bot cannot be deleted with `message.delete()` ')
+        );
+    if (message.member.hasPermission(['ADMINISTRATOR'])) {
+        message.author.send(memberEmbed);
+        message.author.send(adminEmbed);
+    } else {
+        message.author.send(memberEmbed);
     }
 };
 
