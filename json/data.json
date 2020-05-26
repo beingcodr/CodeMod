@@ -82,24 +82,6 @@
             "value": "\u200b"
         },
         {
-            "name": "`How to do freelancing in web development and make a lot of money?`",
-            "value": "Right now i.e In the CORONA Virus period, don't go for freelancing. Big companies won't hire you as a one man show developer and pay you more neither will the small startups will hire you because they too are struggling to save they're company. Do freelancing after: \n\n1. having some industry experience. \n2. Creating some clout in the industry. \n3. It's not about how good are you, but always about how much is your value in other person's view",
-            "inline": false
-        },
-        {
-            "name": "\u200b",
-            "value": "\u200b"
-        },
-        {
-            "name": "`How to improve my programming skills and learn faster?`",
-            "value": "1. Learn step by step, don't rush into advanced stuff first. Learn the basics and improve from there \n2. Increase your dificulty level \n3. Get out of the tutorial hell and start making programs/projects \n4. Google the term [delibrate practice](https://www.google.com/search?q=deliberate+practice&oq=delibrate+pract&aqs=chrome.1.69i57j0l7.7341j1j7&sourceid=chrome&ie=UTF-8) to learn more \n5. Reference blog to [learn even more](https://fs.blog/2012/07/what-is-deliberate-practice/)",
-            "inline": false
-        },
-        {
-            "name": "\u200b",
-            "value": "\u200b"
-        },
-        {
             "name": "`Should we learn more tech or focus and go deep in one tech?`",
             "value": "Short answer is, optimize for the job and learn in BFS(Breadth First Search) i.e. generalize until you get a good job and then learn in DFS(Depth First Search) mode to specialize in one tech",
             "inline": false
@@ -111,6 +93,26 @@
         {
             "name": "`How to get started in Open Source #OctoberFest?`",
             "value": " We have a podcast episode where [Tanay Pratap & Rahul Kadyan talks about getting started in open source](https://teawithtanay.com/vue-js-and-getting-started-with-open-source-ft-rahul-kadyan-episode-4/) \n\n Don't miss [their Live Stream for getting started in open source ft. #OctoberFest](https://www.youtube.com/watch?v=jUxy4WNdc0s)",
+            "inline": false
+        },
+        {
+            "name": "\u200b",
+            "value": "\u200b"
+        }
+    ],
+    "faqs2": [
+        {
+            "name": "`How to do freelancing in web development and make a lot of money?`",
+            "value": "Right now i.e In the CORONA Virus period, don't go for freelancing. Big companies won't hire you as a one man show developer and pay you more neither will the small startups will hire you because they too are struggling to save they're company. Do freelancing after: \n\n1. having some industry experience. \n2. Creating some clout in the industry. \n3. It's not about how good are you, but always about how much is your value in other person's view",
+            "inline": false
+        },
+        {
+            "name": "\u200b",
+            "value": "\u200b"
+        },
+        {
+            "name": "`How to improve my programming skills and learn faster?`",
+            "value": "1. Learn step by step, don't rush into advanced stuff first. Learn the basics and improve from there \n2. Increase your dificulty level \n3. Get out of the tutorial hell and start making programs/projects \n4. Google the term [delibrate practice](https://www.google.com/search?q=deliberate+practice&oq=delibrate+pract&aqs=chrome.1.69i57j0l7.7341j1j7&sourceid=chrome&ie=UTF-8) to learn more \n5. Reference blog to [learn even more](https://fs.blog/2012/07/what-is-deliberate-practice/)",
             "inline": false
         },
         {

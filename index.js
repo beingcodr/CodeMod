@@ -249,6 +249,7 @@ const socialLinksCommand = (message) => {
     message.author.send(embed);
 };
 
+// ! Broken command since the limit of Embed exceds {embed: 6000 chars, addField: 1024 chars, name: 256 chars, footer: 2048 chars, author: 256 chars }
 const faqCommand = (message, arguments) => {
     // The array which stores the results as per the question passed
     let faqArray = [];
@@ -268,7 +269,6 @@ const faqCommand = (message, arguments) => {
                     if (!faqArray.includes(faq)) {
                         // If faq is not present in faqArray then it pushes the FAQ
                         faqArray.push(faq);
-                        faqArray.push({ name: '\u200b', value: '\u200b', inline: false });
                     }
                 }
             }
@@ -282,36 +282,24 @@ const faqCommand = (message, arguments) => {
 
     let faqEmbed;
 
-    // This condition decides how to send the Embed to the member
-    if (arguments.length > 0 && faqArray.length === 0) {
-        return;
-    } else {
-        if (arguments.length === 0) {
-            faqEmbed = new MessageEmbed()
-                .setColor(colors.green)
-                .setTitle(`FAQ's (Total count: ${faqs.length / 2})`)
-                .setThumbnail(
-                    'https://instagram.fbom15-1.fna.fbcdn.net/v/t51.2885-19/s320x320/90181421_510156213222489_6690442420095549440_n.jpg?_nc_ht=instagram.fbom15-1.fna.fbcdn.net&_nc_ohc=QI8cRp3F8jEAX8v63zw&oh=3049ecd08c681c1cd52cff42ed0b4a26&oe=5EF5EA33'
-                )
-                .addFields([...faqs])
-                .addField('\u200b', '\u200b');
-        } else {
-            faqEmbed = new MessageEmbed()
-                .setColor(colors.green)
-                .setTitle(`FAQ's (Total results: ${faqArray.length / 2})`)
-                .setThumbnail(
-                    'https://instagram.fbom15-1.fna.fbcdn.net/v/t51.2885-19/s320x320/90181421_510156213222489_6690442420095549440_n.jpg?_nc_ht=instagram.fbom15-1.fna.fbcdn.net&_nc_ohc=QI8cRp3F8jEAX8v63zw&oh=3049ecd08c681c1cd52cff42ed0b4a26&oe=5EF5EA33'
-                )
-                .addFields([...faqArray]);
-        }
-    }
+    faqArray.forEach((faq) => {
+        faqEmbed = new MessageEmbed()
+            .setColor(colors.green)
+            .setTitle('FAQ')
+            .setThumbnail(
+                'https://instagram.fbom15-1.fna.fbcdn.net/v/t51.2885-19/s320x320/90181421_510156213222489_6690442420095549440_n.jpg?_nc_ht=instagram.fbom15-1.fna.fbcdn.net&_nc_ohc=QI8cRp3F8jEAX8v63zw&oh=3049ecd08c681c1cd52cff42ed0b4a26&oe=5EF5EA33'
+            )
+            .addField(`${faq.name}`, `${faq.value}`);
+
+        console.log(faq);
+        message.author.send(faqEmbed);
+    });
 
     message
         .delete()
         .catch(() =>
             console.log('[Warning]: DM to the bot cannot be deleted with `message.delete()` ')
         );
-    message.author.send(faqEmbed);
 };
 
 const kickCommand = async (message) => {
