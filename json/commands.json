@@ -47,7 +47,7 @@
         },
         {
             "name": "`/faq your question`",
-            "value": "This command shows the Frequently Asked Question specified by you",
+            "value": "This command shows the Frequently Asked Question specified by you.\n> **Tip:** use specific keywords such as `coding, blogs, etc`",
             "inline": false
         },
         {
@@ -86,6 +86,15 @@
         {
             "name": "`/kick`",
             "value": "This command allows you to kick a @user. Use the command like this `/kick @username`. This command will display an embed on the channel",
+            "inline": false
+        },
+        {
+            "name": "\u200b",
+            "value": "\u200b"
+        },
+        {
+            "name": "`/prune number`",
+            "value": "This command deletes the number of messages specified in the `number`. The `number` ranges from 1 to 99. This is command can be used on server channels only, DO NOT USE THIS COMMAND TO DELETE DM MESSAGES.",
             "inline": false
         },
         {

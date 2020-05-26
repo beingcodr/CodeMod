@@ -21,7 +21,7 @@
             "inline": false
         },
         {
-            "name": "`I am in class 12th. Should I go for JEE preparation to get a better college or should I put all my efforts on programming only? `",
+            "name": "`I am in class 12th/final year student. Should I go for JEE preparation to get a better college or should I put all my efforts on programming only? `",
             "value": "If you're already in 12th then you know by now whether you can get CS in IIT or not. If you don't, let me tell you, you won't. People who are going to get that are cramming in Kota already.  If you think you're smart enough to get into top 25 engineering college in India and that too Computer Science then go there. Else, don't go to college at all. **Start programming, intern, freelance, open source, create projects**. Learn to market yourself well.\n\n> **You're better off than going to any shitty college and a shitty branch.**",
             "inline": false
         },
@@ -66,8 +66,23 @@
             "inline": false
         },
         {
-            "name": "`Which career path to choose UI (User Interface) or AI (Artificial Intelligence)`",
+            "name": "`Which career path to choose UI (User Interface) or AI (Artificial Intelligence)/ML (Machine Learning)`",
             "value": " We have a youtube episode where [Tanay Pratap talks about [which career is better](https://www.youtube.com/watch?v=oZhXwCEBmmk) \n\n Don't miss [their Live Stream for getting started in open source ft. #OctoberFest](https://www.youtube.com/watch?v=jUxy4WNdc0s)",
+            "inline": false
+        },
+        {
+            "name": "`How does a Front-end developer interview looks like?`",
+            "value": "  [Tanay Pratap has tweeted about this previously [check the thread here](https://twitter.com/tanaypratap/status/1222194378564722688)",
+            "inline": false
+        },
+        {
+            "name": "`How to get past of Imposter Syndrome?`",
+            "value": "  [Tanay Pratap has tweeted about this previously [check the thread here](https://twitter.com/tanaypratap/status/1222194378564722688)",
+            "inline": false
+        },
+        {
+            "name": "`How to get past of Imposter Syndrome?`",
+            "value": "  [Tanay Pratap has tweeted about this previously [check the thread here](https://twitter.com/tanaypratap/status/1222194378564722688)",
             "inline": false
         }
     ]

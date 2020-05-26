@@ -54,6 +54,10 @@ const processCommand = (message) => {
             faqCommand(message, arguments);
             break;
 
+        case 'prune':
+            pruneCommand(message, arguments);
+            break;
+
         case 'kick':
             kickCommand(message);
             break;
@@ -115,26 +119,30 @@ const resourcesCommand = (message) => {
 };
 
 const helpCommand = (message) => {
-    let memberEmbed = new MessageEmbed()
-        .setTitle('Member commands')
-        .setColor(colors.green)
-        .addFields([...memberCommands]);
+    const dm = serverCommand(message);
 
-    let adminEmbed = new MessageEmbed()
-        .setTitle('Admin commands')
-        .setColor(colors.green)
-        .addFields([...adminCommands]);
+    if (dm) {
+        let memberEmbed = new MessageEmbed()
+            .setTitle('Member commands')
+            .setColor(colors.green)
+            .addFields([...memberCommands]);
 
-    message
-        .delete()
-        .catch(() =>
-            console.log('[Warning]: DM to the bot cannot be deleted with `message.delete()` ')
-        );
-    if (message.member.hasPermission(['ADMINISTRATOR'])) {
-        message.author.send(memberEmbed);
-        message.author.send(adminEmbed);
-    } else {
-        message.author.send(memberEmbed);
+        let adminEmbed = new MessageEmbed()
+            .setTitle('Admin commands')
+            .setColor(colors.green)
+            .addFields([...adminCommands]);
+
+        message
+            .delete()
+            .catch(() =>
+                console.log('[Warning]: DM to the bot cannot be deleted with `message.delete()` ')
+            );
+        if (message.member.hasPermission(['ADMINISTRATOR'])) {
+            message.author.send(memberEmbed);
+            message.author.send(adminEmbed);
+        } else {
+            message.author.send(memberEmbed);
+        }
     }
 };
 
@@ -279,7 +287,7 @@ const faqCommand = (message, arguments) => {
 
         if (faqArray.length === 0)
             message.author.send(
-                "No FAQ's matched your question. Try `/faq` and go through it once?"
+                "No FAQ's matched your question. Try `/faq your question`\n> **Tip:** use specific keywords such as `coding, blogs, etc`"
             );
     }
 
@@ -302,6 +310,23 @@ const faqCommand = (message, arguments) => {
         .catch(() =>
             console.log('[Warning]: DM to the bot cannot be deleted with `message.delete()` ')
         );
+};
+
+const pruneCommand = (message, arguments) => {
+    let amount = parseInt(arguments[0]) + 1;
+
+    if (isNaN(amount)) {
+        message.reply("That doesn't seem to be a valid number.");
+        return;
+    } else if (amount <= 1 || amount > 100) {
+        message.reply('you need to input a number between 2 and 99.');
+        return;
+    }
+
+    message.channel.bulkDelete(amount).catch((err) => {
+        console.error(err);
+        message.channel.send('there was an error trying to prune messages in this channel!');
+    });
 };
 
 const kickCommand = async (message) => {
