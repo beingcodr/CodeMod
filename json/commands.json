@@ -46,10 +46,6 @@
             "value": "\u200b"
         },
         {
-            "name": "\u200b",
-            "value": "\u200b"
-        },
-        {
             "name": "`/faq your question`",
             "value": "This command shows the Frequently Asked Question specified by you",
             "inline": false
@@ -95,11 +91,6 @@
         {
             "name": "\u200b",
             "value": "\u200b"
-        },
-        {
-            "name": "`/ban`",
-            "value": "This command allows you to ban a @user. Use the command like this `/ban @username`. This command will display an embed on the channel",
-            "inline": false
         }
     ]
 }
