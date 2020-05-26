@@ -245,6 +245,10 @@ const socialLinksCommand = (message) => {
 
 // ! Broken command since the limit of Embed exceds {embed: 6000 chars, addField: 1024 chars, name: 256 chars, footer: 2048 chars, author: 256 chars }
 const faqCommand = (message, arguments) => {
+    if (arguments.length === 0) {
+        message.author.send('Invalid command execution. Try `/faq your question` on the server');
+        return;
+    }
     // The array which stores the results as per the question passed
     let faqArray = [];
     // todo: Make a duplicate checker function that takes 2 FAQ's in this case and checks if the question or answer has similarityCount > 5
