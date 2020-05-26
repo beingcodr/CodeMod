@@ -1,0 +1,110 @@
+{
+    "memberCommands": [
+        {
+            "name": "`/help`",
+            "value": "This command shows you all the commands you can use",
+            "inline": false
+        },
+        {
+            "name": "\u200b",
+            "value": "\u200b"
+        },
+        {
+            "name": "`/discordHelp`",
+            "value": "This command sends you resources to Get Started with Discord",
+            "inline": false
+        },
+        {
+            "name": "\u200b",
+            "value": "\u200b"
+        },
+        {
+            "name": "`/resources`",
+            "value": "This command will ping you all the resources you might need for learning Web Development and Design",
+            "inline": false
+        },
+        {
+            "name": "\u200b",
+            "value": "\u200b"
+        },
+        {
+            "name": "`/jobChallenge`",
+            "value": "This command provides you informative links for JobChallenge",
+            "inline": false
+        },
+        {
+            "name": "\u200b",
+            "value": "\u200b"
+        },
+        {
+            "name": "`/socialLinks`",
+            "value": "This command shows you all the social handles and initiatives of Tanay Pratap",
+            "inline": false
+        },
+        {
+            "name": "\u200b",
+            "value": "\u200b"
+        },
+        {
+            "name": "`/faq`",
+            "value": "This command shows all the most Frequently Asked Questions",
+            "inline": false
+        },
+        {
+            "name": "\u200b",
+            "value": "\u200b"
+        },
+        {
+            "name": "`/faq your question`",
+            "value": "This command shows the Frequently Asked Question specified by you",
+            "inline": false
+        },
+        {
+            "name": "\u200b",
+            "value": "\u200b"
+        },
+        {
+            "name": "`/send @username your message`",
+            "value": "This command sends a private message to @username specified by you",
+            "inline": false
+        },
+        {
+            "name": "\u200b",
+            "value": "\u200b"
+        },
+        {
+            "name": "`/serverInfo`",
+            "value": "This command sends information about the server like no.of members, createdAt, etc",
+            "inline": false
+        },
+        {
+            "name": "\u200b",
+            "value": "\u200b"
+        },
+        {
+            "name": "`/botInfo`",
+            "value": "This command sends information about the bot",
+            "inline": false
+        },
+        {
+            "name": "\u200b",
+            "value": "\u200b"
+        }
+    ],
+    "adminCommands": [
+        {
+            "name": "`/kick`",
+            "value": "This command allows you to kick a @user. Use the command like this `/kick @username`. This command will display an embed on the channel",
+            "inline": false
+        },
+        {
+            "name": "\u200b",
+            "value": "\u200b"
+        },
+        {
+            "name": "`/ban`",
+            "value": "This command allows you to ban a @user. Use the command like this `/ban @username`. This command will display an embed on the channel",
+            "inline": false
+        }
+    ]
+}

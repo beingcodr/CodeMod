@@ -1,0 +1,121 @@
+{
+    "faqs": [
+        {
+            "name": "`I'm new to coding. Which language to start with? (Part 1)`",
+            "value": "Answered by @Rahul Ravindran, @OGAdmin:\n\nFor all the beginners who have no clue where to start from, here are some of my suggestions and ways that I learnt. In the realm of web development, there are 3  main technologies\n\n1. HTML \n2. CSS \n3. JS\n\nWith additional features rolling out every day, mastering technology is impossible. I suggest you learn enough that you can create a layout on your own. \n\nType `/resources` to get all resources\n\nAnd many more if you search on Google. If you ask me I would suggest you learn the basics from Codecademy they have better UI and some of the visual examples clears your doubts \n\nAfter learning the basics move to FreeCodeCamp and learn some intermediate stuff that wasn't covered in Codecademy.",
+            "inline": false
+        },
+        {
+            "name": "\u200b",
+            "value": "\u200b"
+        },
+        {
+            "name": "`I'm new to coding. Which language to start with? (Part 2)`",
+            "value": "Answered by @Rahul Ravindran, @OGAdmin:\n\nAfter a while, you'll feel confident. That's when you need to make accounts on Pinterest, dribble, Etc. These are UI designer sites. Login and search for beautiful modern layouts and try to recreate them applying all the knowledge you learnt till now.\n\nYou're bound to be stuck in the hell of errors and/or your layouts won't line up the way they should. Use the 2 most widely used search engines Google and YouTube to find StackOverflow solutions and tutorial videos to solve your problems.\n\nIf you still don't find a solution, post your issue in this group. While posting an issue you need help with. Describe the issue in detail with screenshots and/or share code on GitHub\n\nWhen you're confident enough to recreate any type of UI layout with HTML & CSS. You can watch Tanay YouTube playlist to add JS to you skillset",
+            "inline": false
+        },
+        {
+            "name": "\u200b",
+            "value": "\u200b"
+        },
+        {
+            "name": "` I am in class 12th. Should I go for JEE preparation to get a better college or should I put all my efforts on programming only? `",
+            "value": "If you're already in 12th then you know by now whether you can get CS in IIT or not. If you don't, let me tell you, you won't. People who are going to get that are cramming in Kota already.  If you think you're smart enough to get into top 25 engineering college in India and that too Computer Science then go there. Else, don't go to college at all. **Start programming, intern, freelance, open source, create projects**. Learn to market yourself well.\n\n> **You're better off than going to any shitty college and a shitty branch.**",
+            "inline": false
+        },
+        {
+            "name": "\u200b",
+            "value": "\u200b"
+        },
+        {
+            "name": "`How to switch from service-based company to product-based companies like Microsoft?`",
+            "value": " If you're a fresher, until companies like Microsoft comes to your college for placements it's really hard to get in because bias exists. If you're from tier 3 or even lower standard colleges, all you can do is to make a clout. Give talks, write blogs, produce great content and help the community until the recruiters from big companies see you. Always be good to your seniors especially the ones who are smart, they can refer you into big companies in the future. \n\n We also have 5 podcast episodes where [Abhik shares his story](https://anchor.fm/tanaypratap/episodes/Infosys-to-Microsoft--1-the-mindset-ft--Abhik-edi8np/a-a5g0n8)",
+            "inline": false
+        },
+        {
+            "name": "\u200b",
+            "value": "\u200b"
+        },
+        {
+            "name": "`Should I learn Python and Django for web development?`",
+            "value": " We have a podcast episode where [Tanay talks about why Python is not recommended for CS devs](https://anchor.fm/tanaypratap/episodes/why-python-is-not-recommended-for-cs-devs-edfq3f/a-a22urma)",
+            "inline": false
+        },
+        {
+            "name": "\u200b",
+            "value": "\u200b"
+        },
+        {
+            "name": "`Why should I learn web development when services like Wix, Wordpress can make websites for me? Will it replace web developers? Is web development safe career?`",
+            "value": " We have a podcast episode where [Tanay talks about how safe is Web Development as a career](https://anchor.fm/tanaypratap/episodes/Is-web-development-saferight-as-a-career-choice-edf35k/a-a22pn17)",
+            "inline": false
+        },
+        {
+            "name": "\u200b",
+            "value": "\u200b"
+        },
+        {
+            "name": "`Is Data Structures and Algorithms required for web developers interview? How to learn DS and Algo?`",
+            "value": " We have a podcast episode where [Tanay & Sushil talks about learning strategies for DATA STRUCTURES & ALGORITHMS](https://anchor.fm/tanaypratap/episodes/Learning-strategies-for-Data-Structures-and-Algorithms-ft--Sushil-ed6u9q/a-a213faj) \n\n And another episode where [Tanay & Kamlesh talks about avoiding DS & algorithms questions in interviews](https://anchor.fm/tanaypratap/episodes/avoiding-DS-n-Algo-questions-in-interviews-ft--Kamlesh-ed2tga/a-a2097ij)",
+            "inline": false
+        },
+        {
+            "name": "\u200b",
+            "value": "\u200b"
+        },
+        {
+            "name": "`How to meet new people, make friends and network with developers the right way?`",
+            "value": " We have a podcast episode where [Tanay  talks about meeting and making friends with new people](https://anchor.fm/tanaypratap/episodes/how-to-meet-new-people-and-make-friends-ed1il6/a-a201fqj)",
+            "inline": false
+        },
+        {
+            "name": "\u200b",
+            "value": "\u200b"
+        },
+        {
+            "name": "`How to start writing technical blogs and where should I host it?`",
+            "value": " We have a podcast episode where [Tanay  talks about hosting blogs](https://anchor.fm/tanaypratap/episodes/where-should-I-host-my-blog-ecrlsg/a-a1usoo4)",
+            "inline": false
+        },
+        {
+            "name": "\u200b",
+            "value": "\u200b"
+        },
+        {
+            "name": "`How to do freelancing in web development and make a lot of money?`",
+            "value": "Right now i.e In the CORONA Virus period, don't go for freelancing. Big companies won't hire you as a one man show developer and pay you more neither will the small startups will hire you because they too are struggling to save they're company. Do freelancing after: \n\n1. having some industry experience. \n2. Creating some clout in the industry. \n3. It's not about how good are you, but always about how much is your value in other person's view",
+            "inline": false
+        },
+        {
+            "name": "\u200b",
+            "value": "\u200b"
+        },
+        {
+            "name": "`How to improve my programming skills and learn faster?`",
+            "value": "1. Learn step by step, don't rush into advanced stuff first. Learn the basics and improve from there \n2. Increase your dificulty level \n3. Get out of the tutorial hell and start making programs/projects \n4. Google the term [delibrate practice](https://www.google.com/search?q=deliberate+practice&oq=delibrate+pract&aqs=chrome.1.69i57j0l7.7341j1j7&sourceid=chrome&ie=UTF-8) to learn more \n5. Reference blog to [learn even more](https://fs.blog/2012/07/what-is-deliberate-practice/)",
+            "inline": false
+        },
+        {
+            "name": "\u200b",
+            "value": "\u200b"
+        },
+        {
+            "name": "`Should we learn more tech or focus and go deep in one tech?`",
+            "value": "Short answer is, optimize for the job and learn in BFS(Breadth First Search) i.e. generalize until you get a good job and then learn in DFS(Depth First Search) mode to specialize in one tech",
+            "inline": false
+        },
+        {
+            "name": "\u200b",
+            "value": "\u200b"
+        },
+        {
+            "name": "`How to get started in Open Source #OctoberFest?`",
+            "value": " We have a podcast episode where [Tanay Pratap & Rahul Kadyan talks about getting started in open source](https://teawithtanay.com/vue-js-and-getting-started-with-open-source-ft-rahul-kadyan-episode-4/) \n\n Don't miss [their Live Stream for getting started in open source ft. #OctoberFest](https://www.youtube.com/watch?v=jUxy4WNdc0s)",
+            "inline": false
+        },
+        {
+            "name": "\u200b",
+            "value": "\u200b"
+        }
+    ]
+}
