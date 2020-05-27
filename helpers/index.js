@@ -11,10 +11,10 @@ const serverCommand = (message) => {
             message.channel.send(
                 ` ${content} might be a server command. Try running it on the server`
             );
-            return false;
+            return true;
         }
     }
-    return true;
+    return false;
 };
 
 module.exports = {

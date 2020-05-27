@@ -14,9 +14,7 @@ bot.once('ready', () => {
 bot.on('message', (message) => {
     if (!message.content.startsWith(`${prefix}`) || message.author === bot.user) {
         return;
-    }
-
-    if (message.content.startsWith(`${prefix}`)) {
+    } else {
         processCommand(message);
     }
 });
@@ -76,7 +74,9 @@ const processCommand = (message) => {
 
         default:
             message.delete();
-            message.author.send('Invalid command. Run `/help` to know all the valid commands');
+            message.author.send(
+                'Invalid command. Run `/help` on the server channelsto know all the valid commands'
+            );
             break;
     }
 };
@@ -121,7 +121,7 @@ const resourcesCommand = (message) => {
 const helpCommand = (message) => {
     const dm = serverCommand(message);
 
-    if (dm) {
+    if (!dm) {
         let memberEmbed = new MessageEmbed()
             .setTitle('Member commands')
             .setColor(colors.green)
@@ -315,21 +315,29 @@ const faqCommand = (message, arguments) => {
 const pruneCommand = (message, arguments) => {
     const dm = serverCommand(message);
 
-    if (dm) {
-        let amount = parseInt(arguments[0]) + 1;
+    if (!dm) {
+        let memeber = message.guild.memeber(message.author);
+        if (memeber.hasPermission('ADMINISTRATOR')) {
+            let amount = parseInt(arguments[0]) + 1;
 
-        if (isNaN(amount)) {
-            message.author.send("That doesn't seem to be a valid number.");
-            return;
-        } else if (amount <= 1 || amount > 100) {
-            message.author.send('you need to input a number between 2 and 99.');
+            if (isNaN(amount)) {
+                message.author.send("That doesn't seem to be a valid number.");
+                return;
+            } else if (amount <= 1 || amount > 100) {
+                message.author.send('you need to input a number between 2 and 99.');
+                return;
+            }
+
+            message.channel.bulkDelete(amount).catch((err) => {
+                console.error(err);
+                message.channel.send(
+                    'there was an error trying to prune messages in this channel!'
+                );
+            });
+        } else {
+            message.reply("You don't have permissions to delete messages on the server ");
             return;
         }
-
-        message.channel.bulkDelete(amount).catch((err) => {
-            console.error(err);
-            message.channel.send('there was an error trying to prune messages in this channel!');
-        });
     }
 };
 
@@ -339,7 +347,7 @@ const kickCommand = async (message) => {
 
         let user = message.mentions.users.first();
 
-        if (user && dm) {
+        if (user && !dm) {
             let admin = message.guild.member(message.author);
             let member = message.guild.member(user);
             if (member && admin.hasPermission('KICK_MEMBERS')) {
@@ -403,7 +411,7 @@ const kickCommand = async (message) => {
 const sendCommand = async (message, arguments) => {
     const dm = serverCommand(message);
 
-    if (dm) {
+    if (!dm) {
         if (arguments.length < 2) {
             message.author.send(
                 'Try the command like this `/send @mentionsomeone type your message`'
@@ -439,7 +447,7 @@ const sendCommand = async (message, arguments) => {
 const serverInfo = (message) => {
     const dm = serverCommand(message);
 
-    if (dm) {
+    if (!dm) {
         let serverEmbed = new MessageEmbed()
             .setTitle(`${message.guild.name}'s Info`)
             .setColor(colors.green)
@@ -462,7 +470,7 @@ const serverInfo = (message) => {
 const botInfo = (message) => {
     const dm = serverCommand(message);
 
-    if (dm) {
+    if (!dm) {
         let botInfoEmbed = new MessageEmbed()
             .setTitle(`${bot.user.username}'s Info`)
             .setColor(colors.green)
@@ -473,11 +481,7 @@ const botInfo = (message) => {
             .addField('Server', message.guild.name, true)
             .addField('Joined server on', formatDate(message.guild.joinedAt), true)
             .addField('\u200b', '\u200b')
-            .addField(
-                'Wanna operate me?',
-                '[Github](https://github.com/rahul1116/DiscordBot)',
-                true
-            )
+            .addField('Wanna operate me?', '[Github](https://github.com/rahul1116/codemod)', true)
             .addField('Son Of', '[Rahul Ravindran](https://github.com/rahul1116)', true);
 
         message
