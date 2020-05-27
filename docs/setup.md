@@ -5,7 +5,7 @@ This bot runs on your machine or a server. To keep the bot running you might nee
 ## Terminology
 
 1. **Main server** (guild) is the server on which the bot is invited and operated from
-1. **Inbox server** (bot DM channel) is the channel that the bot will send most of the information requested by the server members
+1. **Inbox server** (bot DM channel) is the channel that the bot will send most of the information requested by the server members to avoid clutter in the channel
 1. A **member** in CodeMod's context, is a server member who requests information from the bot
 1. An **admin** in CodeMod's context, is the moderator/owner of the server who has access to change the data that the **members** can request for
 

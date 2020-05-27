@@ -1,12 +1,12 @@
 {
     "faqs": [
         {
-            "name": "`I'm new to coding. Which language to start with? (Part 1)`",
+            "name": "`I'm new to coding. Which language to start with? Roadmap to frontend(Part 1)`",
             "value": "Answered by @Rahul Ravindran, @OGAdmin:\n\nFor all the beginners who have no clue where to start from, here are some of my suggestions and ways that I learnt. In the realm of web development, there are 3  main technologies\n\n1. HTML \n2. CSS \n3. JS\n\nWith additional features rolling out every day, mastering technology is impossible. I suggest you learn enough that you can create a layout on your own. \n\nType `/resources` to get all resources\n\nAnd many more if you search on Google. If you ask me I would suggest you learn the basics from Codecademy they have better UI and some of the visual examples clears your doubts \n\nAfter learning the basics move to FreeCodeCamp and learn some intermediate stuff that wasn't covered in Codecademy.",
             "inline": false
         },
         {
-            "name": "`I'm new to coding. Which language to start with? (Part 2)`",
+            "name": "`I'm new to coding. Which language to start with? Roadmap to frontend(Part 2)`",
             "value": "Answered by @Rahul Ravindran, @OGAdmin:\n\nAfter a while, you'll feel confident. That's when you need to make accounts on Pinterest, dribble, Etc. These are UI designer sites. Login and search for beautiful modern layouts and try to recreate them applying all the knowledge you learnt till now.\n\nYou're bound to be stuck in the hell of errors and/or your layouts won't line up the way they should. Use the 2 most widely used search engines Google and YouTube to find StackOverflow solutions and tutorial videos to solve your problems.\n\nIf you still don't find a solution, post your issue in this group. While posting an issue you need help with. Describe the issue in detail with screenshots and/or share code on GitHub\n\nWhen you're confident enough to recreate any type of UI layout with HTML & CSS. You can watch Tanay YouTube playlist to add JS to you skillset",
             "inline": false
         },
@@ -77,7 +77,12 @@
         },
         {
             "name": "`How to get past of Imposter Syndrome?`",
-            "value": "",
+            "value": "1. You're not alone, 70% people in the world have Imposter Syndrome\n 2. You have to listen to this podcast episode\n3. When I got into Microsoft I was like MY GOD everyone knows so much\n4. First of all, don't have that burden that just because I'm senior I can't ask other people\n5. Learn from everyone\n6. Every time you get a new role/change companies you're bound to feel like this\n7. You'll always feel like if you're in 3rd year the 1st year knows more than me. So, you'll always compare yourself with someone who knows more than you. It's in our nature that we don't want to compare with someone who have less but people who have more",
+            "inline": false
+        },
+        {
+            "name": "`How to write production ready code?`",
+            "value": "The problem with our generation is that we don't read books, we believe in blogs but blogs don't cover the depth of a topic. Talk to senior people, people who are doing stuff. It's not easy to learn these things.",
             "inline": false
         }
     ]
