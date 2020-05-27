@@ -305,6 +305,12 @@ const faqCommand = (message, arguments) => {
         message.author.send(faqEmbed);
     });
 
+    if (faqArray.length > 5) {
+        message.author.send(
+            "If you're bombarded with too many **FAQ** results. Try to be more specific with the questions\n\n> Tip: use specific keywords such as `coding, blogs, etc` and avoid generic words such as **how, where, what**"
+        );
+    }
+
     message
         .delete()
         .catch(() =>
