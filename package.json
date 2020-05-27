@@ -1,6 +1,6 @@
 {
-    "name": "CodeMod",
-    "version": "1.13.0",
+    "name": "codemod",
+    "version": "1.14.0",
     "description": "",
     "main": "index.js",
     "scripts": {
@@ -9,7 +9,7 @@
         "dev": "nodemon index"
     },
     "keywords": [],
-    "author": "Rahul Ravidran",
+    "author": "Rahul Ravindran",
     "license": "ISC",
     "dependencies": {
         "discord.js": "^12.2.0",

@@ -22,5 +22,7 @@ Assuming that you already have a discord account and a server.
 
 ## Bot setup
 
-1. Go through the prerequisites above first!
+1. Go through the [prerequisites](https://github.com/rahul1116/CodeMod/blob/master/docs/setup.md#prerequisites) above first!
 1. Open `.env` in a text editor and fill in the required values. `token` should be set to your bot token
+1. In the root directory, open terminal and run `npm install` to install all the dependencies for the bot
+1. Run `npm run dev` to start the bot process, now go to the server and type `/serverInfo`. If the message automatically deleted and the bot pinged in your DM then everything is setup properly and you're ready to proceed.
