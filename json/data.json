@@ -84,6 +84,11 @@
             "name": "`How to write production ready code?`",
             "value": "The problem with our generation is that we don't read books, we believe in blogs but blogs don't cover the depth of a topic. Talk to senior people, people who are doing stuff. It's not easy to learn these things.",
             "inline": false
+        },
+        {
+            "name": "`I'm learning web development, but how to get a suitable project to implement my learnings and build something new that has never been built?`",
+            "value": "First learn to build. Don't worry about the idea. Worry about the tech initially.\n\nBut when you have learnt enough then go and solve unknown problems.\n\nSakshi! I understand the urge to create something new, trust me I do. But there's nothing new under the sun. So, what you can do is, create something which is there but do a marginal improvement. And that's yours now.\n\nAlso, listen to the episode where [Rachit talks about hobby projects](https://teawithtanay.com/hobby-projects-ft-rachit-gulati-episode-2/). You'll get more ideas.",
+            "inline": false
         }
     ]
 }
