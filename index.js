@@ -3,7 +3,7 @@ require('dotenv').config();
 const { prefix, colors } = require('./json/config.json');
 const { formatDate, serverCommand } = require('./helpers/index');
 const { memberCommands, adminCommands } = require('./json/commands.json');
-const { faqs } = require('./json/data.json');
+const { faqs, moderate } = require('./json/data.json');
 const bot = new Client();
 
 bot.once('ready', () => {
@@ -12,9 +12,11 @@ bot.once('ready', () => {
 });
 
 bot.on('message', (message) => {
-    if (!message.content.startsWith(`${prefix}`) || message.author === bot.user) {
+    if (message.author === bot.user) {
         return;
     } else {
+        let slangUsed = moderateMessagesCommand(message);
+        if (slangUsed) return;
         processCommand(message);
     }
 });
@@ -56,8 +58,16 @@ const processCommand = (message) => {
             pruneCommand(message, arguments);
             break;
 
+        case 'moderate':
+            moderateMessagesCommand(message);
+            break;
+
         case 'kick':
             kickCommand(message);
+            break;
+
+        case 'ban':
+            banCommand(message);
             break;
 
         case 'send':
@@ -73,9 +83,15 @@ const processCommand = (message) => {
             break;
 
         default:
-            message.delete();
+            message
+                .delete()
+                .catch(() =>
+                    console.log(
+                        '[Warning]: DM to the bot cannot be deleted with `message.delete()` '
+                    )
+                );
             message.author.send(
-                'Invalid command. Run `/help` on the server channelsto know all the valid commands'
+                'Invalid command. Run `/help` on the server channels to know all the valid commands'
             );
             break;
     }
@@ -322,8 +338,8 @@ const pruneCommand = (message, arguments) => {
     const dm = serverCommand(message);
 
     if (!dm) {
-        let memeber = message.guild.memeber(message.author);
-        if (memeber.hasPermission('ADMINISTRATOR')) {
+        let member = message.guild.member(message.author);
+        if (member.hasPermission('ADMINISTRATOR')) {
             let amount = parseInt(arguments[0]) + 1;
 
             if (isNaN(amount)) {
@@ -347,6 +363,32 @@ const pruneCommand = (message, arguments) => {
     }
 };
 
+const moderateMessagesCommand = (message) => {
+    const dm = serverCommand(message);
+
+    if (!dm) {
+        moderate.forEach((msg) => {
+            if (message.content.includes(msg)) {
+                message.author.send(
+                    '[Warning] This message is to notify you that your message was deleted from the server because it contained a slang word which is not permitted in this server. You might get banned if you continue to voilate the rules'
+                );
+                message
+                    .delete()
+                    .catch(() =>
+                        console.log(
+                            '[Warning]: DM to the bot cannot be deleted with `message.delete()` '
+                        )
+                    );
+                message.reply('Just used a slang word in his/her message, take a look @admins');
+                // If slang is used
+                return true;
+            }
+        });
+        // if no slang is used
+        return false;
+    }
+};
+
 const kickCommand = async (message) => {
     try {
         const dm = serverCommand(message);
@@ -365,11 +407,9 @@ const kickCommand = async (message) => {
                     return;
                 }
 
-                member
-                    .kick('Violation of server rules and regulations')
-                    .then(() => {
-                        let rules = '`/rules`';
-
+                try {
+                    const kickedMember = member.kick('Voilation of server rules and regulations');
+                    if (kickedMember) {
                         let kickEmbed = new MessageEmbed()
                             .setTitle(`${user.username} is kicked from ${message.guild.name}`)
                             .setColor(0xff0000)
@@ -383,30 +423,81 @@ const kickCommand = async (message) => {
                                 true
                             );
 
-                        // !It seems that message.guild.channels.find() is not a function anymore
-                        // let kickChannel = message.guild.channels.find(`name`, 'kickreports');
-                        // if (!kickChannel) return message.channel.send(kickEmbed);
-
-                        // kickChannel.send(kickEmbed);
                         message.channel.send(kickEmbed);
-                        message
-                            .delete()
-                            .catch(() =>
-                                console.log(
-                                    '[Warning]: DM to the bot cannot be deleted with `message.delete()` '
-                                )
-                            );
-                    })
-                    .catch((err) => {
-                        message.author.send(`Unable to kick ${user}`);
-                        console.log(err);
-                    });
+                        message.delete();
+                    }
+                } catch (error) {
+                    message.author.send(`Unable to kick ${user}`);
+                    console.error(error);
+                }
+
+                // !It seems that message.guild.channels.find() is not a function anymore
+                // let kickChannel = message.guild.channels.find(`name`, 'kickreports');
+                // if (!kickChannel) return message.channel.send(kickEmbed);
+
+                // kickChannel.send(kickEmbed);
             } else {
                 message.reply(`You don\'t have permissions to kick anyone`);
             }
         } else {
             message.channel.send(
                 `Oooo, someone was going to be kicked out. But seems like ${message.author} didn\'t specify who`
+            );
+        }
+    } catch (error) {
+        throw error;
+    }
+};
+
+const banCommand = async (message) => {
+    try {
+        const dm = serverCommand(message);
+
+        let user = message.mentions.users.first();
+
+        if (user && !dm) {
+            let admin = message.guild.member(message.author);
+            let member = message.guild.member(user);
+            if (member && admin.hasPermission('BAN_MEMBERS')) {
+                if (member.hasPermission(['KICK_MEMBERS', 'BAN_MEMBERS', 'ADMINISTRATOR'])) {
+                    bot.user.username === member.user.username
+                        ? message.reply(`You really think you can ban me? Traitor! `)
+                        : message.reply(`You can\'t ban ${member} `);
+                    message.delete();
+                    return;
+                }
+
+                try {
+                    const banedMember = member.ban({
+                        reason: 'Repeated voilation of server rules and regulations',
+                    });
+                    if (banedMember) {
+                        let banEmbed = new MessageEmbed()
+                            .setTitle(`${user.username} is baned from ${message.guild.name}`)
+                            .setColor(0xff0000)
+                            .setThumbnail(message.author.displayAvatarURL)
+                            .addField('Baned User', `${member}`, true)
+                            .addField('Baned By', `<@${message.author.id}>`, true)
+                            .addField('Spammed In', `${message.channel} channel`, true)
+                            .addField(
+                                'Reason',
+                                'Violation of server rules and regulations. You can learn more about the rules by typing `/rules`',
+                                true
+                            );
+
+                        message.channel.send(banEmbed);
+                        message.delete();
+                    }
+                } catch (error) {
+                    message.author.send(`Unable to ban ${user}`);
+                    console.error(error);
+                }
+            } else {
+                message.reply(`You don\'t have permissions to ban anyone`);
+            }
+        } else {
+            message.channel.send(
+                `Oooo, someone was going to be baned out. But seems like ${message.author} didn\'t specify who`
             );
         }
     } catch (error) {

@@ -90,5 +90,6 @@
             "value": "First learn to build. Don't worry about the idea. Worry about the tech initially.\n\nBut when you have learnt enough then go and solve unknown problems.\n\nSakshi! I understand the urge to create something new, trust me I do. But there's nothing new under the sun. So, what you can do is, create something which is there but do a marginal improvement. And that's yours now.\n\nAlso, listen to the episode where [Rachit talks about hobby projects](https://teawithtanay.com/hobby-projects-ft-rachit-gulati-episode-2/). You'll get more ideas.",
             "inline": false
         }
-    ]
+    ],
+    "moderate": ["fuck", "shit", "bitch", "asshole"]
 }
