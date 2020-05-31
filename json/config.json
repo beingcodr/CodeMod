@@ -2,6 +2,7 @@
     "prefix": "/",
     "colors": {
         "green": "#4ecfb8",
-        "yellow": "#FFC000"
+        "yellow": "#FFC000",
+        "red": "#ff0000"
     }
 }

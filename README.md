@@ -6,6 +6,6 @@ CodeMod Bot is a bot for [Discord](https://discordapp.com) that allows moderator
 
 ## Getting Started
 
--   🛠️ [Setting up the bot](https://github.com/beingcoddr/CodeMod/blob/master/docs/setup.md)
--   📝 [Configuring the bot](https://github.com/beingcoddr/CodeMod/blob/master/docs/configuration.md)
--   🤖 [Commands](https://github.com/beingcoddr/CodeMod/blob/master/docs/commands.md)
+-   🛠️ [Setting up the bot](https://github.com/rahul1116/CodeMod/blob/master/docs/setup.md)
+-   📝 [Configuring the bot](https://github.com/rahul1116/CodeMod/blob/master/docs/configuration.md)
+-   🤖 [Commands](https://github.com/rahul1116/CodeMod/blob/master/docs/commands.md)
