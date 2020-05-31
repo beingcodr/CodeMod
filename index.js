@@ -17,7 +17,28 @@ bot.on('message', (message) => {
     } else {
         let slangUsed = moderateMessagesCommand(message);
         if (slangUsed) return;
+        if (!message.content.startsWith(`${prefix}`)) return;
+
         processCommand(message);
+    }
+});
+
+bot.on('guildMemberAdd', (member) => {
+    let memberEmbed = new MessageEmbed()
+        .setTitle('Member commands')
+        .setColor(colors.green)
+        .addFields([...memberCommands]);
+
+    let adminEmbed = new MessageEmbed()
+        .setTitle('Admin commands')
+        .setColor(colors.green)
+        .addFields([...adminCommands]);
+
+    if (member.hasPermission(['ADMINISTRATOR'])) {
+        member.send(memberEmbed);
+        member.send(adminEmbed);
+    } else {
+        member.send(memberEmbed);
     }
 });
 
@@ -28,8 +49,7 @@ const processCommand = (message) => {
     let arguments = splitCommand.slice(1);
 
     switch (primaryCommand) {
-        /* //todo: ban, ama, links(to all social media platforms of Tanay)
-           todo: rules, faq  */
+        //todo: rules, ama
         case 'resources':
             resourcesCommand(message);
             break;
@@ -56,10 +76,6 @@ const processCommand = (message) => {
 
         case 'prune':
             pruneCommand(message, arguments);
-            break;
-
-        case 'moderate':
-            moderateMessagesCommand(message);
             break;
 
         case 'kick':
@@ -339,7 +355,7 @@ const pruneCommand = (message, arguments) => {
 
     if (!dm) {
         let member = message.guild.member(message.author);
-        if (member.hasPermission('ADMINISTRATOR')) {
+        if (member.hasPermission('ADMINISTRATOR', 'MANAGE_MESSAGES')) {
             let amount = parseInt(arguments[0]) + 1;
 
             if (isNaN(amount)) {
@@ -403,7 +419,13 @@ const kickCommand = async (message) => {
                     bot.user.username === member.user.username
                         ? message.reply(`You really think you can kick me? Traitor! `)
                         : message.reply(`You can\'t kick ${member} `);
-                    message.delete();
+                    message
+                        .delete()
+                        .catch(() =>
+                            console.log(
+                                '[Warning]: DM to the bot cannot be deleted with `message.delete()` '
+                            )
+                        );
                     return;
                 }
 
@@ -424,7 +446,14 @@ const kickCommand = async (message) => {
                             );
 
                         message.channel.send(kickEmbed);
-                        message.delete();
+
+                        message
+                            .delete()
+                            .catch(() =>
+                                console.log(
+                                    '[Warning]: DM to the bot cannot be deleted with `message.delete()` '
+                                )
+                            );
                     }
                 } catch (error) {
                     message.author.send(`Unable to kick ${user}`);
