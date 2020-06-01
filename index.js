@@ -4,7 +4,6 @@ const { prefix, colors } = require('./json/config.json');
 const { moderateMessagesCommand } = require('./helpers/index');
 const { memberCommands, adminCommands } = require('./json/commands.json');
 const fs = require('fs');
-const members = require('./json/members.json');
 const bot = new Client();
 bot.commands = new Collection();
 
@@ -20,7 +19,7 @@ bot.once('ready', () => {
     bot.user.setActivity('messages', { type: 'WATCHING' });
 });
 
-bot.on('message', async (message) => {
+bot.on('message', (message) => {
     if (message.author === bot.user) {
         return;
     } else {
@@ -31,8 +30,15 @@ bot.on('message', async (message) => {
         let commandName = splitCommand[0];
         let args = splitCommand.slice(1);
 
-        if (!bot.commands.has(commandName)) return;
-        let command = bot.commands.get(commandName);
+        const command =
+            bot.commands.get(commandName) ||
+            bot.commands.find((cmd) => cmd.aliases && cmd.aliases.includes(commandName));
+
+        if (!command) {
+            return message.reply(
+                'Invalid command. Try `/help` to learn more about available commands'
+            );
+        }
 
         if (command.guildOnly && message.channel.type !== 'text') {
             return message.reply("I can't execute that command inside DMs!");
@@ -57,28 +63,7 @@ bot.on('message', async (message) => {
     }
 });
 
-bot.on('guildMemberAdd', async (member) => {
-    let newMember = {
-        id: `${member.user.id}`,
-        discriminator: `#${member.user.discriminator}`,
-        username: `${member.user.username}`,
-        nickName: null,
-        roles: [],
-        server: `${member.guild.name}`,
-        level: 0,
-        totalPoints: 0,
-    };
-
-    // STEP 2: Adding new data to users object
-    members.push(newMember);
-
-    // Writing data to the file
-    try {
-        fs.writeFileSync('./json/members.json', JSON.stringify(members));
-    } catch (err) {
-        console.error(err);
-    }
-
+bot.on('guildMemberAdd', (member) => {
     let memberEmbed = new MessageEmbed()
         .setTitle('Member commands')
         .setColor(colors.green)
@@ -97,111 +82,44 @@ bot.on('guildMemberAdd', async (member) => {
     }
 });
 
-bot.on('guildMemberUpdate', async (oldMember, newMember) => {
-    console.log(newMember);
+// ! make a request to the server for updating member details in the database
+// bot.on('guildMemberUpdate',  (oldMember, newMember) => {
+//     const filteredMember = members.filter((member) => member.id === newMember.user.id);
+//     if (!filteredMember.length) {
+//         filteredMember[0] = {
+//             id: newMember.user.id,
+//             discriminator: `#${newMember.user.discriminator}`,
+//             username: newMember.user.username,
+//             nickName: newMember.nickname,
+//             avatar: newMember.user.avatarURL(),
+//             server: newMember.guild.name,
+//             roles: [...newMember._roles],
+//             level: 0,
+//             totalPoints: 0,
+//         };
+//     } else {
+//         filteredMember[0] = {
+//             id: newMember.user.id,
+//             discriminator: `#${newMember.user.discriminator}`,
+//             username: newMember.user.username,
+//             nickName: newMember.nickname,
+//             avatar: newMember.user.avatarURL(),
+//             server: newMember.guild.name,
+//             roles: [...newMember._roles],
+//             level: 0,
+//             totalPoints: 0,
+//         };
 
-    const filteredMember = members.filter((member) => member.id === newMember.user.id);
-    if (!filteredMember.length) {
-        filteredMember[0] = {
-            id: newMember.user.id,
-            discriminator: `#${newMember.user.discriminator}`,
-            username: newMember.user.username,
-            nickName: newMember.nickname,
-            avatar: newMember.user.avatarURL(),
-            server: newMember.guild.name,
-            roles: [...newMember._roles],
-            level: 0,
-            totalPoints: 0,
-        };
-    } else {
-        filteredMember[0] = {
-            id: newMember.user.id,
-            discriminator: `#${newMember.user.discriminator}`,
-            username: newMember.user.username,
-            nickName: newMember.nickname,
-            avatar: newMember.user.avatarURL(),
-            server: newMember.guild.name,
-            roles: [...newMember._roles],
-            level: 0,
-            totalPoints: 0,
-        };
+//         members.pop(newMember.user.id);
+//     }
+//     members.push(filteredMember[0]);
 
-        members.pop(newMember.user.id);
-    }
-    members.push(filteredMember[0]);
-
-    try {
-        fs.writeFileSync('./json/members.json', JSON.stringify(members));
-    } catch (error) {
-        console.error(error);
-    }
-    console.log(filteredMember);
-});
-
-const processCommand = (message) => {
-    switch (primaryCommand) {
-        //todo: rules, ama
-        case 'resources':
-            resourcesCommand(message);
-            break;
-
-        case 'help':
-            helpCommand(message);
-            break;
-
-        case 'discordHelp':
-            discordHelpCommand(message);
-            break;
-
-        case 'jobChallenge':
-            jobChallengeCommand(message);
-            break;
-
-        case 'socialLinks':
-            socialLinksCommand(message);
-            break;
-
-        case 'faq':
-            faqCommand(message, arguments);
-            break;
-
-        case 'prune':
-            pruneCommand(message, arguments);
-            break;
-
-        case 'kick':
-            kickCommand(message);
-            break;
-
-        case 'ban':
-            banCommand(message);
-            break;
-
-        case 'send':
-            sendCommand(message, arguments);
-            break;
-
-        case 'serverInfo':
-            serverInfo(message);
-            break;
-
-        case 'botInfo':
-            botInfo(message);
-            break;
-
-        default:
-            message
-                .delete()
-                .catch(() =>
-                    console.log(
-                        '[Warning]: DM to the bot cannot be deleted with `message.delete()` '
-                    )
-                );
-            message.author.send(
-                'Invalid command. Run `/help` on the server channels to know all the valid commands'
-            );
-            break;
-    }
-};
+//     try {
+//         fs.writeFileSync('./json/members.json', JSON.stringify(members));
+//     } catch (error) {
+//         console.error(error);
+//     }
+//     console.log(filteredMember);
+// });
 
 bot.login(process.env.token);

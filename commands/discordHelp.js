@@ -4,6 +4,7 @@ const { colors } = require('../json/config.json');
 module.exports = {
     name: 'discordHelp',
     description: 'dafdsaf',
+    aliases: ['discordhelp', 'discord'],
     execute: async (message, args) => {
         let discordHelpEmbed = new MessageEmbed()
             .setTitle('Get Started with Discord')

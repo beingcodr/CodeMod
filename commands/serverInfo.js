@@ -6,6 +6,7 @@ module.exports = {
     name: 'serverInfo',
     description: 'kdsljf',
     guildOnly: true,
+    aliases: ['serverinfo'],
     execute: async (message, args) => {
         let serverEmbed = new MessageEmbed()
             .setTitle(`${message.guild.name}'s Info`)

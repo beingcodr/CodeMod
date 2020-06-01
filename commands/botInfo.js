@@ -6,6 +6,7 @@ module.exports = {
     name: 'botInfo',
     description: 'kdsljf',
     guildOnly: true,
+    aliases:['botinfo'],
     execute: async (message, args) => {
         // const bot = new Client();
 
