@@ -4,6 +4,7 @@ module.exports = {
     args: true,
     usage: 'amount (range: 1-99)',
     guildOnly: true,
+    aliases: ['delete'],
     execute: async (message, args) => {
         let member = message.guild.member(message.author);
         if (member.hasPermission('ADMINISTRATOR', 'MANAGE_MESSAGES')) {

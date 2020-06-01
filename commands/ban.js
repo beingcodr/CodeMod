@@ -1,5 +1,5 @@
 const { MessageEmbed } = require('discord.js');
-const { colors } = require('../json/config.json');
+const { prefix, colors } = require('../json/config.json');
 
 module.exports = {
     name: 'ban',
@@ -17,7 +17,13 @@ module.exports = {
                         bot.user.username === member.user.username
                             ? message.reply(`You really think you can ban me? Traitor! `)
                             : message.reply(`You can\'t ban ${member} `);
-                        message.delete();
+                        message
+                            .delete()
+                            .catch(() =>
+                                console.log(
+                                    '[Warning]: DM to the bot cannot be deleted with `message.delete()` '
+                                )
+                            );
                         return;
                     }
 
@@ -40,7 +46,13 @@ module.exports = {
                                 );
 
                             message.channel.send(banEmbed);
-                            message.delete();
+                            message
+                                .delete()
+                                .catch(() =>
+                                    console.log(
+                                        '[Warning]: DM to the bot cannot be deleted with `message.delete()` '
+                                    )
+                                );
                         }
                     } catch (error) {
                         message.author.send(`Unable to ban ${user}`);
@@ -50,8 +62,15 @@ module.exports = {
                     message.reply(`You don\'t have permissions to ban anyone`);
                 }
             } else {
-                message.channel.send(
-                    `Oooo, someone was going to be baned out. But seems like ${message.author} didn\'t specify who`
+                message
+                    .delete()
+                    .catch(() =>
+                        console.log(
+                            '[Warning]: DM to the bot cannot be deleted with `message.delete()` '
+                        )
+                    );
+                message.reply(
+                    `The proper usage would be: \`${prefix}ban @username days[optional]\``
                 );
             }
         } catch (error) {

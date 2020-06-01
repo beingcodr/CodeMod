@@ -4,6 +4,7 @@ const { colors } = require('../json/config.json');
 module.exports = {
     name: 'socialLinks',
     description: 'dslakfjldksjf',
+    aliases: ['sociallinks'],
     execute: async (message, args) => {
         let embed = new MessageEmbed()
             .setTitle("Tanay's social handles")

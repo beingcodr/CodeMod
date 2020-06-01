@@ -4,6 +4,7 @@ const { colors } = require('../json/config.json');
 module.exports = {
     name: 'jobChallenge',
     description: 'lkdjflkdajsf',
+    aliases: ['jobchallenge', 'ttjc'],
     execute: async (message, args) => {
         let embed = new MessageEmbed()
             .setTitle('Details for TeamTanayJobChallenge')
