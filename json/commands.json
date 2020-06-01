@@ -93,7 +93,16 @@
             "value": "\u200b"
         },
         {
-            "name": "`/prune number`",
+            "name": "`/ban`",
+            "value": "This command allows you to ban a @user. Use the command like this `/ban @username`. This command will display an embed on the channel",
+            "inline": false
+        },
+        {
+            "name": "\u200b",
+            "value": "\u200b"
+        },
+        {
+            "name": "`/purge number`",
             "value": "This command deletes the number of messages specified in the `number`. The `number` ranges from 1 to 99. This is command can be used on server channels only, DO NOT USE THIS COMMAND TO DELETE DM MESSAGES.",
             "inline": false
         },

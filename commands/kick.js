@@ -4,7 +4,8 @@ const { colors } = require('../json/config.json');
 module.exports = {
     name: 'kick',
     description: 'dklfj;ad',
-    execute: async (message, args) => {
+    guildOnly: true,
+    execute: async (message) => {
         try {
             let user = message.mentions.users.first();
 

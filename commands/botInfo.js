@@ -5,6 +5,7 @@ const { formatDate } = require('../helpers/index');
 module.exports = {
     name: 'botInfo',
     description: 'kdsljf',
+    guildOnly: true,
     execute: async (message, args) => {
         // const bot = new Client();
 

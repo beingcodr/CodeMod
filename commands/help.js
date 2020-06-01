@@ -5,6 +5,7 @@ const { memberCommands, adminCommands } = require('../json/commands.json');
 module.exports = {
     name: 'help',
     description: 'dlsj;fld',
+    guildOnly: true,
     execute: async (message, args) => {
         let memberEmbed = new MessageEmbed()
             .setTitle('Member commands')
