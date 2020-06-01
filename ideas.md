@@ -14,3 +14,5 @@
 
 1. Level up messages will be sent to the respective user on their DM's
 1. Users can check their information by using `/me` command
+
+<!-- todo Add the necessary features in the command handlers -->

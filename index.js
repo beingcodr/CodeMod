@@ -4,6 +4,7 @@ const { prefix, colors } = require('./json/config.json');
 const { moderateMessagesCommand } = require('./helpers/index');
 const { memberCommands, adminCommands } = require('./json/commands.json');
 const fs = require('fs');
+const members = require('./json/members.json');
 const bot = new Client();
 bot.commands = new Collection();
 
@@ -16,7 +17,7 @@ commandFiles.forEach((file) => {
 
 bot.once('ready', () => {
     console.log('The bot is now ready to receive commands');
-    bot.user.setActivity('messages', { type: 'LISTENING' });
+    bot.user.setActivity('messages', { type: 'WATCHING' });
 });
 
 bot.on('message', async (message) => {
@@ -33,6 +34,20 @@ bot.on('message', async (message) => {
         if (!bot.commands.has(commandName)) return;
         let command = bot.commands.get(commandName);
 
+        if (command.guildOnly && message.channel.type !== 'text') {
+            return message.reply("I can't execute that command inside DMs!");
+        }
+
+        if (command.args && !args.length) {
+            let reply = "You didn't provide any arguments!";
+
+            if (command.usage)
+                reply += `\t The proper usage would be: \`${prefix}${command.name} ${command.usage}\``;
+
+            message.reply(reply);
+            return;
+        }
+
         try {
             command.execute(message, args);
         } catch (error) {
@@ -42,7 +57,28 @@ bot.on('message', async (message) => {
     }
 });
 
-bot.on('guildMemberAdd', (member) => {
+bot.on('guildMemberAdd', async (member) => {
+    let newMember = {
+        id: `${member.user.id}`,
+        discriminator: `#${member.user.discriminator}`,
+        username: `${member.user.username}`,
+        nickName: null,
+        roles: [],
+        server: `${member.guild.name}`,
+        level: 0,
+        totalPoints: 0,
+    };
+
+    // STEP 2: Adding new data to users object
+    members.push(newMember);
+
+    // Writing data to the file
+    try {
+        fs.writeFileSync('./json/members.json', JSON.stringify(members));
+    } catch (err) {
+        console.error(err);
+    }
+
     let memberEmbed = new MessageEmbed()
         .setTitle('Member commands')
         .setColor(colors.green)
@@ -59,6 +95,47 @@ bot.on('guildMemberAdd', (member) => {
     } else {
         member.send(memberEmbed);
     }
+});
+
+bot.on('guildMemberUpdate', async (oldMember, newMember) => {
+    console.log(newMember);
+
+    const filteredMember = members.filter((member) => member.id === newMember.user.id);
+    if (!filteredMember.length) {
+        filteredMember[0] = {
+            id: newMember.user.id,
+            discriminator: `#${newMember.user.discriminator}`,
+            username: newMember.user.username,
+            nickName: newMember.nickname,
+            avatar: newMember.user.avatarURL(),
+            server: newMember.guild.name,
+            roles: [...newMember._roles],
+            level: 0,
+            totalPoints: 0,
+        };
+    } else {
+        filteredMember[0] = {
+            id: newMember.user.id,
+            discriminator: `#${newMember.user.discriminator}`,
+            username: newMember.user.username,
+            nickName: newMember.nickname,
+            avatar: newMember.user.avatarURL(),
+            server: newMember.guild.name,
+            roles: [...newMember._roles],
+            level: 0,
+            totalPoints: 0,
+        };
+
+        members.pop(newMember.user.id);
+    }
+    members.push(filteredMember[0]);
+
+    try {
+        fs.writeFileSync('./json/members.json', JSON.stringify(members));
+    } catch (error) {
+        console.error(error);
+    }
+    console.log(filteredMember);
 });
 
 const processCommand = (message) => {

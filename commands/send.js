@@ -4,12 +4,10 @@ const { colors } = require('../json/config.json');
 module.exports = {
     name: 'send',
     description: 'lkadsjf',
+    args: true,
+    usage: '@user your message',
+    guildOnly: true,
     execute: async (message, args) => {
-        if (args.length < 2) {
-            message.author.send(
-                'Try the command like this `/send @mentionsomeone type your message`'
-            );
-        }
         let user = message.guild.member(message.mentions.users.first());
         if (!user) message.author.send(`There is no user as ${args[0]}`);
 

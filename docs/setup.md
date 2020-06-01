@@ -16,7 +16,7 @@ Assuming that you already have a discord account and a server.
 1. Login to your [Discord account](https://discordapp.com/login)
 1. Create a bot account through the [Discord Developer Portal](https://discordapp.com/developers/)
 1. Add a bot user by selecting your bot > Bot tab > Add user. You'll get your bot token there, copy and save it for later steps. (**Note:** Never share your bot token anywhere/anyone)
-1. Navigate to the [discord applications page](https://discord.com/developers/applications) > select your bot > in the general information, copy the CLIENT ID (**Note:** Do not copy the CLIENT SECRET by mistake). You'll need it in the next step. You can change the display name and image for the bot
+1. Navigate to the [discord applications page](https://discord.com/developers/applications) > select your bot > in the general information, copy the CLIENT ID (**Note:** Do not copy the CLIENT SECRET by mistake).     c0+You'll need it in the next step. You can change the display name and image for the bot
 1. Invite the [bot to your server directly](https://discordapi.com/permissions.html) or [read documentation on how to properly invite the bots](https://discordjs.guide/preparations/adding-your-bot-to-servers.html)
 1. Install Node.js 12^ or higher for your OS from [here](https://www.nodejs.org)
 1. Download the [latest bot version and configure git](https://github.com/rahul1116/CodeMod/blob/master/docs/settingupgit.md)

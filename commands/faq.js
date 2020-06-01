@@ -5,18 +5,9 @@ const { faqs } = require('../json/data.json');
 module.exports = {
     name: 'faq',
     description: 'ldjafsl;jdf',
+    args: true,
+    usage: 'your question',
     execute: async (message, args) => {
-        if (args.length === 0) {
-            message
-                .delete()
-                .catch(() =>
-                    console.log(
-                        '[Warning]: DM to the bot cannot be deleted with `message.delete()` '
-                    )
-                );
-            message.author.send('Invalid command execution. Try `/faq your question`');
-            return;
-        }
         // The array which stores the results as per the question passed
         let faqArray = [];
         // todo: Make a duplicate checker function that takes 2 FAQ's in this case and checks if the question or answer has similarityCount > 5

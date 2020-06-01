@@ -1,6 +1,9 @@
 module.exports = {
-    name: 'prune',
+    name: 'purge',
     description: 'kldsjflk;d',
+    args: true,
+    usage: 'amount (range: 1-99)',
+    guildOnly: true,
     execute: async (message, args) => {
         let member = message.guild.member(message.author);
         if (member.hasPermission('ADMINISTRATOR', 'MANAGE_MESSAGES')) {
