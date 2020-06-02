@@ -14,7 +14,7 @@ module.exports = {
                 let member = message.guild.member(user);
                 if (member && admin.hasPermission('BAN_MEMBERS')) {
                     if (member.hasPermission(['KICK_MEMBERS', 'BAN_MEMBERS', 'ADMINISTRATOR'])) {
-                        bot.user.username === member.user.username
+                        message.client.user.username === member.user.username
                             ? message.reply(`You really think you can ban me? Traitor! `)
                             : message.reply(`You can\'t ban ${member} `);
                         message

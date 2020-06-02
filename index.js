@@ -23,7 +23,18 @@ bot.on('message', (message) => {
     if (message.author === bot.user) {
         return;
     } else {
-        if (moderateMessagesCommand(message)) return;
+        let slangsUsed = moderateMessagesCommand(message);
+        if (slangsUsed.length) {
+            message.author.send(
+                '**[Warning] This message is to notify you that your message contained a slang word which is not permitted in this server. You might get banned if you continue to voilate the rules**'
+            );
+            message.reply(
+                `**Just used \`${slangsUsed.join(
+                    ', '
+                )}\` in his/her message, take a look <@&713426332528148511>**`
+            );
+            return;
+        }
         if (!message.content.startsWith(`${prefix}`)) return;
 
         let splitCommand = message.content.substr(prefix.length).split(' ');
