@@ -1,4 +1,4 @@
-_Want to [contribute](https://github.com/rahul1116/codmod/blob/master/docs/contribution.md) to open-source? Try solving our issues [here](https://github.com/rahul1116/discordbot/issues)_
+_Want to [contribute](https://github.com/rahul1116/CodeMod/blob/master/docs/contribution.md) to open-source? Try solving our issues [here](https://github.com/rahul1116/discordbot/issues)_
 
 # Moderator for Discord
 
