@@ -1,11 +1,11 @@
-## Contribution Guidelines
+# Contribution Guidelines
 
-#### 👇 Prerequisites:
+## 👇 Prerequisites:
 
 -   Ability to use Git and Github is mandatory
 -   Additional backend skills of NodeJS
 
-#### Steps:
+## Steps:
 
 **1.** Fork [this](https://github.com/rahul1116/codemod) repository :fork_and_knife:
 

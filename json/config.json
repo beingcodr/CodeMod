@@ -4,5 +4,8 @@
         "green": "#4ecfb8",
         "yellow": "#FFC000",
         "red": "#ff0000"
-    }
+    },
+    "moderation": true,
+    "adminRole": "713426332528148511",
+    "adminRoleTest": "714044152769151056"
 }

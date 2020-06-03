@@ -1,6 +1,6 @@
 const { Client, MessageEmbed, Collection } = require('discord.js');
 require('dotenv').config();
-const { prefix, colors } = require('./json/config.json');
+const { prefix, colors, moderation, adminRole } = require('./json/config.json');
 const { moderateMessagesCommand } = require('./helpers/index');
 const { memberCommands, adminCommands } = require('./json/commands.json');
 const fs = require('fs');
@@ -23,17 +23,19 @@ bot.on('message', (message) => {
     if (message.author === bot.user) {
         return;
     } else {
-        let slangsUsed = moderateMessagesCommand(message);
-        if (slangsUsed.length) {
-            message.author.send(
-                '**[Warning] This message is to notify you that your message contained a slang word which is not permitted in this server. You might get banned if you continue to voilate the rules**'
-            );
-            message.reply(
-                `**Just used \`${slangsUsed.join(
-                    ', '
-                )}\` in his/her message, take a look <@&713426332528148511>**`
-            );
-            return;
+        if (moderation) {
+            let slangsUsed = moderateMessagesCommand(message);
+            if (slangsUsed.length) {
+                message.author.send(
+                    '**[Warning] This message is to notify you that your message contained a slang word which is not permitted in this server. You might get banned if you continue to voilate the rules**'
+                );
+                message.reply(
+                    `**Just used \`${slangsUsed.join(', ')}\` in his/her message, take a look <@&${
+                        process.env.CM_ADMIN_ROLE || adminRole
+                    }>**`
+                );
+                return;
+            }
         }
         if (!message.content.startsWith(`${prefix}`)) return;
 
@@ -133,4 +135,4 @@ bot.on('guildMemberAdd', (member) => {
 //     console.log(filteredMember);
 // });
 
-bot.login(process.env.token);
+bot.login(process.env.CM_TOKEN);
