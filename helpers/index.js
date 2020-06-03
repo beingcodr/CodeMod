@@ -8,7 +8,7 @@ const formatDate = (date) => {
 const moderateMessagesCommand = (message) => {
     let slangsUsed = [];
     moderate.forEach((msg) => {
-        if (message.content.includes(msg)) {
+        if (new RegExp("\\b" + msg + "\\b").test(message.content)) {
             slangsUsed.push(msg);
         }
     });
