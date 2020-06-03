@@ -20,7 +20,7 @@ You need to setup which role you want to be mentioned when someone uses slang wo
     ```
 
 
-    **Note:** You can mention multiple @roles by appending multiple @roleIds in similar manner. To mention a user, obtain the user id by following the same steps
+
 
 You can also turn off moderation by changing the value of `moderation` in the `json/config.json` to **false**
 
