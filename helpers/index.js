@@ -1,4 +1,3 @@
-const { prefix } = require('../json/config.json');
 const { moderate } = require('../json/data.json');
 
 const formatDate = (date) => {
@@ -8,7 +7,7 @@ const formatDate = (date) => {
 const moderateMessagesCommand = (message) => {
     let slangsUsed = [];
     moderate.forEach((msg) => {
-        if (new RegExp("\\b" + msg + "\\b").test(message.content)) {
+        if (new RegExp('\\b' + msg + '\\b').test(message.content)) {
             slangsUsed.push(msg);
         }
     });
