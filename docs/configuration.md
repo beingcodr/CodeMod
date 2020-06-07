@@ -32,7 +32,7 @@ Admin role id of the server, wrapped in quotes.
 **Default:** `/`  
 The bot prefix for commands.
 
-### moderaton [Type: Boolean]
+### moderation [Type: Boolean]
 
 **Default**: `true`  
 This config determines whether to moderate all the messages for slang words or not, not wrapped in quotes.
