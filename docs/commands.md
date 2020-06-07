@@ -1,11 +1,5 @@
 # 📝 Commands
 
-## Table of contents
-
--   [Inside the server](https://github.com/rahul1116/CodeMod/blob/master/docs/commands.md#inside-the-server) (start here)
--   [Anywhere/ bot DM](https://github.com/rahul1116/CodeMod/blob/master/docs/commands.md#anywhere/-bot-dm)
--   [Admin commands](https://github.com/rahul1116/CodeMod/blob/master/docs/commands.md#admin-commands)
-
 **Note: Most of the response to the commands are sent to the user's DM by the bot to avoid clutter on the channels**
 
 ## Inside the server
