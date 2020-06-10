@@ -1,5 +1,5 @@
 const { MessageEmbed } = require('discord.js');
-const { colors } = require('../json/config.json');
+const { colors, prefix } = require('../json/config.json');
 
 module.exports = {
     name: 'kick',
@@ -69,9 +69,14 @@ module.exports = {
                     message.reply(`You don\'t have permissions to kick anyone`);
                 }
             } else {
-                message.channel.send(
-                    `Oooo, someone was going to be kicked out. But seems like ${message.author} didn\'t specify who`
-                );
+                message
+                    .delete()
+                    .catch(() =>
+                        console.log(
+                            '[Warning]: DM to the bot cannot be deleted with `message.delete()` '
+                        )
+                    );
+                message.reply(` proper usage would be: \`${prefix}kick @username\``);
             }
         } catch (error) {
             throw error;

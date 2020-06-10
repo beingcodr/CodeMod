@@ -39,6 +39,26 @@ This command shows the Frequently Asked Question specified by you.
 This command sends a private message to the @username mentioned by the user  
 **Example**: `/send @rahulravindran Hello mate, what's up?`
 
+### `/add`
+
+This command registers you to the database for user leveling  
+**Example**: `/add`
+
+### `/userInfo`
+
+This command fetches information about the registered user  
+**Example**: `/userInfo @username[optional]`
+
+### `/update`
+
+This command updates the information of the registered user  
+**Example**: `/update`
+
+### `/upvote`
+
+This command allows you to upvote another user for helping you/community
+**Example**: `/upvote @username <keyword>`
+
 ### `/serverInfo` / `/serverinfo`
 
 This command sends the information of the server

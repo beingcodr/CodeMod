@@ -80,6 +80,42 @@
         {
             "name": "\u200b",
             "value": "\u200b"
+        },
+        {
+            "name": "`/upvote`",
+            "value": "This command lets the user upvote other users for their help",
+            "inline": false
+        },
+        {
+            "name": "\u200b",
+            "value": "\u200b"
+        },
+        {
+            "name": "`/add`",
+            "value": "This command registers the users information to the database",
+            "inline": false
+        },
+        {
+            "name": "\u200b",
+            "value": "\u200b"
+        },
+        {
+            "name": "`/update`",
+            "value": "This command updates the users information in the database",
+            "inline": false
+        },
+        {
+            "name": "\u200b",
+            "value": "\u200b"
+        },
+        {
+            "name": "`/userInfo`",
+            "value": "This command fetches information about the user",
+            "inline": false
+        },
+        {
+            "name": "\u200b",
+            "value": "\u200b"
         }
     ],
     "adminCommands": [

@@ -22,11 +22,17 @@ module.exports = {
             .catch(() =>
                 console.log('[Warning]: DM to the bot cannot be deleted with `message.delete()` ')
             );
-        if (message.member.hasPermission(['ADMINISTRATOR'])) {
-            message.author.send(memberEmbed);
-            message.author.send(adminEmbed);
-        } else {
-            message.author.send(memberEmbed);
+        try {
+            if (message.member.hasPermission(['ADMINISTRATOR'])) {
+                await message.author.send(memberEmbed);
+                await message.author.send(adminEmbed);
+            } else {
+                await message.author.send(memberEmbed);
+            }
+        } catch (error) {
+            message.reply(
+                'Your DM is not accessible. **User settings > Privacy & safety > Allow messages from server members**. Please enable it'
+            );
         }
     },
 };

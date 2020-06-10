@@ -12,6 +12,10 @@
 # production
 /build
 
+#files
+index.html
+index.css
+
 # misc
 .DS_Store
 .env

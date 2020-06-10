@@ -25,6 +25,11 @@ The bots token from [Discord Developer Portal](https://discordapp.com/developers
 **Default:** `none`  
 Admin role id of the server, wrapped in quotes.
 
+### botChannel [Type: String]
+
+**Default:** `none`
+This parameter needs the id of the channel where the bots messages will go, if the users DM is blocked. We recommend to have a separate channel `#bot-spam` or with any name of your choice
+
 ## Other options
 
 ### prefix [Type: String]

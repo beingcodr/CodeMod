@@ -12,6 +12,7 @@ const memberSchema = new Schema({
     roles: [{ type: String }],
     level: { type: Number, required: true },
     totalPoints: { type: Number, required: true },
+    joinedAt: { type: String, required: true },
     points: {
         contribution: { type: Number, required: true },
         codeError: { type: Number, required: true },

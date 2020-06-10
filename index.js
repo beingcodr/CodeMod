@@ -1,10 +1,12 @@
 const { Client, MessageEmbed, Collection } = require('discord.js');
 require('dotenv').config();
-const { prefix, colors, moderation, adminRole } = require('./json/config.json');
+const mongoose = require('mongoose');
+const { prefix, colors, moderation, adminRole, botChannel } = require('./json/config.json');
 const { moderateMessagesCommand } = require('./helpers/index');
 const { memberCommands, adminCommands } = require('./json/commands.json');
 const fs = require('fs');
 const bot = new Client();
+const cooldowns = new Collection();
 bot.commands = new Collection();
 
 const commandFiles = fs.readdirSync('./commands').filter((file) => file.endsWith('.js'));
@@ -26,9 +28,12 @@ bot.on('message', (message) => {
         if (moderation) {
             let slangsUsed = moderateMessagesCommand(message);
             if (slangsUsed.length) {
-                message.author.send(
-                    '**[Warning] This message is to notify you that your message contained a slang word which is not permitted in this server. You might get banned if you continue to voilate the rules**'
-                );
+                message.client.channels
+                    .fetch(process.env.CM_BOT_CHANNEL || botChannel)
+                    .then((channel) => {
+                        channel.send('Slang used');
+                    });
+
                 message.reply(
                     `**Just used \`${slangsUsed.join(', ')}\` in his/her message, take a look <@&${
                         process.env.CM_ADMIN_ROLE || adminRole
@@ -63,14 +68,12 @@ bot.on('message', (message) => {
             if (command.usage)
                 reply += `\t The proper usage would be: \`${prefix}${command.name} ${command.usage}\``;
 
-            message.reply(reply);
-            return;
+            return message.reply(reply);
         }
 
         try {
             command.execute(message, args);
         } catch (error) {
-            console.error(error);
             message.reply('There was an error trying to execute that command!');
         }
     }
@@ -136,3 +139,7 @@ bot.on('guildMemberAdd', (member) => {
 // });
 
 bot.login(process.env.CM_TOKEN);
+
+mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true }, () =>
+    console.log('Database connection established')
+);

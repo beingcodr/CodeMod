@@ -69,9 +69,7 @@ module.exports = {
                             '[Warning]: DM to the bot cannot be deleted with `message.delete()` '
                         )
                     );
-                message.reply(
-                    `The proper usage would be: \`${prefix}ban @username days[optional]\``
-                );
+                message.reply(` proper usage would be: \`${prefix}ban @username days[optional]\``);
             }
         } catch (error) {
             throw error;
