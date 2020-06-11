@@ -1,12 +1,15 @@
 const { MessageEmbed } = require('discord.js');
 const { colors } = require('../json/config.json');
 const { formatDate } = require('../helpers/index');
+const { messageErrorAsync } = require('../helpers/message');
 
 module.exports = {
     name: 'serverInfo',
-    description: 'kdsljf',
+    description:
+        'This command sends information about the server like no.of members, createdAt, etc',
     guildOnly: true,
     aliases: ['serverinfo'],
+    usage: ' ',
     execute: async (message, args) => {
         let serverEmbed = new MessageEmbed()
             .setTitle(`${message.guild.name}'s Info`)
@@ -23,6 +26,6 @@ module.exports = {
             .catch(() =>
                 console.log('[Warning]: DM to the bot cannot be deleted with `message.delete()` ')
             );
-        message.author.send(serverEmbed);
+        messageErrorAsync(message, serverEmbed, `<@!${message.author.id}>, I can't send the embed`);
     },
 };

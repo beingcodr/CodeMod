@@ -1,15 +1,15 @@
-const { Client, MessageEmbed } = require('discord.js');
+const { MessageEmbed } = require('discord.js');
 const { colors } = require('../json/config.json');
 const { formatDate } = require('../helpers/index');
+const { messageErrorAsync } = require('../helpers/message');
 
 module.exports = {
     name: 'botInfo',
-    description: 'kdsljf',
+    description: 'This command sends information about the bot',
     guildOnly: true,
-    aliases:['botinfo'],
+    aliases: ['botinfo'],
+    usage: ' ',
     execute: async (message, args) => {
-        // const bot = new Client();
-
         let botInfoEmbed = new MessageEmbed()
             .setTitle(`${message.client.user.username}'s Info`)
             .setColor(colors.green)
@@ -28,6 +28,10 @@ module.exports = {
             .catch(() =>
                 console.log('[Warning]: DM to the bot cannot be deleted with `message.delete()` ')
             );
-        message.author.send(botInfoEmbed);
+        messageErrorAsync(
+            message,
+            botInfoEmbed,
+            `<@!${message.author.id}>, I can't send the embed`
+        );
     },
 };
