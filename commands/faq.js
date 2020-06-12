@@ -1,7 +1,7 @@
 const { MessageEmbed } = require('discord.js');
 const { colors } = require('../json/config.json');
 const { faqs } = require('../json/data.json');
-const { messageErrorAsync } = require('../helpers/message');
+const { messageErrorAsync, deleteMessage } = require('../helpers/message');
 
 module.exports = {
     name: 'faq',
@@ -32,13 +32,7 @@ module.exports = {
         });
 
         if (faqArray.length === 0) {
-            message
-                .delete()
-                .catch(() =>
-                    console.log(
-                        '[Warning]: DM to the bot cannot be deleted with `message.delete()` '
-                    )
-                );
+            deleteMessage(message, 0);
             messageErrorAsync(
                 message,
                 "No FAQ's matched your question. Try `/faq your question`\n> **Tip:** use specific keywords such as `coding, blogs, etc`",
@@ -52,7 +46,7 @@ module.exports = {
             !messageErrorAsync(
                 message,
                 `**${faqArray.length} results found**`,
-                `<@!${message.author.id}>, I can't send you the results`
+                `<@!${message.author.id}>, I can't send you the FAQ results`
             )
         )
             return;
@@ -76,11 +70,6 @@ module.exports = {
                 `<@!${message.author.id}> If you're bombarded with too many **FAQ** results. Try to be more specific with the questions\n\n> Tip: use specific keywords such as \`coding, blogs, etc\` and avoid generic words such as **how, where, what**`
             );
         }
-
-        message
-            .delete()
-            .catch(() =>
-                console.log('[Warning]: DM to the bot cannot be deleted with `message.delete()` ')
-            );
+        deleteMessage(message, 0);
     },
 };

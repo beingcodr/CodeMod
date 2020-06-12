@@ -1,6 +1,7 @@
 const { MessageEmbed } = require('discord.js');
+const { colors } = require('../json/config.json');
 const { formatDate } = require('../helpers/index');
-const { messageErrorAsync } = require('../helpers/message');
+const { messageErrorAsync, deleteMessage } = require('../helpers/message');
 const Member = require('../server/models/Member');
 
 // me command can add the user in the database with all the args required
@@ -16,7 +17,7 @@ module.exports = {
             if (!args.length) {
                 const member = await Member.findOne({ discordId: message.author.id });
                 if (!member) {
-                    message.delete();
+                    deleteMessage(message, 0);
                     messageErrorAsync(
                         message,
                         'No such member found, try adding yourself in the database with the `/add` command',
@@ -27,13 +28,15 @@ module.exports = {
 
                 userEmbed = new MessageEmbed()
                     .setTitle("User's info")
-                    .setThumbnail(message.author.avatarURL())
-                    .addField('Username', `${message.author.username}`, true)
-                    .addField('Joined server on', formatDate(message.guild.joinedAt), true)
+                    .setThumbnail(member.avatar)
+                    .setColor(colors.green)
+                    .addField('Username', `${member.username}`, true)
+                    .addField('Joined server on', formatDate(member.joinedAt), true)
                     .addField('Level', `${member.level}`, true)
-                    .addField('Username', `${message.author.username}`, true);
+                    .addField('TotalPoints', `${member.totalPoints}`, true)
+                    .addField('Username', `${member.username}`, true);
 
-                message.delete();
+                deleteMessage(message, 0);
 
                 messageErrorAsync(
                     message,
@@ -45,7 +48,7 @@ module.exports = {
                 if (!mentionedUser) return message.reply('No valid mentions found');
                 const member = message.guild.member(mentionedUser);
                 if (!member) {
-                    message.delete();
+                    deleteMessage(message, 0);
                     messageErrorAsync(
                         message,
                         `<@!${mentionedUser.id}> is not a member of ${message.guild.name}`,
@@ -56,7 +59,7 @@ module.exports = {
 
                 const returnedMember = await Member.findOne({ discordId: mentionedUser.id });
                 if (!returnedMember) {
-                    message.delete();
+                    deleteMessage(message, 0);
                     messageErrorAsync(
                         message,
                         'This user is not registered in the DB',
@@ -68,11 +71,14 @@ module.exports = {
                 userEmbed = new MessageEmbed()
                     .setTitle("User's info")
                     .setThumbnail(returnedMember.avatar)
+                    .setColor(colors.green)
                     .addField('Username', `${returnedMember.username}`, true)
                     .addField('Joined server on', formatDate(returnedMember.joinedAt), true)
-                    .addField('Level', `${returnedMember.level}`, true);
+                    .addField('\u200b', '\u200b')
+                    .addField('Level', `${returnedMember.level}`, true)
+                    .addField('TotalPoints', `${returnedMember.totalPoints}`, true);
 
-                message.delete();
+                deleteMessage(message, 0);
                 messageErrorAsync(message, userEmbed, `<@!${message.author.id}> `);
             }
         } catch (error) {

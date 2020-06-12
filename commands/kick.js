@@ -1,10 +1,10 @@
 const { MessageEmbed } = require('discord.js');
 const { colors, prefix } = require('../json/config.json');
-const { messageErrorAsync, botChannelAsync } = require('../helpers/message');
+const { messageErrorAsync, botChannelAsync, deleteMessage } = require('../helpers/message');
 
 module.exports = {
     name: 'kick',
-    description: 'dklfj;ad',
+    description: 'This command kicks the specified user',
     guildOnly: true,
     adminOnly: true,
     usage: '@username',
@@ -26,13 +26,7 @@ module.exports = {
                                   message,
                                   `<@!${message.author.id}>, you can\'t kick ${member} `
                               );
-                        message
-                            .delete()
-                            .catch(() =>
-                                console.log(
-                                    '[Warning]: DM to the bot cannot be deleted with `message.delete()` '
-                                )
-                            );
+                        deleteMessage(message, 0);
                         return;
                     }
 
@@ -55,14 +49,7 @@ module.exports = {
                                 );
 
                             botChannelAsync(message, kickEmbed);
-
-                            message
-                                .delete()
-                                .catch(() =>
-                                    console.log(
-                                        '[Warning]: DM to the bot cannot be deleted with `message.delete()` '
-                                    )
-                                );
+                            deleteMessage(message, 0);
                         }
                     } catch (error) {
                         messageErrorAsync(
@@ -72,12 +59,6 @@ module.exports = {
                         );
                         console.error(error);
                     }
-
-                    // !It seems that message.guild.channels.find() is not a function anymore
-                    // let kickChannel = message.guild.channels.find(`name`, 'kickreports');
-                    // if (!kickChannel) return message.channel.send(kickEmbed);
-
-                    // kickChannel.send(kickEmbed);
                 } else {
                     botChannelAsync(
                         message,
@@ -85,15 +66,10 @@ module.exports = {
                     );
                 }
             } else {
-                message
-                    .delete()
-                    .catch(() =>
-                        console.log(
-                            '[Warning]: DM to the bot cannot be deleted with `message.delete()` '
-                        )
-                    );
-                botChannelAsync(
+                deleteMessage(message, 0);
+                messageErrorAsync(
                     message,
+                    `Proper usage would be: \`${prefix}kick @username\``,
                     `<@!${message.author.id}>, proper usage would be: \`${prefix}kick @username\``
                 );
             }

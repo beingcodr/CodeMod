@@ -1,7 +1,7 @@
 const { MessageEmbed } = require('discord.js');
 const { colors } = require('../json/config.json');
 const { formatDate } = require('../helpers/index');
-const { messageErrorAsync } = require('../helpers/message');
+const { messageErrorAsync, deleteMessage } = require('../helpers/message');
 
 module.exports = {
     name: 'botInfo',
@@ -23,11 +23,7 @@ module.exports = {
             .addField('Wanna operate me?', '[Github](https://github.com/rahul1116/codemod)', true)
             .addField('Son Of', '[Rahul Ravindran](https://github.com/rahul1116)', true);
 
-        message
-            .delete()
-            .catch(() =>
-                console.log('[Warning]: DM to the bot cannot be deleted with `message.delete()` ')
-            );
+        deleteMessage(message, 0);
         messageErrorAsync(
             message,
             botInfoEmbed,

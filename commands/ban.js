@@ -1,10 +1,10 @@
 const { MessageEmbed } = require('discord.js');
 const { prefix, colors } = require('../json/config.json');
-const { botChannelAsync, messageErrorAsync } = require('../helpers/message');
+const { botChannelAsync, messageErrorAsync, deleteMessage } = require('../helpers/message');
 
 module.exports = {
     name: 'ban',
-    description: 'kdslsjf;lkads',
+    description: 'This command bans the specified member of the guild',
     guildOnly: true,
     adminOnly: true,
     usage: '@username',
@@ -26,13 +26,7 @@ module.exports = {
                                   message,
                                   `<@!${message.author.id}>, you can\'t ban ${member}`
                               );
-                        message
-                            .delete()
-                            .catch(() =>
-                                console.log(
-                                    '[Warning]: DM to the bot cannot be deleted with `message.delete()` '
-                                )
-                            );
+                        deleteMessage(message, 0);
                         return;
                     }
 
@@ -56,15 +50,10 @@ module.exports = {
 
                             botChannelAsync(message, banEmbed);
 
-                            message
-                                .delete()
-                                .catch(() =>
-                                    console.log(
-                                        '[Warning]: DM to the bot cannot be deleted with `message.delete()` '
-                                    )
-                                );
+                            deleteMessage(message, 0);
                         }
                     } catch (error) {
+                        deleteMessage(message, 0);
                         messageErrorAsync(
                             message,
                             `Unable to ban ${user}`,
@@ -79,13 +68,7 @@ module.exports = {
                     );
                 }
             } else {
-                message
-                    .delete()
-                    .catch(() =>
-                        console.log(
-                            '[Warning]: DM to the bot cannot be deleted with `message.delete()` '
-                        )
-                    );
+                deleteMessage(message, 0);
                 botChannelAsync(
                     message,
                     `<@!${message.author.id}>, proper usage would be: \`${prefix}ban @username days[optional]\``

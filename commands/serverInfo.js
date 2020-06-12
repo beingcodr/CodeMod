@@ -1,7 +1,7 @@
 const { MessageEmbed } = require('discord.js');
 const { colors } = require('../json/config.json');
 const { formatDate } = require('../helpers/index');
-const { messageErrorAsync } = require('../helpers/message');
+const { messageErrorAsync, deleteMessage } = require('../helpers/message');
 
 module.exports = {
     name: 'serverInfo',
@@ -21,11 +21,11 @@ module.exports = {
             .addField('You joined on: ', formatDate(message.member.joinedAt), true)
             .addField('Total members: ', message.guild.memberCount, true);
 
-        message
-            .delete()
-            .catch(() =>
-                console.log('[Warning]: DM to the bot cannot be deleted with `message.delete()` ')
-            );
-        messageErrorAsync(message, serverEmbed, `<@!${message.author.id}>, I can't send the embed`);
+        deleteMessage(message, 0);
+        messageErrorAsync(
+            message,
+            serverEmbed,
+            `<@!${message.author.id}>, I can't send the server information`
+        );
     },
 };

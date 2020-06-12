@@ -1,5 +1,5 @@
 const { prefix, botChannel } = require('../json/config.json');
-const { messageErrorAsync, botChannelAsync } = require('../helpers/message');
+const { messageErrorAsync,  deleteMessage } = require('../helpers/message');
 
 module.exports = {
     name: 'help',
@@ -33,13 +33,7 @@ module.exports = {
                 `\n\nYou can send \`${prefix}help <commandName>\` to get info on a specific command!`
             );
 
-            message
-                .delete()
-                .catch(() =>
-                    console.log(
-                        '[Warning]: DM to the bot cannot be deleted with `message.delete()` '
-                    )
-                );
+            deleteMessage(message, 0);
             !isAdmin
                 ? messageErrorAsync(message, data, `<@!${message.author.id}>,\n${data}, `)
                 : messageErrorAsync(
@@ -47,6 +41,14 @@ module.exports = {
                       data,
                       `<@!${message.author.id}>, with great roles comes great responsibilities :man_superhero:`
                   );
+            return;
+        } else if (args.length > 1) {
+            deleteMessage(message, 0);
+            messageErrorAsync(
+                message,
+                `Pass one command name at a time to get more details`,
+                `<@!${message.author.id}>, pass one command name at a time to get more details`
+            );
             return;
         }
 
@@ -56,13 +58,7 @@ module.exports = {
             commands.find((cmd) => cmd.aliases && cmd.aliases.includes(commandName));
 
         if (!command) {
-            message
-                .delete()
-                .catch(() =>
-                    console.log(
-                        '[Warning]: DM to the bot cannot be deleted with `message.delete()` '
-                    )
-                );
+            deleteMessage(message, 0);
             messageErrorAsync(
                 message,
                 'Invalid command',
@@ -84,11 +80,7 @@ module.exports = {
         if (command.usage) data.push(`\n**Usage:** ${prefix}${command.name} ${command.usage}`);
         if (command.guildOnly) data.push(`\n**Server only command:** ${command.guildOnly}`);
 
-        message
-            .delete()
-            .catch(() =>
-                console.log('[Warning]: DM to the bot cannot be deleted with `message.delete()` ')
-            );
+        deleteMessage(message, 0);
 
         if (isAdmin) {
             if (command.adminOnly) {

@@ -1,6 +1,6 @@
 const { MessageEmbed } = require('discord.js');
 const { colors } = require('../json/config.json');
-const { messageErrorAsync } = require('../helpers/message');
+const { messageErrorAsync, deleteMessage } = require('../helpers/message');
 
 module.exports = {
     name: 'send',
@@ -10,13 +10,9 @@ module.exports = {
     guildOnly: true,
     execute: async (message, args) => {
         let user = message.guild.member(message.mentions.users.first());
-        if (!user) message.author.send(`There is no user as ${args[0]}`);
+        if (!user) message.author.send(`There is no user as **${args[0]}**`);
 
-        message
-            .delete()
-            .catch(() =>
-                console.log('[Warning]: DM to the bot cannot be deleted with `message.delete()` ')
-            );
+        deleteMessage(message, 0);
         mentionMessage = args.slice(1).join(' ');
         let sendEmbed = new MessageEmbed()
             .setTitle(`Private message`)
@@ -27,11 +23,7 @@ module.exports = {
             .addField('\u200b', '\u200b')
             .addField('Message', mentionMessage);
 
-        message
-            .delete()
-            .catch(() =>
-                console.log('[Warning]: DM to the bot cannot be deleted with `message.delete()` ')
-            );
+        deleteMessage(message, 0);
         user.send(sendEmbed).catch(() =>
             messageErrorAsync(
                 message,

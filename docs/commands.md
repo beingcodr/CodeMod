@@ -41,6 +41,11 @@ This command updates the information of the registered user
 This command allows you to upvote another user for helping you/community
 **Example**: `/upvote @username <keyword>`
 
+### `/downvote`
+
+This command allows you to downvote another user for voilating server rules or spams
+**Example**: `/downvote @username`
+
 ### `/serverInfo` / `/serverinfo`
 
 This command sends the information of the server

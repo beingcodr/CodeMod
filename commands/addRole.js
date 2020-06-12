@@ -1,4 +1,9 @@
-const { botChannelAsync, messageErrorAsync, memberErrorAsync } = require('../helpers/message');
+const {
+    botChannelAsync,
+    messageErrorAsync,
+    memberErrorAsync,
+    deleteMessage,
+} = require('../helpers/message');
 
 module.exports = {
     name: 'addRole',
@@ -9,7 +14,7 @@ module.exports = {
     aliases: ['addrole'],
     execute: async (message, args) => {
         if (!message.member.hasPermission(['MANAGE_ROLES'])) {
-            message.delete();
+            deleteMessage(message, 0);
             return botChannelAsync(
                 message,
                 `<@!${message.author.id}>, you don't have permissions to add roles`
@@ -19,7 +24,7 @@ module.exports = {
         let mentionedUser = message.mentions.users.first() || message.guild.members.get(args[0]);
         let roleMember = message.guild.member(mentionedUser);
         if (!roleMember) {
-            message.delete();
+            deleteMessage(message, 0);
             return messageErrorAsync(
                 message,
                 'No such member found!',
@@ -29,7 +34,7 @@ module.exports = {
 
         let roleName = args.slice(1).join(' ');
         if (!roleName) {
-            message.delete();
+            deleteMessage(message, 0);
             return messageErrorAsync(
                 message,
                 'Specify a role!',
@@ -39,7 +44,7 @@ module.exports = {
 
         let guildRole = message.guild.roles.cache.find((role) => role.name === roleName);
         if (!guildRole) {
-            message.delete();
+            deleteMessage(message, 0);
             return messageErrorAsync(
                 message,
                 "Couldn't find a role!",
@@ -48,7 +53,7 @@ module.exports = {
         }
 
         if (roleMember.roles.cache.some((role) => role.name === roleName)) {
-            message.delete();
+            deleteMessage(message, 0);
             return messageErrorAsync(
                 message,
                 'The user already has that role!',
@@ -56,7 +61,7 @@ module.exports = {
             );
         }
 
-        message.delete();
+        deleteMessage(message, 0);
         try {
             await roleMember.roles.add(guildRole.id);
         } catch (error) {
@@ -68,7 +73,7 @@ module.exports = {
             message,
             roleMember,
             `Congrats, you have been given the role **${guildRole.name}**`,
-            `<@!${roleMember.id}>, \n\nYour DM is locked`
+            `Congrats, <@!${roleMember.id}> have been given the role **${guildRole.name}**`
         );
     },
 };

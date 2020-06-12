@@ -11,6 +11,7 @@ const memberSchema = new Schema({
     server: { type: String, required: true },
     roles: [{ type: String }],
     level: { type: Number, required: true },
+    levelUp: { type: Number, required: true },
     totalPoints: { type: Number, required: true },
     joinedAt: { type: String, required: true },
     points: {

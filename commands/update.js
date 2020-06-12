@@ -1,5 +1,5 @@
 const Member = require('../server/models/Member');
-const { messageErrorAsync, botChannelAsync } = require('../helpers/message');
+const { messageErrorAsync, botChannelAsync, deleteMessage } = require('../helpers/message');
 
 module.exports = {
     name: 'update',
@@ -11,7 +11,7 @@ module.exports = {
         if (message.guild.member(message.author)) {
             let returnedMember = await Member.findOne({ discordId: message.author.id });
             if (!returnedMember) {
-                message.delete();
+                deleteMessage(message, 0);
                 messageErrorAsync(
                     message,
                     "You're not in the database. You can add your details with `add` command",
@@ -29,7 +29,7 @@ module.exports = {
             returnedMember.joinedAt = message.guild.joinedAt;
             returnedMember.roles = [...message.member._roles];
 
-            message.delete();
+            deleteMessage(message, 0);
 
             try {
                 await returnedMember.save();
@@ -39,18 +39,17 @@ module.exports = {
                     `**<@!${message.author.id}> updated your details in the database.**`
                 );
             } catch (error) {
-                botChannelAsync(
+                return botChannelAsync(
                     message,
                     `<@!${message.author.id}>, there was an error while updating your details`
                 );
             }
         } else {
-            message.delete();
-
-            messageErrorAsync(
+            deleteMessage(message, 0);
+            return messageErrorAsync(
                 message,
                 "Something isn't right, DM <@!487310051393011713> to manually add you to the DB",
-                `**<@!${message.author.id}> Something isn't right, DM <@!487310051393011713> to manually add you to the DB**`
+                `**<@!${message.author.id}> something isn't right, DM <@!487310051393011713> to manually add you to the DB**`
             );
         }
     },

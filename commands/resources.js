@@ -1,6 +1,6 @@
 const { MessageEmbed } = require('discord.js');
 const { colors } = require('../json/config.json');
-const { messageErrorAsync } = require('../helpers/message');
+const { messageErrorAsync, deleteMessage } = require('../helpers/message');
 
 module.exports = {
     name: 'resources',
@@ -36,11 +36,7 @@ module.exports = {
                 'For dozens of cool resources check out [this link](https://github.com/bradtraversy/design-resources-for-developers) by Brad Travesy'
             );
 
-        message
-            .delete()
-            .catch(() =>
-                console.log('[Warning]: DM to the bot cannot be deleted with `message.delete()` ')
-            );
-        messageErrorAsync(message, embed, `<@!${message.author.id}>, I can't send the embed`);
+        deleteMessage(message, 0);
+        messageErrorAsync(message, embed, `<@!${message.author.id}>, I can't send the resources`);
     },
 };

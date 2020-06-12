@@ -1,6 +1,6 @@
 const { MessageEmbed } = require('discord.js');
 const { colors } = require('../json/config.json');
-const { messageErrorAsync } = require('../helpers/message');
+const { messageErrorAsync, deleteMessage } = require('../helpers/message');
 
 module.exports = {
     name: 'socialLinks',
@@ -48,11 +48,11 @@ module.exports = {
                 '[JobChallenge](https://2020.jobchallenge.teamtanay.dev)  |  [Open Mentorship Program](https://bit.ly/mentorship-karona)  |  [Reddit Disscussion](https://www.reddit.com/r/teamtanay/ )'
             );
 
-        message
-            .delete()
-            .catch(() =>
-                console.log('[Warning]: DM to the bot cannot be deleted with `message.delete()` ')
-            );
-        messageErrorAsync(message, embed, `<@!${message.author.id}>, I can't send the embed`);
+        deleteMessage(message, 0);
+        messageErrorAsync(
+            message,
+            embed,
+            `<@!${message.author.id}>, I can't send Tanay's social media links`
+        );
     },
 };

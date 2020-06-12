@@ -75,7 +75,7 @@ bot.on('message', (message) => {
         } catch (error) {
             botChannelAsync(
                 message,
-                `<@!${message.author.id}> There was an error trying to execute that command!`
+                `<@!${message.author.id}> There was an error trying to execute ${commandName}`
             );
         }
     }

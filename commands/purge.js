@@ -2,7 +2,7 @@ const { messageErrorAsync, botChannelAsync } = require('../helpers/message');
 
 module.exports = {
     name: 'purge',
-    description: 'kldsjflk;d',
+    description: 'This command deletes the number of recent messages specified by the user',
     args: true,
     usage: 'amount (range: 1-99)',
     guildOnly: true,
@@ -14,19 +14,17 @@ module.exports = {
             let amount = parseInt(args[0]) + 1;
 
             if (isNaN(amount)) {
-                messageErrorAsync(
+                return messageErrorAsync(
                     message,
                     "That doesn't seem to be a valid number.",
                     `<@!${message.author.id}>, it doesn't seem to be a valid number.`
                 );
-                return;
             } else if (amount <= 1 || amount > 100) {
-                messageErrorAsync(
+                return messageErrorAsync(
                     message,
                     'you need to pass a number between 2 and 99.',
                     `<@!${message.author.id}>, you need to pass a number between 2 and 99.`
                 );
-                return;
             }
 
             message.channel.bulkDelete(amount).catch((err) => {

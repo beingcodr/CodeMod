@@ -1,6 +1,6 @@
 const { MessageEmbed } = require('discord.js');
 const { colors } = require('../json/config.json');
-const { messageErrorAsync, botChannelAsync } = require('../helpers/message');
+const { messageErrorAsync, deleteMessage } = require('../helpers/message');
 
 module.exports = {
     name: 'discordHelp',
@@ -16,16 +16,11 @@ module.exports = {
                 '[Discord YouTube link](https://www.google.com/search?client=firefox-b-d&q=discord+for+dummies#kpvalbx=_xFfJXt7hAcbf9QP6lJ6ICQ48)'
             );
 
-        message
-            .delete()
-            .catch(() =>
-                console.log('[Warning]: DM to the bot cannot be deleted with `message.delete()` ')
-            );
-
+        deleteMessage(message, 0);
         messageErrorAsync(
             message,
             discordHelpEmbed,
-            `<@!${message.author.id}>, I can't send the embed`
+            `<@!${message.author.id}>, I can't send the resource to Get Started with Discord`
         );
     },
 };

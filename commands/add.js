@@ -4,7 +4,7 @@ const { messageErrorAsync, botChannelAsync } = require('../helpers/message');
 module.exports = {
     name: 'add',
     guildOnly: true,
-    aliases: ['adduser'],
+    aliases: ['adduser', 'register'],
     usage: ' ',
     execute: async (message, args) => {
         if (message.guild.member(message.author)) {
@@ -29,6 +29,7 @@ module.exports = {
                 server: message.guild.name,
                 joinedAt: message.guild.joinedAt,
                 level: 0,
+                levelUp: 100,
                 totalPoints: 0,
                 points: {
                     codeError: 0,
@@ -59,20 +60,15 @@ module.exports = {
             } catch (error) {
                 botChannelAsync(
                     message,
-                    `<@!${message.author.id}>, there was an error adding you to the database. Please try again`
+                    `<@!${message.author.id}>, there was an error adding you to the database. Please try again later`
                 );
             }
         } else {
-            try {
-                await message.author.send(
-                    "Something isn't right, DM <@!487310051393011713> to manually add you to the DB"
-                );
-            } catch (error) {
-                botChannelAsync(
-                    message,
-                    `<@!${message.author.id}>, **something isn't right, DM <@!487310051393011713> to manually add you to the DB**`
-                );
-            }
+            messageErrorAsync(
+                message,
+                "Something isn't right, DM <@!487310051393011713> to manually add you to the DB",
+                `<@!${message.author.id}>, **something isn't right, DM <@!487310051393011713> to manually add you to the DB**`
+            );
         }
     },
 };
