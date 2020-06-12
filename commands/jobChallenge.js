@@ -1,10 +1,12 @@
 const { MessageEmbed } = require('discord.js');
 const { colors } = require('../json/config.json');
+const { messageErrorAsync } = require('../helpers/message');
 
 module.exports = {
     name: 'jobChallenge',
-    description: 'lkdjflkdajsf',
+    description: 'This command provides you informative links for JobChallenge',
     aliases: ['jobchallenge', 'ttjc'],
+    usage: ' ',
     execute: async (message, args) => {
         let embed = new MessageEmbed()
             .setTitle('Details for TeamTanayJobChallenge')
@@ -45,6 +47,6 @@ module.exports = {
             .catch(() =>
                 console.log('[Warning]: DM to the bot cannot be deleted with `message.delete()` ')
             );
-        message.author.send(embed);
+        messageErrorAsync(message, embed, `<@!${message.author.id}>, I can't send the embed`);
     },
 };

@@ -1,10 +1,13 @@
 const { MessageEmbed } = require('discord.js');
 const { colors, prefix } = require('../json/config.json');
+const { messageErrorAsync, botChannelAsync } = require('../helpers/message');
 
 module.exports = {
     name: 'kick',
     description: 'dklfj;ad',
     guildOnly: true,
+    adminOnly: true,
+    usage: '@username',
     execute: async (message) => {
         try {
             let user = message.mentions.users.first();
@@ -15,8 +18,14 @@ module.exports = {
                 if (member && admin.hasPermission('KICK_MEMBERS')) {
                     if (member.hasPermission(['KICK_MEMBERS', 'BAN_MEMBERS'])) {
                         message.client.user.username === member.user.username
-                            ? message.reply(`You really think you can kick me? Traitor! `)
-                            : message.reply(`You can\'t kick ${member} `);
+                            ? botChannelAsync(
+                                  message,
+                                  `<@!${message.author.id}>, you really think you can kick me? Traitor! `
+                              )
+                            : botChannelAsync(
+                                  message,
+                                  `<@!${message.author.id}>, you can\'t kick ${member} `
+                              );
                         message
                             .delete()
                             .catch(() =>
@@ -45,7 +54,7 @@ module.exports = {
                                     true
                                 );
 
-                            message.channel.send(kickEmbed);
+                            botChannelAsync(message, kickEmbed);
 
                             message
                                 .delete()
@@ -56,7 +65,11 @@ module.exports = {
                                 );
                         }
                     } catch (error) {
-                        message.author.send(`Unable to kick ${user}`);
+                        messageErrorAsync(
+                            message,
+                            `Unable to kick ${user}`,
+                            `<@!${message.author.id}> Unable to kick ${user}`
+                        );
                         console.error(error);
                     }
 
@@ -66,7 +79,10 @@ module.exports = {
 
                     // kickChannel.send(kickEmbed);
                 } else {
-                    message.reply(`You don\'t have permissions to kick anyone`);
+                    botChannelAsync(
+                        message,
+                        `<@!${message.author.id}>, you don\'t have permissions to kick anyone`
+                    );
                 }
             } else {
                 message
@@ -76,7 +92,10 @@ module.exports = {
                             '[Warning]: DM to the bot cannot be deleted with `message.delete()` '
                         )
                     );
-                message.reply(` proper usage would be: \`${prefix}kick @username\``);
+                botChannelAsync(
+                    message,
+                    `<@!${message.author.id}>, proper usage would be: \`${prefix}kick @username\``
+                );
             }
         } catch (error) {
             throw error;

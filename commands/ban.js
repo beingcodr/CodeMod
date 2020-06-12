@@ -1,10 +1,13 @@
 const { MessageEmbed } = require('discord.js');
 const { prefix, colors } = require('../json/config.json');
+const { botChannelAsync, messageErrorAsync } = require('../helpers/message');
 
 module.exports = {
     name: 'ban',
     description: 'kdslsjf;lkads',
     guildOnly: true,
+    adminOnly: true,
+    usage: '@username',
     execute: async (message, args) => {
         try {
             let user = message.mentions.users.first();
@@ -15,8 +18,14 @@ module.exports = {
                 if (member && admin.hasPermission('BAN_MEMBERS')) {
                     if (member.hasPermission(['KICK_MEMBERS', 'BAN_MEMBERS', 'ADMINISTRATOR'])) {
                         message.client.user.username === member.user.username
-                            ? message.reply(`You really think you can ban me? Traitor! `)
-                            : message.reply(`You can\'t ban ${member} `);
+                            ? botChannelAsync(
+                                  message,
+                                  `<@!${message.author.id}>, you really think you can ban me? Traitor! `
+                              )
+                            : botChannelAsync(
+                                  message,
+                                  `<@!${message.author.id}>, you can\'t ban ${member}`
+                              );
                         message
                             .delete()
                             .catch(() =>
@@ -36,7 +45,7 @@ module.exports = {
                                 .setTitle(`${user.username} is baned from ${message.guild.name}`)
                                 .setColor(colors.green)
                                 .setThumbnail(message.author.displayAvatarURL)
-                                .addField('Baned User', `${member}`, true)
+                                .addField('Baned User', `<@!${member.user.id}>`, true)
                                 .addField('Baned By', `<@${message.author.id}>`, true)
                                 .addField('Spammed In', `${message.channel} channel`, true)
                                 .addField(
@@ -45,7 +54,8 @@ module.exports = {
                                     true
                                 );
 
-                            message.channel.send(banEmbed);
+                            botChannelAsync(message, banEmbed);
+
                             message
                                 .delete()
                                 .catch(() =>
@@ -55,11 +65,18 @@ module.exports = {
                                 );
                         }
                     } catch (error) {
-                        message.author.send(`Unable to ban ${user}`);
+                        messageErrorAsync(
+                            message,
+                            `Unable to ban ${user}`,
+                            `Unable to ban <@!${user}>`
+                        );
                         console.error(error);
                     }
                 } else {
-                    message.reply(`You don\'t have permissions to ban anyone`);
+                    botChannelAsync(
+                        message,
+                        `<@!${message.author.id}>, you don\'t have permissions to ban anyone`
+                    );
                 }
             } else {
                 message
@@ -69,7 +86,10 @@ module.exports = {
                             '[Warning]: DM to the bot cannot be deleted with `message.delete()` '
                         )
                     );
-                message.reply(` proper usage would be: \`${prefix}ban @username days[optional]\``);
+                botChannelAsync(
+                    message,
+                    `<@!${message.author.id}>, proper usage would be: \`${prefix}ban @username days[optional]\``
+                );
             }
         } catch (error) {
             throw error;

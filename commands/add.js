@@ -1,26 +1,21 @@
 const Member = require('../server/models/Member');
+const { messageErrorAsync, botChannelAsync } = require('../helpers/message');
 
 module.exports = {
     name: 'add',
     guildOnly: true,
     aliases: ['adduser'],
+    usage: ' ',
     execute: async (message, args) => {
         if (message.guild.member(message.author)) {
             let returnedMember = await Member.findOne({ discordId: message.author.id });
             if (returnedMember) {
                 message.delete();
-
-                try {
-                    await message.author.send(
-                        "you're already in the database. Update your details with `update` command"
-                    );
-                } catch (error) {
-                    message.client.channels.fetch(process.env.CM_BOT_CHANNEL).then((channel) => {
-                        channel.send(
-                            `<@!${message.author.id}> you're already in the database. Update your details with \`update\` command. Your DM is not accessible, please enable it **User settings > Privacy & safety > Allow messages from server members**`
-                        );
-                    });
-                }
+                messageErrorAsync(
+                    message,
+                    "You're already in the database. Update your details with `update` command",
+                    `**<@!${message.author.id}> you're already in the database. Update your details with \`update\` command.**`
+                );
                 return;
             }
 
@@ -56,20 +51,28 @@ module.exports = {
             try {
                 await newUser.save();
 
-                try {
-                    await message.author.send('You have been successfully added to the database');
-                } catch (error) {
-                    message.reply(
-                        ' successfully added your details, your DM is not accessible. Please enable it **User settings > Privacy & safety > Allow messages from server members**'
-                    );
-                }
+                messageErrorAsync(
+                    message,
+                    'You have been successfully added to the database',
+                    `<@!${message.author.id}>, you have been successfully added to the database`
+                );
             } catch (error) {
-                message.channel.send(`${error}`);
+                botChannelAsync(
+                    message,
+                    `<@!${message.author.id}>, there was an error adding you to the database. Please try again`
+                );
             }
         } else {
-            message.author.send(
-                "Something isn't right, DM <@!487310051393011713> to manually add you to the DB"
-            );
+            try {
+                await message.author.send(
+                    "Something isn't right, DM <@!487310051393011713> to manually add you to the DB"
+                );
+            } catch (error) {
+                botChannelAsync(
+                    message,
+                    `<@!${message.author.id}>, **something isn't right, DM <@!487310051393011713> to manually add you to the DB**`
+                );
+            }
         }
     },
 };

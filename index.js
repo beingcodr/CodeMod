@@ -1,9 +1,9 @@
-const { Client, MessageEmbed, Collection } = require('discord.js');
+const { Client, Collection } = require('discord.js');
 require('dotenv').config();
 const mongoose = require('mongoose');
-const { prefix, colors, moderation, adminRole, botChannel } = require('./json/config.json');
+const { prefix, moderation, adminRole } = require('./json/config.json');
 const { moderateMessagesCommand } = require('./helpers/index');
-const { memberCommands, adminCommands } = require('./json/commands.json');
+const { messageErrorAsync, botChannelAsync } = require('./helpers/message');
 const fs = require('fs');
 const bot = new Client();
 const cooldowns = new Collection();
@@ -28,11 +28,10 @@ bot.on('message', (message) => {
         if (moderation) {
             let slangsUsed = moderateMessagesCommand(message);
             if (slangsUsed.length) {
-                message.client.channels
-                    .fetch(process.env.CM_BOT_CHANNEL || botChannel)
-                    .then((channel) => {
-                        channel.send('Slang used');
-                    });
+                botChannelAsync(
+                    message,
+                    `**This message is to notify <@!${message.author.id}> that your message contained a slang word which is not permitted in this server. You might get banned if you continue to voilate the rules**`
+                );
 
                 message.reply(
                     `**Just used \`${slangsUsed.join(', ')}\` in his/her message, take a look <@&${
@@ -74,28 +73,40 @@ bot.on('message', (message) => {
         try {
             command.execute(message, args);
         } catch (error) {
-            message.reply('There was an error trying to execute that command!');
+            botChannelAsync(
+                message,
+                `<@!${message.author.id}> There was an error trying to execute that command!`
+            );
         }
     }
 });
 
 bot.on('guildMemberAdd', (member) => {
-    let memberEmbed = new MessageEmbed()
-        .setTitle('Member commands')
-        .setColor(colors.green)
-        .addFields([...memberCommands]);
+    let { commands } = member.client;
+    let data = [];
+    let isAdmin = false;
+    if (member.hasPermission(['ADMINISTRATOR'])) isAdmin = true;
 
-    let adminEmbed = new MessageEmbed()
-        .setTitle('Admin commands')
-        .setColor(colors.green)
-        .addFields([...adminCommands]);
+    data.push("Here's a list of all the available commands  ");
+    data.push(
+        isAdmin
+            ? commands
+                  .map((command) => {
+                      return `\`${command.name}\``;
+                  })
+                  .join(', ')
+            : commands
+                  .filter((command) => !command.adminOnly)
+                  .map((cmnd) => {
+                      return `\`${cmnd.name}\``;
+                  })
+                  .join(', ')
+    );
+    data.push(
+        `\n\nYou can send \`${prefix}help <commandName>\` to get info on a specific command!`
+    );
 
-    if (member.hasPermission(['ADMINISTRATOR'])) {
-        member.send(memberEmbed);
-        member.send(adminEmbed);
-    } else {
-        member.send(memberEmbed);
-    }
+    messageErrorAsync(member, data, `<@!${member.user.id}>,\n${data}`);
 });
 
 // ! make a request to the server for updating member details in the database

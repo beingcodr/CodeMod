@@ -1,10 +1,12 @@
 const { MessageEmbed } = require('discord.js');
 const { colors } = require('../json/config.json');
+const { messageErrorAsync } = require('../helpers/message');
 
 module.exports = {
     name: 'socialLinks',
-    description: 'dslakfjldksjf',
+    description: 'This command shows you all the social handles and initiatives of Tanay Pratap',
     aliases: ['sociallinks'],
+    usage: ' ',
     execute: async (message, args) => {
         let embed = new MessageEmbed()
             .setTitle("Tanay's social handles")
@@ -51,6 +53,6 @@ module.exports = {
             .catch(() =>
                 console.log('[Warning]: DM to the bot cannot be deleted with `message.delete()` ')
             );
-        message.author.send(embed);
+        messageErrorAsync(message, embed, `<@!${message.author.id}>, I can't send the embed`);
     },
 };

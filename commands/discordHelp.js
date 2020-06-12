@@ -1,10 +1,12 @@
 const { MessageEmbed } = require('discord.js');
 const { colors } = require('../json/config.json');
+const { messageErrorAsync, botChannelAsync } = require('../helpers/message');
 
 module.exports = {
     name: 'discordHelp',
-    description: 'dafdsaf',
+    description: 'This command sends you resources to Get Started with Discord',
     aliases: ['discordhelp', 'discord'],
+    usage: ' ',
     execute: async (message, args) => {
         let discordHelpEmbed = new MessageEmbed()
             .setTitle('Get Started with Discord')
@@ -19,6 +21,11 @@ module.exports = {
             .catch(() =>
                 console.log('[Warning]: DM to the bot cannot be deleted with `message.delete()` ')
             );
-        message.author.send(discordHelpEmbed);
+
+        messageErrorAsync(
+            message,
+            discordHelpEmbed,
+            `<@!${message.author.id}>, I can't send the embed`
+        );
     },
 };
