@@ -30,42 +30,59 @@ module.exports = {
       }
     }
 
-    let pointInc = member[points],
-      totalPointsCal = member[totalPoints];
+    args = args.slice(1);
 
-    const { codeDoubt, codeError, verbalDoubt, sharedResource } = pointInc;
+    let {
+      codeDoubt,
+      codeError,
+      verbalDoubt,
+      sharedResource,
+      contribution,
+      slangUsed,
+    } = member.points;
 
-    pointInc.contribution += 1;
-    totalPointsCal += codeDoubt + codeError + verbalDoubt + sharedResource;
-
-    if (!args.length > 1) {
-      if (args === "codeError") {
-        codeError += 15;
-      }
-      if (args === "verbalDoubt") {
-        verbalDoubt += 5;
-      }
-      if (args === "codeDoubt") {
-        codeDoubt += 10;
-      }
-      if (args === "sharedResource") {
-        sharedResource += 5;
+    if (args.length <= 1) {
+      switch (args[0]) {
+        case "codeError":
+          codeError += 15;
+          break;
+        case "contribution":
+          contribution += 10;
+          break;
+        case "verbalDoubt":
+          verbalDoubt += 10;
+          break;
+        case "codeDoubt":
+          codeDoubt += 10;
+          break;
+        case "sharedResource":
+          sharedResource += 5;
       }
     } else {
-      try {
-        await message.author.send(
-          "Please upvote for only one type of help at a time."
-        );
-      } catch (error) {
-        console.log(error);
-      }
+      message.delete();
+      messageErrorAsync(
+        message,
+        `<@!${message.author.id}>, please upvote for only one type of help at a time`
+      );
+      return;
     }
 
-    Member.update(
-      {
-        discordId: message.mentions.users.first().id,
-      },
-      { $set: { points: pointInc, totalPoints: totalPointsCal } }
-    );
+    member.totalPoints =
+      codeDoubt + codeError + verbalDoubt + sharedResource + contribution;
+    member.points = {
+      codeDoubt,
+      codeError,
+      verbalDoubt,
+      sharedResource,
+      contribution,
+      slangUsed,
+    };
+
+    message.delete();
+    try {
+      await member.save();
+    } catch (error) {
+      console.log(error);
+    }
   },
 };
