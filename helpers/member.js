@@ -68,7 +68,7 @@ module.exports = {
             avatar: member.user.avatarURL(),
             server: member.guild.name,
             joinedAt: member.guild.joinedAt,
-            warn: 0,
+            warn: [],
             level: 0,
             levelUp: 100,
             totalPoints: 0,

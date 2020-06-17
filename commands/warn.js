@@ -40,12 +40,18 @@ module.exports = {
         if (!member) {
             result = await addMemberEvent(guildMember);
         }
+
+        const warnObj = {
+            warnedBy: `${message.author.username}`,
+            warnedFor: `${args.slice(1).join(' ')}`,
+            warnedOnChannel: `${message.channel.name}`,
+        };
         try {
             if (result.success && result.member) {
-                result.member.warn += 1;
+                result.member.warn = [...result.member.warn, warnObj];
                 await result.member.save();
             } else {
-                member.warn += 1;
+                member.warn = [...member.warn, warnObj];
                 await member.save();
             }
         } catch (error) {

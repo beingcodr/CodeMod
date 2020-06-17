@@ -20,7 +20,6 @@ const memberSchema = new Schema(
                 warnedBy: { type: String, required: true },
                 warnedOnChannel: { type: String, required: true },
                 warnedFor: { type: String, required: true },
-                messageLink: { type: String },
             },
             { timestamps: true },
         ],
