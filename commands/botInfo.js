@@ -10,6 +10,7 @@ module.exports = {
     aliases: ['botinfo'],
     usage: ' ',
     execute: async (message, args) => {
+        deleteMessage(message, 0);
         let botInfoEmbed = new MessageEmbed()
             .setTitle(`${message.client.user.username}'s Info`)
             .setColor(colors.green)
@@ -23,11 +24,10 @@ module.exports = {
             .addField('Wanna operate me?', '[Github](https://github.com/rahul1116/codemod)', true)
             .addField('Son Of', '[Rahul Ravindran](https://github.com/rahul1116)', true);
 
-        deleteMessage(message, 0);
         messageErrorAsync(
             message,
             botInfoEmbed,
-            `<@!${message.author.id}>, I can't send the embed`
+            `<@!${message.author.id}>, I wasn't able to send the bot information`
         );
     },
 };

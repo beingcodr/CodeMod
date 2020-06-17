@@ -8,6 +8,7 @@ module.exports = {
     aliases: ['jobchallenge', 'ttjc'],
     usage: ' ',
     execute: async (message, args) => {
+        deleteMessage(message, 0);
         let embed = new MessageEmbed()
             .setTitle('Details for TeamTanayJobChallenge')
             .setColor(colors.yellow)
@@ -42,11 +43,10 @@ module.exports = {
                 true
             );
 
-        deleteMessage(message, 0);
         messageErrorAsync(
             message,
             embed,
-            `<@!${message.author.id}>, I can't send the links for JobChallenge`
+            `<@!${message.author.id}>, I wasn't able to send the links for JobChallenge`
         );
     },
 };

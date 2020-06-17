@@ -9,10 +9,18 @@ module.exports = {
     adminOnly: true,
     usage: '@username',
     execute: async (message) => {
+        deleteMessage(message, 0);
         try {
             let user = message.mentions.users.first();
 
             if (user) {
+                if (message.author.id === user.id)
+                    return messageErrorAsync(
+                        message,
+                        `You can't kick yourself :man_shrugging:`,
+                        `<@!${message.author.id}>, you can't kick yourself :man_shrugging:`
+                    );
+
                 let admin = message.guild.member(message.author);
                 let member = message.guild.member(user);
                 if (member && admin.hasPermission('KICK_MEMBERS')) {
@@ -26,7 +34,6 @@ module.exports = {
                                   message,
                                   `<@!${message.author.id}>, you can\'t kick ${member} `
                               );
-                        deleteMessage(message, 0);
                         return;
                     }
 
@@ -41,7 +48,7 @@ module.exports = {
                                 .setThumbnail(message.author.displayAvatarURL)
                                 .addField('Kicked User', `${member}`, true)
                                 .addField('Kicked By', `<@${message.author.id}>`, true)
-                                .addField('Spammed In', `${message.channel} channel`, true)
+                                .addField('Spammed In', `<#${message.channel.id}>`, true)
                                 .addField(
                                     'Reason',
                                     'Violation of server rules and regulations. You can learn more about the rules by typing `/rules`',
@@ -49,7 +56,6 @@ module.exports = {
                                 );
 
                             botChannelAsync(message, kickEmbed);
-                            deleteMessage(message, 0);
                         }
                     } catch (error) {
                         messageErrorAsync(
@@ -66,7 +72,6 @@ module.exports = {
                     );
                 }
             } else {
-                deleteMessage(message, 0);
                 messageErrorAsync(
                     message,
                     `Proper usage would be: \`${prefix}kick @username\``,

@@ -8,16 +8,15 @@ module.exports = {
     guildOnly: true,
     usage: ' ',
     execute: async (message, args) => {
+        deleteMessage(message, 0);
         if (message.guild.member(message.author)) {
             let returnedMember = await Member.findOne({ discordId: message.author.id });
             if (!returnedMember) {
-                deleteMessage(message, 0);
-                messageErrorAsync(
+                return messageErrorAsync(
                     message,
                     "You're not in the database. You can add your details with `add` command",
                     `**<@!${message.author.id}>, you\'re not in the database, add your details with \`add\` command.**`
                 );
-                return;
             }
 
             returnedMember.discordId = message.author.id;
@@ -28,8 +27,6 @@ module.exports = {
             returnedMember.server = message.guild.name;
             returnedMember.joinedAt = message.guild.joinedAt;
             returnedMember.roles = [...message.member._roles];
-
-            deleteMessage(message, 0);
 
             try {
                 await returnedMember.save();
@@ -45,7 +42,6 @@ module.exports = {
                 );
             }
         } else {
-            deleteMessage(message, 0);
             return messageErrorAsync(
                 message,
                 "Something isn't right, DM <@!487310051393011713> to manually add you to the DB",

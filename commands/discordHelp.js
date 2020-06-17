@@ -8,6 +8,7 @@ module.exports = {
     aliases: ['discordhelp', 'discord'],
     usage: ' ',
     execute: async (message, args) => {
+        deleteMessage(message, 0);
         let discordHelpEmbed = new MessageEmbed()
             .setTitle('Get Started with Discord')
             .setColor(colors.green)
@@ -16,11 +17,10 @@ module.exports = {
                 '[Discord YouTube link](https://www.google.com/search?client=firefox-b-d&q=discord+for+dummies#kpvalbx=_xFfJXt7hAcbf9QP6lJ6ICQ48)'
             );
 
-        deleteMessage(message, 0);
         messageErrorAsync(
             message,
             discordHelpEmbed,
-            `<@!${message.author.id}>, I can't send the resource to Get Started with Discord`
+            `<@!${message.author.id}>, I wasn't able to send the resource to Get Started with Discord`
         );
     },
 };

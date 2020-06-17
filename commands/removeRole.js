@@ -11,20 +11,25 @@ module.exports = {
     guildOnly: true,
     adminOnly: true,
     usage: '@username <role name>[case-sensitive]',
-    aliases: ['removerole'],
+    aliases: ['removerole', 'rmrole'],
     execute: async (message, args) => {
+        deleteMessage(message, 0);
         if (!message.member.hasPermission(['MANAGE_ROLES'])) {
-            deleteMessage(message, 0);
             return botChannelAsync(
                 message,
                 `<@!${message.author.id}>, you don't have permissions to add roles`
             );
         }
 
-        let mentionedUser = message.mentions.users.first() || message.guild.members.get(args[0]);
+        let mentionedUser = message.mentions.users.first();
+        if (!mentionedUser)
+            return messageErrorAsync(
+                message,
+                'Invalid user mentioned',
+                `<@!${message.author.id}>, you mentioned an invalid user`
+            );
         let roleMember = message.guild.member(mentionedUser);
         if (!roleMember) {
-            deleteMessage(message, 0);
             return messageErrorAsync(
                 message,
                 'No such member found!',
@@ -34,7 +39,6 @@ module.exports = {
 
         let roleName = args.slice(1).join(' ');
         if (!roleName) {
-            deleteMessage(message, 0);
             return messageErrorAsync(
                 message,
                 'Specify a role!',
@@ -42,9 +46,10 @@ module.exports = {
             );
         }
 
-        let guildRole = message.guild.roles.cache.find((role) => role.name === roleName);
+        let guildRole = message.guild.roles.cache.find(
+            (role) => role.name.toLowerCase() === roleName.toLowerCase()
+        );
         if (!guildRole) {
-            deleteMessage(message, 0);
             return messageErrorAsync(
                 message,
                 "Couldn't find a role!",
@@ -52,8 +57,11 @@ module.exports = {
             );
         }
 
-        if (!roleMember.roles.cache.some((role) => role.name === roleName)) {
-            deleteMessage(message, 0);
+        if (
+            !roleMember.roles.cache.some(
+                (role) => role.name.toLowerCase() === roleName.toLowerCase()
+            )
+        ) {
             return messageErrorAsync(
                 message,
                 "The user doesn't have that role!",

@@ -9,14 +9,14 @@ module.exports = {
     name: 'userInfo',
     description: 'This command fetches information about the user',
     aliases: ['userinfo'],
-    guildOnly: true,
+    guildOnly: false,
     usage: '@username',
     execute: async (message, args) => {
         let userEmbed;
         try {
             if (!args.length) {
-                const member = await Member.findOne({ discordId: message.author.id });
-                if (!member) {
+                const returnedMember = await Member.findOne({ discordId: message.author.id });
+                if (!returnedMember) {
                     deleteMessage(message, 0);
                     messageErrorAsync(
                         message,
@@ -28,13 +28,15 @@ module.exports = {
 
                 userEmbed = new MessageEmbed()
                     .setTitle("User's info")
-                    .setThumbnail(member.avatar)
+                    .setThumbnail(returnedMember.avatar)
                     .setColor(colors.green)
-                    .addField('Username', `${member.username}`, true)
-                    .addField('Joined server on', formatDate(member.joinedAt), true)
-                    .addField('Level', `${member.level}`, true)
-                    .addField('TotalPoints', `${member.totalPoints}`, true)
-                    .addField('Username', `${member.username}`, true);
+                    .addField('Username', `${returnedMember.username}`, true)
+                    .addField('Joined server on', formatDate(returnedMember.joinedAt), true)
+                    .addField('\u200b', '\u200b')
+                    .addField('Level', `${returnedMember.level}`, true)
+                    .addField('TotalPoints', `${returnedMember.totalPoints}`, true)
+                    .addField('\u200b', '\u200b')
+                    .addField('Points needed to level up', `${returnedMember.levelUp}`, true);
 
                 deleteMessage(message, 0);
 
@@ -76,7 +78,9 @@ module.exports = {
                     .addField('Joined server on', formatDate(returnedMember.joinedAt), true)
                     .addField('\u200b', '\u200b')
                     .addField('Level', `${returnedMember.level}`, true)
-                    .addField('TotalPoints', `${returnedMember.totalPoints}`, true);
+                    .addField('TotalPoints', `${returnedMember.totalPoints}`, true)
+                    .addField('\u200b', '\u200b')
+                    .addField('Points needed to level up', `${returnedMember.levelUp}`, true);
 
                 deleteMessage(message, 0);
                 messageErrorAsync(message, userEmbed, `<@!${message.author.id}> `);

@@ -10,6 +10,7 @@ module.exports = {
     args: true,
     usage: 'your question',
     execute: async (message, args) => {
+        deleteMessage(message, 0);
         // The array which stores the results as per the question passed
         let faqArray = [];
         // todo: Make a duplicate checker function that takes 2 FAQ's in this case and checks if the question or answer has similarityCount > 5
@@ -32,7 +33,6 @@ module.exports = {
         });
 
         if (faqArray.length === 0) {
-            deleteMessage(message, 0);
             messageErrorAsync(
                 message,
                 "No FAQ's matched your question. Try `/faq your question`\n> **Tip:** use specific keywords such as `coding, blogs, etc`",
@@ -70,6 +70,5 @@ module.exports = {
                 `<@!${message.author.id}> If you're bombarded with too many **FAQ** results. Try to be more specific with the questions\n\n> Tip: use specific keywords such as \`coding, blogs, etc\` and avoid generic words such as **how, where, what**`
             );
         }
-        deleteMessage(message, 0);
     },
 };

@@ -1,5 +1,6 @@
 const { moderate } = require('../json/data.json');
 
+
 const formatDate = (date) => {
     return date.toString().substr(4, 12);
 };

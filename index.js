@@ -1,12 +1,14 @@
-const { Client, Collection } = require('discord.js');
+const { Client, Collection, MessageEmbed } = require('discord.js');
 require('dotenv').config();
 const mongoose = require('mongoose');
-const { prefix, moderation, adminRole } = require('./json/config.json');
+const { prefix, moderation, adminRole, colors } = require('./json/config.json');
 const { moderateMessagesCommand } = require('./helpers/index');
-const { messageErrorAsync, botChannelAsync } = require('./helpers/message');
+const downvote = require('./commands/downvote');
+const { messageErrorAsync, botChannelAsync, memberErrorAsync } = require('./helpers/message');
 const fs = require('fs');
+const { addMemberEvent } = require('./helpers/member');
+const Member = require('./server/models/Member');
 const bot = new Client();
-const cooldowns = new Collection();
 bot.commands = new Collection();
 
 const commandFiles = fs.readdirSync('./commands').filter((file) => file.endsWith('.js'));
@@ -22,30 +24,40 @@ bot.once('ready', () => {
 });
 
 bot.on('message', (message) => {
+    let args = [];
     if (message.author === bot.user) {
         return;
     } else {
         if (moderation) {
             let slangsUsed = moderateMessagesCommand(message);
             if (slangsUsed.length) {
-                botChannelAsync(
-                    message,
-                    `**This message is to notify <@!${message.author.id}> that your message contained a slang word which is not permitted in this server. You might get banned if you continue to voilate the rules**`
-                );
-
+                let slangEmbed = new MessageEmbed()
+                    .setTitle('Warning for using slang')
+                    .setThumbnail(message.author.avatarURL())
+                    .setColor(colors.red)
+                    .addField('Cursed in', `<#${message.channel.id}>`, true)
+                    .addField('Warned user', `<@!${message.author.id}>`, true)
+                    .addField(
+                        'Content',
+                        `${message.content} [Message link](https://discord.com/channels/${message.guild.id}/${message.channel.id}/${message.id})`
+                    );
+                // .addField('Message Link');
+                botChannelAsync(message, slangEmbed);
                 message.reply(
                     `**Just used \`${slangsUsed.join(', ')}\` in his/her message, take a look <@&${
                         process.env.CM_ADMIN_ROLE || adminRole
                     }>**`
                 );
-                return;
+                args = [{ id: `${message.author.id}`, bypass: true }, 'slang'];
+                return downvote.execute(message, args);
             }
         }
         if (!message.content.startsWith(`${prefix}`)) return;
 
         let splitCommand = message.content.substr(prefix.length).split(' ');
         let commandName = splitCommand[0];
-        let args = splitCommand.slice(1);
+        args = splitCommand.slice(1);
+        console.log(`Args: ${args}`);
 
         const command =
             bot.commands.get(commandName) ||
@@ -106,7 +118,17 @@ bot.on('guildMemberAdd', (member) => {
         `\n\nYou can send \`${prefix}help <commandName>\` to get info on a specific command!`
     );
 
-    messageErrorAsync(member, data, `<@!${member.user.id}>,\n${data}`);
+    memberErrorAsync({}, member, data, `<@!${member.user.id}>,\n${data}`);
+
+    addMemberEvent(member).catch((err) => console.error(err));
+});
+
+bot.on('guildMemberRemove', (member) => {
+    console.log(`${member.user.username} left`);
+    Member.findOneAndDelete({ discordId: member.user.id }).catch((err) => {
+        console.log(err);
+        return;
+    });
 });
 
 // ! make a request to the server for updating member details in the database

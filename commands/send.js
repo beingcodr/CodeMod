@@ -9,10 +9,14 @@ module.exports = {
     usage: '@user <your message>',
     guildOnly: true,
     execute: async (message, args) => {
-        let user = message.guild.member(message.mentions.users.first());
-        if (!user) message.author.send(`There is no user as **${args[0]}**`);
-
         deleteMessage(message, 0);
+        let user = message.guild.member(message.mentions.users.first());
+        if (!user) return messageErrorAsync(
+                       message,
+                       `There is no user as **${args[0]}**`,
+                       `<@!${message.author.id}>, there is no user as **${args[0]}**`
+                   );
+
         mentionMessage = args.slice(1).join(' ');
         let sendEmbed = new MessageEmbed()
             .setTitle(`Private message`)
@@ -23,7 +27,6 @@ module.exports = {
             .addField('\u200b', '\u200b')
             .addField('Message', mentionMessage);
 
-        deleteMessage(message, 0);
         user.send(sendEmbed).catch(() =>
             messageErrorAsync(
                 message,

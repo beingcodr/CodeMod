@@ -9,6 +9,7 @@ module.exports = {
     adminOnly: true,
     usage: '@username',
     execute: async (message, args) => {
+        deleteMessage(message, 0);
         try {
             let user = message.mentions.users.first();
 
@@ -16,17 +17,17 @@ module.exports = {
                 let admin = message.guild.member(message.author);
                 let member = message.guild.member(user);
                 if (member && admin.hasPermission('BAN_MEMBERS')) {
-                    if (member.hasPermission(['KICK_MEMBERS', 'BAN_MEMBERS', 'ADMINISTRATOR'])) {
+                    if (member.hasPermission(['BAN_MEMBERS'])) {
                         message.client.user.username === member.user.username
                             ? botChannelAsync(
                                   message,
                                   `<@!${message.author.id}>, you really think you can ban me? Traitor! `
                               )
-                            : botChannelAsync(
+                            : messageErrorAsync(
                                   message,
-                                  `<@!${message.author.id}>, you can\'t ban ${member}`
+                                  `<@!${message.author.id}>, you can\'t ban <@!${member.user.id}>`,
+                                  `<@!${message.author.id}>, you can\'t ban <@!${member.user.id}>`
                               );
-                        deleteMessage(message, 0);
                         return;
                     }
 
@@ -37,23 +38,20 @@ module.exports = {
                         if (banedMember) {
                             let banEmbed = new MessageEmbed()
                                 .setTitle(`${user.username} is baned from ${message.guild.name}`)
-                                .setColor(colors.green)
+                                .setColor(colors.red)
                                 .setThumbnail(message.author.displayAvatarURL)
                                 .addField('Baned User', `<@!${member.user.id}>`, true)
                                 .addField('Baned By', `<@${message.author.id}>`, true)
-                                .addField('Spammed In', `${message.channel} channel`, true)
+                                .addField('Spammed In', `<#${message.channel.id}>`, true)
                                 .addField(
                                     'Reason',
-                                    'Violation of server rules and regulations. You can learn more about the rules by typing `/rules`',
+                                    'Repeated violation of server rules and regulations. You can learn more about the rules by typing `/rules`',
                                     true
                                 );
 
                             botChannelAsync(message, banEmbed);
-
-                            deleteMessage(message, 0);
                         }
                     } catch (error) {
-                        deleteMessage(message, 0);
                         messageErrorAsync(
                             message,
                             `Unable to ban ${user}`,
@@ -68,7 +66,6 @@ module.exports = {
                     );
                 }
             } else {
-                deleteMessage(message, 0);
                 botChannelAsync(
                     message,
                     `<@!${message.author.id}>, proper usage would be: \`${prefix}ban @username days[optional]\``

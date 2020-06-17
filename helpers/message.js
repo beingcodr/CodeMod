@@ -27,12 +27,12 @@ module.exports = {
             return false;
         }
     },
-    memberErrorAsync: async (message, member, authorMessage, botChannelMessage) => {
+    memberErrorAsync: async (message, member, memberMessage, botChannelMessage) => {
         try {
-            await member.send(authorMessage);
+            await member.send(memberMessage);
             return true;
         } catch (error) {
-            message.client.channels
+            member.client.channels
                 .fetch(process.env.CM_BOT_CHANNEL || botChannel)
                 .then((channel) =>
                     channel.send(

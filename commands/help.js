@@ -1,5 +1,5 @@
 const { prefix, botChannel } = require('../json/config.json');
-const { messageErrorAsync,  deleteMessage } = require('../helpers/message');
+const { messageErrorAsync, deleteMessage } = require('../helpers/message');
 
 module.exports = {
     name: 'help',
@@ -8,6 +8,7 @@ module.exports = {
     usage: '<commandName>',
     aliases: ['commands'],
     execute: async (message, args) => {
+        deleteMessage(message, 0);
         let data = [];
         const { commands } = message.client;
         let isAdmin = false;
@@ -33,7 +34,6 @@ module.exports = {
                 `\n\nYou can send \`${prefix}help <commandName>\` to get info on a specific command!`
             );
 
-            deleteMessage(message, 0);
             !isAdmin
                 ? messageErrorAsync(message, data, `<@!${message.author.id}>,\n${data}, `)
                 : messageErrorAsync(
@@ -43,7 +43,6 @@ module.exports = {
                   );
             return;
         } else if (args.length > 1) {
-            deleteMessage(message, 0);
             messageErrorAsync(
                 message,
                 `Pass one command name at a time to get more details`,
@@ -58,7 +57,6 @@ module.exports = {
             commands.find((cmd) => cmd.aliases && cmd.aliases.includes(commandName));
 
         if (!command) {
-            deleteMessage(message, 0);
             messageErrorAsync(
                 message,
                 'Invalid command',
@@ -79,8 +77,6 @@ module.exports = {
         if (command.description) data.push(`\n**Description:** ${command.description}`);
         if (command.usage) data.push(`\n**Usage:** ${prefix}${command.name} ${command.usage}`);
         if (command.guildOnly) data.push(`\n**Server only command:** ${command.guildOnly}`);
-
-        deleteMessage(message, 0);
 
         if (isAdmin) {
             if (command.adminOnly) {

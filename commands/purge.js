@@ -22,24 +22,23 @@ module.exports = {
             } else if (amount <= 1 || amount > 100) {
                 return messageErrorAsync(
                     message,
-                    'you need to pass a number between 2 and 99.',
+                    'you need to pass a number between 1 and 99.',
                     `<@!${message.author.id}>, you need to pass a number between 2 and 99.`
                 );
             }
 
             message.channel.bulkDelete(amount).catch((err) => {
                 console.error(err);
-                botChannelAsync(
+                return botChannelAsync(
                     message,
-                    `<@!${message.author.id}>, there was an error trying to prune messages in this channel!`
+                    `<@!${message.author.id}>, there was an error trying to delete messages in <#${message.channel.id}>!`
                 );
             });
         } else {
-            botChannelAsync(
+            return botChannelAsync(
                 message,
                 `<@!${message.author.id}>, You don't have permissions to delete messages on the server`
             );
-            return;
         }
     },
 };

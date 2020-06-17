@@ -8,6 +8,7 @@ module.exports = {
     aliases: ['sociallinks'],
     usage: ' ',
     execute: async (message, args) => {
+        deleteMessage(message, 0);
         let embed = new MessageEmbed()
             .setTitle("Tanay's social handles")
             .setColor(colors.yellow)
@@ -48,11 +49,10 @@ module.exports = {
                 '[JobChallenge](https://2020.jobchallenge.teamtanay.dev)  |  [Open Mentorship Program](https://bit.ly/mentorship-karona)  |  [Reddit Disscussion](https://www.reddit.com/r/teamtanay/ )'
             );
 
-        deleteMessage(message, 0);
         messageErrorAsync(
             message,
             embed,
-            `<@!${message.author.id}>, I can't send Tanay's social media links`
+            `<@!${message.author.id}>, I wasn't able to send Tanay's social media links`
         );
     },
 };

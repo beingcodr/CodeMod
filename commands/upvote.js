@@ -5,22 +5,23 @@ const {
     deleteMessage,
     memberErrorAsync,
 } = require('../helpers/message');
+const { addMemberEvent } = require('../helpers/member');
 
-const levelChecker = (member, levelUp) => {
-    if (levelUp === 0) {
+const upvoteValidator = (member) => {
+    if (member.levelUp === 0) {
         let level = member.level + 1;
         return {
             level: level,
             levelUp: (level + level) * 100,
             leveledUp: true,
         };
-    } else if (levelUp < 0) {
+    } else if (member.levelUp < 0) {
         let level = member.level + 1;
         return {
             level: level,
             levelUp: (level + level) * 100,
             leveledUp: true,
-            extraPoints: Math.abs(levelUp),
+            extraPoints: Math.abs(member.levelUp),
         };
     }
     return { leveledUp: false };
@@ -31,11 +32,13 @@ module.exports = {
     desciption: 'This command lets the user upvote other users for their help',
     guildOnly: true,
     args: true,
-    usage: '@username <keyword>',
+    aliases: ['uvote', 'uv'],
+    usage: `@username <keyword>\`\n\n The keywords can be one of the following:\n**code**: +10 points\n**doubt**: +5 points\n**error**: +10 points`,
     execute: async (message, args) => {
+        deleteMessage(message, 0);
+        let result = {};
         let mentionedMember = message.mentions.users.first();
         if (!mentionedMember) {
-            deleteMessage(message, 0);
             messageErrorAsync(
                 message,
                 `Invalid mention`,
@@ -46,73 +49,91 @@ module.exports = {
 
         let guildMember = message.guild.member(mentionedMember);
         if (!guildMember) {
-            deleteMessage(message, 0);
-            messageErrorAsync(
+            return messageErrorAsync(
                 message,
                 `<@!${mentionedMember.id}> is not a member of ${message.guild.name}`,
                 `<@!${message.author.id}>, <@!${mentionedMember.id}> is not a member of ${message.guild.name}`
             );
-            return;
         }
 
         const member = await Member.findOne({ discordId: mentionedMember.id });
         if (!member) {
-            deleteMessage(message, 0);
-            messageErrorAsync(
-                message,
-                `<@!${mentionedMember.id}> is not registered in the database`,
-                `<@!${message.author.id}>, <@!${mentionedMember.id}> is not registered in the DB`
-            );
-            return;
+            result = await addMemberEvent(guildMember);
         }
 
-        if (member.discordId === message.author.id) {
-            deleteMessage(message, 0);
-            botChannelAsync(
-                message,
-                `<@!${message.author.id}>, come on! You can't upvote yourself :man_shrugging:`
-            );
-            return;
+        if (result.success && result.member) {
+            if (result.member.discordId === message.author.id) {
+                return botChannelAsync(
+                    message,
+                    `<@!${message.author.id}>, come on! You can't upvote yourself :man_shrugging:`
+                );
+            }
+        } else {
+            if (member.discordId === message.author.id) {
+                return botChannelAsync(
+                    message,
+                    `<@!${message.author.id}>, come on! You can't upvote yourself :man_shrugging:`
+                );
+            }
         }
 
         args = args.slice(1);
+        if (!args.length) {
+            return messageErrorAsync(
+                message,
+                `The proper usage would be: \`/upvote @username <keyword>\`\n\n The keywords can be one of the following:\n**code**: +10 points\n**doubt**: +5 points\n**error**: +10 points`,
+                `<@!${message.author.id}>, the proper usage would be: \`/upvote @username <keyword>\`\n\n The keywords can be one of the following:\n**code**: +10 points\n**doubt**: +5 points\n**error**: +10 points`
+            );
+        }
 
         if (args.length <= 1) {
             switch (args[0]) {
-                case 'codeError':
-                    member.points.codeError += 15;
-                    member.totalPoints += 15;
-                    member.levelUp -= 15;
-                    break;
-
                 case 'contribution':
-                    member.points.contribution += 10;
-                    member.totalPoints += 10;
-                    member.levelUp -= 10;
+                    if (result.success && result.member) {
+                        result.member.points.contribution += 15;
+                        result.member.totalPoints += 15;
+                        result.member.levelUp -= 15;
+                    } else {
+                        member.points.contribution += 15;
+                        member.totalPoints += 15;
+                        member.levelUp -= 15;
+                    }
                     break;
 
-                case 'verbalDoubt':
-                    member.points.verbalDoubt += 10;
-                    member.totalPoints += 10;
-                    member.levelUp -= 10;
+                case 'error':
+                    if (result.success && result.member) {
+                        result.member.points.error += 10;
+                        result.member.totalPoints += 10;
+                        result.member.levelUp -= 10;
+                    } else {
+                        member.points.error += 10;
+                        member.totalPoints += 10;
+                        member.levelUp -= 10;
+                    }
                     break;
 
-                case 'codeDoubt':
-                    member.points.codeDoubt += 10;
-                    member.totalPoints += 10;
-                    member.levelUp -= 10;
+                case 'doubt':
+                    if (result.success && result.member) {
+                        result.member.points.doubt += 10;
+                        result.member.totalPoints += 10;
+                        result.member.levelUp -= 10;
+                    } else {
+                        member.points.doubt += 10;
+                        member.totalPoints += 10;
+                        member.levelUp -= 10;
+                    }
                     break;
 
-                case 'sharedResource':
-                    member.points.sharedResource += 5;
-                    member.totalPoints += 5;
-                    member.levelUp -= 5;
-                    break;
-
-                case 'slangUsed':
-                    member.points.slangUsed -= 5;
-                    member.totalPoints -= 5;
-                    member.levelUp += 5;
+                case 'resource':
+                    if (result.success && result.member) {
+                        result.member.points.resource += 5;
+                        result.member.totalPoints += 5;
+                        result.member.levelUp -= 5;
+                    } else {
+                        member.points.resource += 5;
+                        member.totalPoints += 5;
+                        member.levelUp -= 5;
+                    }
                     break;
 
                 default:
@@ -123,41 +144,55 @@ module.exports = {
                     );
             }
         } else {
-            deleteMessage(message, 0);
-            messageErrorAsync(
+            return messageErrorAsync(
                 message,
                 `Please upvote for only one type of help at a time.`,
                 `<@!${message.author.id}>, please upvote for only one type of help at a time`
             );
-            return;
         }
 
-        let result = levelChecker(member, member.levelUp);
+        let upvoteResult =
+            result.success && result.member
+                ? upvoteValidator(result.member)
+                : upvoteValidator(member);
 
-        if (result.leveledUp) {
-            member.level = result.level;
-            member.levelUp = result.levelUp;
-            if (result.extraPoints) {
-                member.totalPoints += result.extraPoints;
-                member.levelUp -= result.extraPoints;
+        if (upvoteResult.leveledUp) {
+            if (result.success && result.member) {
+                result.member.level = upvoteResult.level;
+                result.member.levelUp = upvoteResult.levelUp;
+                if (upvoteResult.extraPoints) {
+                    result.member.levelUp -= upvoteResult.extraPoints;
+                }
+
+                memberErrorAsync(
+                    message,
+                    guildMember,
+                    `Congratulations <@!${guildMember.id}>, you have been promoted to level **${result.member.level}**`,
+                    `Congratulations <@!${guildMember.id}>, you have been promoted to level **${result.member.level}**`
+                );
+            } else {
+                member.level = upvoteResult.level;
+                member.levelUp = upvoteResult.levelUp;
+                if (upvoteResult.extraPoints) {
+                    member.levelUp -= upvoteResult.extraPoints;
+                }
+
+                memberErrorAsync(
+                    message,
+                    guildMember,
+                    `Congratulations <@!${guildMember.id}>, you have been promoted to level **${member.level}**`,
+                    `Congratulations <@!${guildMember.id}>, you have been promoted to level **${member.level}**`
+                );
             }
-
-            botChannelAsync(
-                message,
-                `<@!${message.author.id}>, has reached level **${member.level}**`
-            );
         }
 
-        console.log(levelChecker(member, member.levelUp));
-
-        deleteMessage(message, 0);
         try {
             await member.save();
             memberErrorAsync(
                 message,
                 guildMember,
-                `<@!${message.author.id}> upvoted you with keyword ${args[0]}. Your \`totalPoints\` is **${member.totalPoints}**`,
-                `<@!${guildMember.id}>, you were upvoted by <@!${message.author.id}>. Your \`totalPoints\` is **${member.totalPoints}**`
+                `<@!${message.author.id}> upvoted you with the keyword **${args[0]}**. You need **${member.levelUp}** points to level up`,
+                `<@!${guildMember.id}>, you were upvoted by <@!${message.author.id}>. You need **${member.levelUp}** points to level up`
             );
         } catch (error) {
             console.log(error);

@@ -8,6 +8,7 @@ module.exports = {
         'This command will ping you all the resources you might need for learning Web Development and Design',
     usage: ' ',
     execute: (message) => {
+        deleteMessage(message, 0);
         let embed = new MessageEmbed()
             .setTitle('Resources for developers')
             .setColor(colors.yellow)
@@ -36,7 +37,6 @@ module.exports = {
                 'For dozens of cool resources check out [this link](https://github.com/bradtraversy/design-resources-for-developers) by Brad Travesy'
             );
 
-        deleteMessage(message, 0);
-        messageErrorAsync(message, embed, `<@!${message.author.id}>, I can't send the resources`);
+        messageErrorAsync(message, embed, `<@!${message.author.id}>, I wasn't able to send the resources`);
     },
 };

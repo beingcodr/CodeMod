@@ -11,6 +11,7 @@ module.exports = {
     aliases: ['serverinfo'],
     usage: ' ',
     execute: async (message, args) => {
+        deleteMessage(message, 0);
         let serverEmbed = new MessageEmbed()
             .setTitle(`${message.guild.name}'s Info`)
             .setColor(colors.green)
@@ -21,11 +22,10 @@ module.exports = {
             .addField('You joined on: ', formatDate(message.member.joinedAt), true)
             .addField('Total members: ', message.guild.memberCount, true);
 
-        deleteMessage(message, 0);
         messageErrorAsync(
             message,
             serverEmbed,
-            `<@!${message.author.id}>, I can't send the server information`
+            `<@!${message.author.id}>, I wasn't able to send the server information`
         );
     },
 };

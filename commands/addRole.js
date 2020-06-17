@@ -13,18 +13,23 @@ module.exports = {
     usage: '@username <role name>[case-sensitive]',
     aliases: ['addrole'],
     execute: async (message, args) => {
+        deleteMessage(message, 0);
         if (!message.member.hasPermission(['MANAGE_ROLES'])) {
-            deleteMessage(message, 0);
             return botChannelAsync(
                 message,
                 `<@!${message.author.id}>, you don't have permissions to add roles`
             );
         }
 
-        let mentionedUser = message.mentions.users.first() || message.guild.members.get(args[0]);
+        let mentionedUser = message.mentions.users.first();
+        if (!mentionedUser)
+            return messageErrorAsync(
+                message,
+                'No mentions found!',
+                `<@!${message.author.id}>, no mentions found!`
+            );
         let roleMember = message.guild.member(mentionedUser);
         if (!roleMember) {
-            deleteMessage(message, 0);
             return messageErrorAsync(
                 message,
                 'No such member found!',
@@ -34,7 +39,6 @@ module.exports = {
 
         let roleName = args.slice(1).join(' ');
         if (!roleName) {
-            deleteMessage(message, 0);
             return messageErrorAsync(
                 message,
                 'Specify a role!',
@@ -42,9 +46,10 @@ module.exports = {
             );
         }
 
-        let guildRole = message.guild.roles.cache.find((role) => role.name === roleName);
+        let guildRole = message.guild.roles.cache.find(
+            (role) => role.name.toLowerCase() === roleName.toLowerCase()
+        );
         if (!guildRole) {
-            deleteMessage(message, 0);
             return messageErrorAsync(
                 message,
                 "Couldn't find a role!",
@@ -52,8 +57,11 @@ module.exports = {
             );
         }
 
-        if (roleMember.roles.cache.some((role) => role.name === roleName)) {
-            deleteMessage(message, 0);
+        if (
+            roleMember.roles.cache.some(
+                (role) => role.name.toLowerCase() === roleName.toLowerCase()
+            )
+        ) {
             return messageErrorAsync(
                 message,
                 'The user already has that role!',
@@ -61,7 +69,6 @@ module.exports = {
             );
         }
 
-        deleteMessage(message, 0);
         try {
             await roleMember.roles.add(guildRole.id);
         } catch (error) {
