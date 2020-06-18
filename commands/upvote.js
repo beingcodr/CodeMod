@@ -33,7 +33,7 @@ module.exports = {
     guildOnly: true,
     args: true,
     aliases: ['uvote', 'uv'],
-    usage: `@username <keyword>\`\n\n The keywords can be one of the following:\n**code**: +10 points\n**doubt**: +5 points\n**error**: +10 points`,
+    usage: `@username <keyword>\`\n\n The keywords can be one of the following:\n**contribution**: +15 points\n**doubt**: +5 points\n**error**: +10 points\n**resource**: +5`,
     execute: async (message, args) => {
         deleteMessage(message, 0);
         let result = {};
@@ -81,8 +81,8 @@ module.exports = {
         if (!args.length) {
             return messageErrorAsync(
                 message,
-                `The proper usage would be: \`/upvote @username <keyword>\`\n\n The keywords can be one of the following:\n**code**: +10 points\n**doubt**: +5 points\n**error**: +10 points`,
-                `<@!${message.author.id}>, the proper usage would be: \`/upvote @username <keyword>\`\n\n The keywords can be one of the following:\n**code**: +10 points\n**doubt**: +5 points\n**error**: +10 points`
+                `The proper usage would be: \`/upvote @username <keyword>\`\n\n The keywords can be one of the following:\n**contribution**: +15 points\n**doubt**: +10 points\n**error**: +10 points\n**resource**: +5`,
+                `<@!${message.author.id}>, the proper usage would be: \`/upvote @username <keyword>\`\n\n The keywords can be one of the following:\n**contribution**: +15 points\n**doubt**: +10 points\n**error**: +10 points\n**resource**: +5`
             );
         }
 
@@ -137,7 +137,7 @@ module.exports = {
                     break;
 
                 default:
-                    messageErrorAsync(
+                    return messageErrorAsync(
                         message,
                         'Invalid argument to upvote a user',
                         `<@!${message.author.id}>, you used an invalid argument to upvote the user`
@@ -187,13 +187,34 @@ module.exports = {
         }
 
         try {
-            await member.save();
-            memberErrorAsync(
-                message,
-                guildMember,
-                `<@!${message.author.id}> upvoted you with the keyword **${args[0]}**. You need **${member.levelUp}** points to level up`,
-                `<@!${guildMember.id}>, you were upvoted by <@!${message.author.id}>. You need **${member.levelUp}** points to level up`
-            );
+            if (result.success && result.member) {
+                await result.member.save();
+                console.log(message);
+                memberErrorAsync(
+                    message,
+                    guildMember,
+                    `<@!${message.author.id}> upvoted you with the keyword **${args[0]}**. You need **${result.member.levelUp}** points to level up`,
+                    `<@!${guildMember.id}>, you were upvoted by <@!${message.author.id}>. You need **${result.member.levelUp}** points to level up`
+                );
+                messageErrorAsync(
+                    message,
+                    `Successfully upvoted <@!${guildMember.id}>`,
+                    `<@!${message.author.id}>, successfully upvoted <@!${guildMember.id}>`
+                );
+            } else {
+                await member.save();
+                memberErrorAsync(
+                    message,
+                    guildMember,
+                    `<@!${message.author.id}> upvoted you with the keyword **${args[0]}**. You need **${member.levelUp}** points to level up`,
+                    `<@!${guildMember.id}>, you were upvoted by <@!${message.author.id}>. You need **${member.levelUp}** points to level up`
+                );
+                messageErrorAsync(
+                    message,
+                    `Successfully upvoted <@!${guildMember.id}>`,
+                    `<@!${message.author.id}>, successfully upvoted <@!${guildMember.id}>`
+                );
+            }
         } catch (error) {
             console.log(error);
         }

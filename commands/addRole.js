@@ -70,7 +70,7 @@ module.exports = {
         }
 
         try {
-            await roleMember.roles.add(guildRole.id);
+            await roleMember.roles.add(guildRole);
         } catch (error) {
             console.log(error);
             return;

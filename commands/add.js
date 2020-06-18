@@ -8,9 +8,10 @@ module.exports = {
     aliases: ['adduser', 'register'],
     usage: ' ',
     execute: async (message, args) => {
+        let result = {};
         deleteMessage(message, 0);
         if (message.guild.member(message.author)) {
-            let result = await addMember(message);
+            result = await addMember(message);
             if (result.success) {
                 messageErrorAsync(
                     message,

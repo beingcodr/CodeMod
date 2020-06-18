@@ -168,7 +168,6 @@ module.exports = {
                 result.member.level = downvoteResult.level;
                 result.member.levelUp = downvoteResult.levelUp;
 
-                console.log(downvoteResult);
                 memberErrorAsync(
                     message,
                     guildMember,
@@ -178,6 +177,7 @@ module.exports = {
             } else {
                 member.level = downvoteResult.level;
                 member.levelUp = downvoteResult.levelUp;
+                
                 memberErrorAsync(
                     message,
                     guildMember,

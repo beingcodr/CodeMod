@@ -73,6 +73,13 @@ bot.on('message', (message) => {
             return message.reply("I can't execute that command inside DMs!");
         }
 
+        if (command.adminOnly && !message.member.hasPermission('ADMINISTRATOR')) {
+            return botChannelAsync(
+                message,
+                `<@!${message.author.id}>, you can't use \`${command.name}\` command`
+            );
+        }
+
         if (command.args && !args.length) {
             let reply = "You didn't provide any arguments!";
 

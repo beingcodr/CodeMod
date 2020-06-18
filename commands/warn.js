@@ -36,6 +36,14 @@ module.exports = {
             );
         }
 
+        if (message.author.id === mentionedMember.id) {
+            return messageErrorAsync(
+                message,
+                `Come on! you can't warn yourself`,
+                `<@!${message.author.id}>, come on! you can't warn yourself`
+            );
+        }
+
         let member = await Member.findOne({ discordId: mentionedMember.id });
         if (!member) {
             result = await addMemberEvent(guildMember);

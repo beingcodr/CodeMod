@@ -2,16 +2,15 @@ const Member = require('../server/models/Member');
 const { messageErrorAsync, memberErrorAsync, deleteMessage } = require('../helpers/message');
 
 module.exports = {
-    addMember: async (message, reason) => {
+    addMember: async (message) => {
         let returnedMember = await Member.findOne({ discordId: message.author.id });
         if (returnedMember) {
             deleteMessage(message, 0);
-            messageErrorAsync(
+            return messageErrorAsync(
                 message,
                 "You're already in the database. Update your details with `update` command",
                 `**<@!${message.author.id}> you're already in the database. Update your details with \`update\` command.**`
             );
-            return;
         }
 
         let newUser = new Member({
@@ -23,7 +22,7 @@ module.exports = {
             avatar: message.author.avatarURL(),
             server: message.guild.name,
             joinedAt: message.guild.joinedAt,
-            warn: 0,
+            warn: [],
             level: 0,
             levelUp: 100,
             totalPoints: 0,
@@ -47,16 +46,15 @@ module.exports = {
             return { success: false };
         }
     },
-    addMemberEvent: async (member, reason) => {
+    addMemberEvent: async (member) => {
         let returnedMember = await Member.findOne({ discordId: member.user.id });
         if (returnedMember) {
-            memberErrorAsync(
+            return memberErrorAsync(
                 {},
                 member,
                 "You're already in the database. Update your details with `update` command",
                 `**<@!${member.user.id}> you're already in the database. Update your details with \`update\` command.**`
             );
-            return;
         }
 
         let newUser = new Member({

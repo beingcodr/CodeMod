@@ -15,7 +15,7 @@ module.exports = {
                 return messageErrorAsync(
                     message,
                     "You're not in the database. You can add your details with `add` command",
-                    `**<@!${message.author.id}>, you\'re not in the database, add your details with \`add\` command.**`
+                    `**<@!${message.author.id}>, you're not in the database, add your details with \`add\` command.**`
                 );
             }
 

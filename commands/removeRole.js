@@ -14,7 +14,7 @@ module.exports = {
     aliases: ['removerole', 'rmrole'],
     execute: async (message, args) => {
         deleteMessage(message, 0);
-        if (!message.member.hasPermission(['MANAGE_ROLES'])) {
+        if (!message.member.hasPermission(['MANAGE_ROLES', 'ADMINISTRATOR'])) {
             return botChannelAsync(
                 message,
                 `<@!${message.author.id}>, you don't have permissions to add roles`
@@ -46,6 +46,14 @@ module.exports = {
             );
         }
 
+        if (roleMember.hasPermission('ADMINISTRATOR')) {
+            return messageErrorAsync(
+                message,
+                `You can't remove role from <@!${roleMember.user.id}>`,
+                `<@!${message.author.id}>, you can't remove role from <@!${roleMember.user.id}>`
+            );
+        }
+
         let guildRole = message.guild.roles.cache.find(
             (role) => role.name.toLowerCase() === roleName.toLowerCase()
         );
@@ -69,7 +77,6 @@ module.exports = {
             );
         }
 
-        deleteMessage(message, 0);
         try {
             await roleMember.roles.remove(guildRole.id);
         } catch (error) {
@@ -81,7 +88,7 @@ module.exports = {
             message,
             roleMember,
             `Alas, you lost **${guildRole.name}** role`,
-            `<@!${roleMember.id}>, you lost **${guildRole.name}** role`
+            `<@!${roleMember.user.id}>, you lost **${guildRole.name}** role`
         );
     },
 };
