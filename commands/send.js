@@ -11,11 +11,12 @@ module.exports = {
     execute: async (message, args) => {
         deleteMessage(message, 0);
         let user = message.guild.member(message.mentions.users.first());
-        if (!user) return messageErrorAsync(
-                       message,
-                       `There is no user as **${args[0]}**`,
-                       `<@!${message.author.id}>, there is no user as **${args[0]}**`
-                   );
+        if (!user)
+            return messageErrorAsync(
+                message,
+                `There is no user as **${args[0]}**`,
+                `<@!${message.author.id}>, there is no user as **${args[0]}**`
+            );
 
         mentionMessage = args.slice(1).join(' ');
         let sendEmbed = new MessageEmbed()

@@ -43,12 +43,11 @@ module.exports = {
                   );
             return;
         } else if (args.length > 1) {
-            messageErrorAsync(
+            return messageErrorAsync(
                 message,
                 `Pass one command name at a time to get more details`,
                 `<@!${message.author.id}>, pass one command name at a time to get more details`
             );
-            return;
         }
 
         let commandName = args[0];
@@ -57,12 +56,11 @@ module.exports = {
             commands.find((cmd) => cmd.aliases && cmd.aliases.includes(commandName));
 
         if (!command) {
-            messageErrorAsync(
+            return messageErrorAsync(
                 message,
                 'Invalid command',
                 `<@!${message.author.id}>, Invalid command`
             );
-            return;
         }
 
         data.push(`\n**Command Name:** ${command.name}`);
@@ -96,8 +94,8 @@ module.exports = {
             if (command.adminOnly) {
                 messageErrorAsync(
                     message,
-                    data.join(''),
-                    `<@!${message.author.id}>, Invalid command`
+                    'Invalid command for a member',
+                    `<@!${message.author.id}>, Invalid command for a member`
                 );
             } else {
                 messageErrorAsync(

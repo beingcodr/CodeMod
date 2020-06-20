@@ -5,7 +5,7 @@ const { messageErrorAsync, deleteMessage } = require('../helpers/message');
 module.exports = {
     name: 'socialLinks',
     description: 'This command shows you all the social handles and initiatives of Tanay Pratap',
-    aliases: ['sociallinks'],
+    aliases: ['sociallinks', 'social', 'links'],
     usage: ' ',
     execute: async (message, args) => {
         deleteMessage(message, 0);

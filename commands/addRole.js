@@ -10,11 +10,11 @@ module.exports = {
     description: 'This command allows the admins to assign roles to the members',
     guildOnly: true,
     adminOnly: true,
-    usage: '@username <role name>[case-sensitive]',
-    aliases: ['addrole'],
+    usage: '@username <role name>',
+    aliases: ['addrole', 'arole'],
     execute: async (message, args) => {
         deleteMessage(message, 0);
-        if (!message.member.hasPermission(['MANAGE_ROLES'])) {
+        if (!message.member.hasPermission(['MANAGE_ROLES', 'ADMINISTRATOR'])) {
             return botChannelAsync(
                 message,
                 `<@!${message.author.id}>, you don't have permissions to add roles`
@@ -53,7 +53,7 @@ module.exports = {
             return messageErrorAsync(
                 message,
                 "Couldn't find a role!",
-                `<@!${message.author.id}>, couldn\'t find a role!`
+                `<@!${message.author.id}>, couldn't find a role!`
             );
         }
 
@@ -73,7 +73,11 @@ module.exports = {
             await roleMember.roles.add(guildRole);
         } catch (error) {
             console.log(error);
-            return;
+            return messageErrorAsync(
+                message,
+                `There was an error while adding role`,
+                `<@!${message.author.id}>, there was an error while adding role`
+            );
         }
 
         memberErrorAsync(

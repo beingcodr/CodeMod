@@ -4,6 +4,7 @@ const { addMember } = require('../helpers/member');
 
 module.exports = {
     name: 'add',
+    description: 'This command allows you to add your details in the DB',
     guildOnly: true,
     aliases: ['adduser', 'register'],
     usage: ' ',
@@ -13,27 +14,26 @@ module.exports = {
         if (message.guild.member(message.author)) {
             result = await addMember(message);
             if (result.success) {
-                messageErrorAsync(
+                return messageErrorAsync(
                     message,
                     'You have been successfully added to the database',
                     `<@!${message.author.id}>, you have been successfully added to the database`
                 );
+            } else if (!result.success && result.message) {
                 return;
             } else {
-                messageErrorAsync(
+                return messageErrorAsync(
                     message,
                     `There was an error adding you to the database. Please try again later`,
                     `<@!${message.author.id}>, there was an error adding you to the database. Please try again later`
                 );
-                return;
             }
         } else {
-            messageErrorAsync(
+            return messageErrorAsync(
                 message,
                 "Something isn't right, DM <@!487310051393011713> to manually add you to the DB",
                 `<@!${message.author.id}>, **something isn't right, DM <@!487310051393011713> to manually add you to the DB**`
             );
-            return;
         }
     },
 };

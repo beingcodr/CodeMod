@@ -7,11 +7,12 @@ module.exports = {
     description:
         'This command will ping you all the resources you might need for learning Web Development and Design',
     usage: ' ',
+    aliases: ['resource'],
     execute: (message) => {
         deleteMessage(message, 0);
         let embed = new MessageEmbed()
             .setTitle('Resources for developers')
-            .setColor(colors.yellow)
+            .setColor(colors.green)
             .addField(
                 'INTERACTIVE CODING',
                 '[FreeCodeCamp](https://www.freecodecamp.org)  |  [Codecademy](https://www.codecademy.com)  |  [Scrimba](https://www.scrimba.com)'
@@ -37,6 +38,10 @@ module.exports = {
                 'For dozens of cool resources check out [this link](https://github.com/bradtraversy/design-resources-for-developers) by Brad Travesy'
             );
 
-        messageErrorAsync(message, embed, `<@!${message.author.id}>, I wasn't able to send the resources`);
+        messageErrorAsync(
+            message,
+            embed,
+            `<@!${message.author.id}>, I wasn't able to send the resources`
+        );
     },
 };

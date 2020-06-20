@@ -1,5 +1,5 @@
 const { MessageEmbed } = require('discord.js');
-const { colors, prefix } = require('../json/config.json');
+const { colors, prefix, ruleChannel } = require('../json/config.json');
 const { messageErrorAsync, botChannelAsync, deleteMessage } = require('../helpers/message');
 
 module.exports = {
@@ -8,10 +8,11 @@ module.exports = {
     guildOnly: true,
     adminOnly: true,
     usage: '@username',
-    execute: async (message) => {
+    execute: async (message, args) => {
         deleteMessage(message, 0);
+        let ruleChannalId = process.env.CM_RULE_CHANNEL || ruleChannel;
         try {
-            let user = message.mentions.users.first();
+            let user = message.mentions.users.first() || args[0];
 
             if (user) {
                 if (message.author.id === user.id)
@@ -22,7 +23,7 @@ module.exports = {
                     );
 
                 let admin = message.guild.member(message.author);
-                let member = message.guild.member(user);
+                let member = message.guild.member(user.id);
                 if (member && admin.hasPermission('KICK_MEMBERS')) {
                     if (member.hasPermission(['KICK_MEMBERS', 'BAN_MEMBERS'])) {
                         message.client.user.username === member.user.username
@@ -43,16 +44,16 @@ module.exports = {
                         );
                         if (kickedMember) {
                             let kickEmbed = new MessageEmbed()
-                                .setTitle(`${user.username} is kicked from ${message.guild.name}`)
+                                .setTitle(
+                                    `${member.user.username} is kicked from ${message.guild.name}`
+                                )
                                 .setColor(colors.red)
-                                .setThumbnail(message.author.displayAvatarURL)
+                                .setThumbnail(member.user.displayAvatarURL())
                                 .addField('Kicked User', `${member}`, true)
-                                .addField('Kicked By', `<@${message.author.id}>`, true)
                                 .addField('Spammed In', `<#${message.channel.id}>`, true)
                                 .addField(
                                     'Reason',
-                                    'Violation of server rules and regulations. You can learn more about the rules by typing `/rules`',
-                                    true
+                                    `Violation of server rules and regulations. You can learn more about the rules here <#${ruleChannalId}>`
                                 );
 
                             botChannelAsync(message, kickEmbed);
@@ -79,6 +80,7 @@ module.exports = {
                 );
             }
         } catch (error) {
+            console.error(error);
             throw error;
         }
     },

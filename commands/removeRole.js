@@ -7,17 +7,17 @@ const {
 
 module.exports = {
     name: 'removeRole',
-    description: 'This command allows the admins to assign roles to the members',
+    description: 'This command allows the admins to remove roles from the members',
     guildOnly: true,
     adminOnly: true,
-    usage: '@username <role name>[case-sensitive]',
+    usage: '@username <role name>',
     aliases: ['removerole', 'rmrole'],
     execute: async (message, args) => {
         deleteMessage(message, 0);
         if (!message.member.hasPermission(['MANAGE_ROLES', 'ADMINISTRATOR'])) {
             return botChannelAsync(
                 message,
-                `<@!${message.author.id}>, you don't have permissions to add roles`
+                `<@!${message.author.id}>, you don't have permissions to remove roles`
             );
         }
 
@@ -28,6 +28,7 @@ module.exports = {
                 'Invalid user mentioned',
                 `<@!${message.author.id}>, you mentioned an invalid user`
             );
+
         let roleMember = message.guild.member(mentionedUser);
         if (!roleMember) {
             return messageErrorAsync(
@@ -46,22 +47,22 @@ module.exports = {
             );
         }
 
-        if (roleMember.hasPermission('ADMINISTRATOR')) {
-            return messageErrorAsync(
-                message,
-                `You can't remove role from <@!${roleMember.user.id}>`,
-                `<@!${message.author.id}>, you can't remove role from <@!${roleMember.user.id}>`
-            );
-        }
-
         let guildRole = message.guild.roles.cache.find(
             (role) => role.name.toLowerCase() === roleName.toLowerCase()
         );
         if (!guildRole) {
             return messageErrorAsync(
                 message,
-                "Couldn't find a role!",
-                `<@!${message.author.id}>, couldn\'t find a role!`
+                `Couldn't find a role named **${roleName}**!`,
+                `<@!${message.author.id}>, couldn\'t find a role named **${roleName}**!`
+            );
+        }
+
+        if (roleMember.hasPermission('ADMINISTRATOR')) {
+            return messageErrorAsync(
+                message,
+                `You can't remove role from <@!${roleMember.user.id}>`,
+                `<@!${message.author.id}>, you can't remove ${guildRole.name} role from <@!${roleMember.user.id}>`
             );
         }
 
@@ -72,16 +73,20 @@ module.exports = {
         ) {
             return messageErrorAsync(
                 message,
-                "The user doesn't have that role!",
-                `<@!${message.author.id}>, the user doesn't have that role!`
+                `The user doesn't have **${guildRole.name}** role!`,
+                `<@!${message.author.id}>, the user doesn't have **${guildRole.name}** role!`
             );
         }
 
         try {
-            await roleMember.roles.remove(guildRole.id);
+            await roleMember.roles.remove(guildRole);
         } catch (error) {
             console.log(error);
-            return;
+            return messageErrorAsync(
+                message,
+                'There was an error while removing the role',
+                `<@!${message.author.id}>, there was an error while removing the role`
+            );
         }
 
         memberErrorAsync(

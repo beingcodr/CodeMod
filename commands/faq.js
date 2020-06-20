@@ -8,6 +8,7 @@ module.exports = {
     description:
         'This command shows the Frequently Asked Question specified by you.\n> **Tip:** use specific keywords such as `coding, blogs, etc`',
     args: true,
+    guildOnly: true,
     usage: 'your question',
     execute: async (message, args) => {
         deleteMessage(message, 0);
@@ -33,20 +34,20 @@ module.exports = {
         });
 
         if (faqArray.length === 0) {
-            messageErrorAsync(
+            return messageErrorAsync(
                 message,
                 "No FAQ's matched your question. Try `/faq your question`\n> **Tip:** use specific keywords such as `coding, blogs, etc`",
                 `<@!${message.author.id}>, No FAQ's matched your question. Try \`/faq your question\`\n> **Tip:** use specific keywords such as \`coding, blogs, etc\``
             );
-            return;
         }
         let faqEmbed;
+        console.log(message.guild);
 
         if (
             !messageErrorAsync(
                 message,
                 `**${faqArray.length} results found**`,
-                `<@!${message.author.id}>, I can't send you the FAQ results`
+                `<@!${message.author.id}>, I wasn't able to send you the FAQ results`
             )
         )
             return;
@@ -55,9 +56,7 @@ module.exports = {
             faqEmbed = new MessageEmbed()
                 .setColor(colors.green)
                 .setTitle('FAQ')
-                .setThumbnail(
-                    'https://instagram.fbom15-1.fna.fbcdn.net/v/t51.2885-19/s320x320/90181421_510156213222489_6690442420095549440_n.jpg?_nc_ht=instagram.fbom15-1.fna.fbcdn.net&_nc_ohc=QI8cRp3F8jEAX8v63zw&oh=3049ecd08c681c1cd52cff42ed0b4a26&oe=5EF5EA33'
-                )
+                .setThumbnail(message.guild.iconURL())
                 .addField(`${faq.name}`, `${faq.value}`);
 
             message.author.send(faqEmbed);

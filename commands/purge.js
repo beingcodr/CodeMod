@@ -22,8 +22,8 @@ module.exports = {
             } else if (amount <= 1 || amount > 100) {
                 return messageErrorAsync(
                     message,
-                    'you need to pass a number between 1w and 99.',
-                    `<@!${message.author.id}>, you need to pass a number between 2 and 99.`
+                    'you need to pass a number between 1 and 99.',
+                    `<@!${message.author.id}>, you need to pass a number between 1 and 99.`
                 );
             }
 

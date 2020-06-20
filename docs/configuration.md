@@ -23,12 +23,20 @@ The bots token from [Discord Developer Portal](https://discordapp.com/developers
 ### adminRole [Type: String]
 
 **Default:** `none`  
-Admin role id of the server, wrapped in quotes.
+This parameter needs the id of the **admin role** of the server, wrapped in quotes.  
+**Example:** `"adminRole": "165439754735678320"`
 
 ### botChannel [Type: String]
 
 **Default:** `none`
-This parameter needs the id of the channel where the bots messages will go, if the users DM is blocked. We recommend to have a separate channel `#bot-spam` or with any name of your choice
+This parameter needs the `id` of the channel where the bot messages will go, if the users DM is blocked. We recommend to have a separate channel `#bot-spam` or with any name of your choice  
+**Example:** `"botChannel": "584975685458698728"`
+
+### ruleChannel [Type: String]
+
+**Default:** `none`
+This parameter needs the `id` of the channel where your server rules will be defined. We recommend to have a separate channel `#rules`  
+**Example:** `"ruleChannel": "713450678096586762"`
 
 ## Other options
 

@@ -1,6 +1,7 @@
 const { MessageEmbed } = require('discord.js');
 const { prefix, colors } = require('../json/config.json');
 const { botChannelAsync, messageErrorAsync, deleteMessage } = require('../helpers/message');
+const Member = require('../server/models/Member');
 
 module.exports = {
     name: 'ban',
@@ -10,8 +11,9 @@ module.exports = {
     usage: '@username',
     execute: async (message, args) => {
         deleteMessage(message, 0);
+        let ruleChannelId = process.env.CM_RULE_CHANNEL || ruleChannel;
         try {
-            let user = message.mentions.users.first();
+            let user = message.mentions.users.first() || args[0];
 
             if (user) {
                 let admin = message.guild.member(message.author);
@@ -37,38 +39,44 @@ module.exports = {
                         });
                         if (banedMember) {
                             let banEmbed = new MessageEmbed()
-                                .setTitle(`${user.username} is baned from ${message.guild.name}`)
+                                .setTitle(
+                                    `${member.user.username} is banned from ${message.guild.name}`
+                                )
                                 .setColor(colors.red)
-                                .setThumbnail(message.author.displayAvatarURL)
-                                .addField('Baned User', `<@!${member.user.id}>`, true)
-                                .addField('Baned By', `<@${message.author.id}>`, true)
+                                .setThumbnail(member.user.displayAvatarURL())
+                                .addField('Banned User', `<@!${member.user.id}>`, true)
                                 .addField('Spammed In', `<#${message.channel.id}>`, true)
                                 .addField(
                                     'Reason',
-                                    'Repeated violation of server rules and regulations. You can learn more about the rules by typing `/rules`',
-                                    true
+                                    `Repeated violation of server rules and regulations. You can learn more about the rules by typing <#${ruleChannelId}>`,
+                                    false
                                 );
 
-                            botChannelAsync(message, banEmbed);
+                            await Member.findOneAndDelete({ discordId: member.user.id }).catch(
+                                (err) => {
+                                    console.log(err);
+                                }
+                            );
+                            return botChannelAsync(message, banEmbed);
                         }
                     } catch (error) {
-                        messageErrorAsync(
-                            message,
-                            `Unable to ban ${user}`,
-                            `Unable to ban <@!${user}>`
-                        );
                         console.error(error);
+                        return messageErrorAsync(
+                            message,
+                            `Unable to ban ${member.user.username}`,
+                            `Unable to ban <@!${member.user.username}>`
+                        );
                     }
                 } else {
-                    botChannelAsync(
+                    return botChannelAsync(
                         message,
                         `<@!${message.author.id}>, you don\'t have permissions to ban anyone`
                     );
                 }
             } else {
-                botChannelAsync(
+                return botChannelAsync(
                     message,
-                    `<@!${message.author.id}>, proper usage would be: \`${prefix}ban @username days[optional]\``
+                    `<@!${message.author.id}>, proper usage would be: \`${prefix}ban @username\``
                 );
             }
         } catch (error) {

@@ -9,22 +9,32 @@ module.exports = {
     name: 'userInfo',
     description: 'This command fetches information about the user',
     aliases: ['userinfo'],
-    guildOnly: false,
+    guildOnly: true,
     usage: '@username',
     execute: async (message, args) => {
         let userEmbed;
+        let rolesArray = [];
+        deleteMessage(message, 0);
         try {
             if (!args.length) {
                 const returnedMember = await Member.findOne({ discordId: message.author.id });
                 if (!returnedMember) {
                     deleteMessage(message, 0);
-                    messageErrorAsync(
+                    return messageErrorAsync(
                         message,
-                        'No such member found, try adding yourself in the database with the `/add` command',
+                        "You're not in the DB, try adding yourself in the database with the `/add` command",
                         `<@!${message.author.id}>, No such member found, try adding yourself in the database with the \`/add\` command`
                     );
-                    return;
                 }
+
+                returnedMember.roles.forEach((role) => {
+                    let guildRole = message.member.roles.cache.find(
+                        (guildRoleId) => role === guildRoleId.id
+                    );
+                    console.log(guildRole);
+                    if (guildRole) rolesArray.push(`**${guildRole.name}**`);
+                });
+                console.log(rolesArray);
 
                 userEmbed = new MessageEmbed()
                     .setTitle("User's info")
@@ -36,38 +46,34 @@ module.exports = {
                     .addField('Level', `${returnedMember.level}`, true)
                     .addField('TotalPoints', `${returnedMember.totalPoints}`, true)
                     .addField('\u200b', '\u200b')
-                    .addField('Points needed to level up', `${returnedMember.levelUp}`, true);
-
-                deleteMessage(message, 0);
+                    .addField('Points needed to level up', `${returnedMember.levelUp}`, true)
+                    .addField('Warned', `${returnedMember.warn.length} times`, true)
+                    .addField('Warned', `${rolesArray.join(', ')}` || 'No roles');
 
                 messageErrorAsync(
                     message,
                     userEmbed,
-                    `<@!${message.author.id}> Cannot send the embed`
+                    `<@!${message.author.id}> I wasn't able to send the user information`
                 );
             } else {
                 const mentionedUser = message.mentions.users.first();
                 if (!mentionedUser) return message.reply('No valid mentions found');
                 const member = message.guild.member(mentionedUser);
                 if (!member) {
-                    deleteMessage(message, 0);
-                    messageErrorAsync(
+                    return messageErrorAsync(
                         message,
-                        `<@!${mentionedUser.id}> is not a member of ${message.guild.name}`,
-                        `<@!${message.author.id}>, <@!${mentionedUser.id}> is not a member of ${message.guild.name}`
+                        `<@!${mentionedUser.id}> is not a member of **${message.guild.name}**`,
+                        `<@!${message.author.id}>, <@!${mentionedUser.id}> is not a member of **${message.guild.name}**`
                     );
-                    return;
                 }
 
                 const returnedMember = await Member.findOne({ discordId: mentionedUser.id });
                 if (!returnedMember) {
-                    deleteMessage(message, 0);
-                    messageErrorAsync(
+                    return messageErrorAsync(
                         message,
                         'This user is not registered in the DB',
                         `<@!${message.author.id}>, <@!${mentionedUser.id}> is not registered in the DB`
                     );
-                    return;
                 }
 
                 userEmbed = new MessageEmbed()
@@ -80,13 +86,19 @@ module.exports = {
                     .addField('Level', `${returnedMember.level}`, true)
                     .addField('TotalPoints', `${returnedMember.totalPoints}`, true)
                     .addField('\u200b', '\u200b')
-                    .addField('Points needed to level up', `${returnedMember.levelUp}`, true);
+                    .addField('Points needed to level up', `${returnedMember.levelUp}`, true)
+                    .addField('Warned', `${returnedMember.warn.length} times`, true)
+                    .addField('Warned', `${rolesArray.join(', ')}` || 'No roles');
 
-                deleteMessage(message, 0);
                 messageErrorAsync(message, userEmbed, `<@!${message.author.id}> `);
             }
         } catch (error) {
             console.log(error);
+            return messageErrorAsync(
+                message,
+                'There was an error while fetching the user information. Try again later',
+                `<@!${message.author.id}>, there was an error while fetching the user information. Try again later`
+            );
         }
     },
 };

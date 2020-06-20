@@ -36,6 +36,7 @@ module.exports = {
                     `**<@!${message.author.id}> updated your details in the database.**`
                 );
             } catch (error) {
+                console.log(error);
                 return botChannelAsync(
                     message,
                     `<@!${message.author.id}>, there was an error while updating your details`
@@ -44,8 +45,8 @@ module.exports = {
         } else {
             return messageErrorAsync(
                 message,
-                "Something isn't right, DM <@!487310051393011713> to manually add you to the DB",
-                `**<@!${message.author.id}> something isn't right, DM <@!487310051393011713> to manually add you to the DB**`
+                "You're not a member of this server, DM <@!487310051393011713> if you're a member and this error still persists",
+                `**<@!${message.author.id}> you're not a member of this server, DM <@!487310051393011713> if you're a member and this error still persists**`
             );
         }
     },

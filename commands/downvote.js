@@ -6,6 +6,8 @@ const {
     memberErrorAsync,
 } = require('../helpers/message');
 const { addMemberEvent } = require('../helpers/member');
+const { colors } = require('../json/config.json');
+const { MessageEmbed } = require('discord.js');
 
 const downvoteValidator = (member) => {
     let currentLevel = member.level;
@@ -30,17 +32,18 @@ module.exports = {
     guildOnly: true,
     adminOnly: true,
     aliases: ['dvote', 'dv'],
-    usage: `@username <keyword>\`\n\n The keywords can be one of the following:\n**spam**: -10 points\n**abuse**: -10 points\n**slang**: -15 points`,
+    usage: `@username <keyword>\`\n\n The keywords can be one of the following:\n**spam**: -10 points\n**abuse**: -10 points\n**rage**: -10 points\n**slang**: -15 points`,
     execute: async (message, args) => {
         typeof args[0] !== 'object' && deleteMessage(message, 0);
-        if (!message.member.hasPermission('ADMINISTRATOR'))
+        if (!message.member.hasPermission('ADMINISTRATOR') && typeof args[0] !== 'object')
             return messageErrorAsync(
                 message,
-                "You can't you the `/downvote` command",
-                `<@!${message.author.id}>, you can't user the \`/downvote\` command`
+                "You can't use the `/downvote` command",
+                `<@!${message.author.id}>, you can't use the \`/downvote\` command`
             );
 
         let result = {};
+        // This OR condition is required to sustain the command from the call in the index.js for slang moderation
         let mentionedMember = message.mentions.users.first() || args[0];
         if (!mentionedMember) {
             return messageErrorAsync(
@@ -61,10 +64,9 @@ module.exports = {
 
         const member = await Member.findOne({ discordId: mentionedMember.id });
         if (!member) {
-            result = await addMemberEvent(guildMember);
+            result = await addMemberEvent(guildMember, 'downvote command');
         }
 
-        console.log(`${typeof args[0]}`);
         if (typeof args[0] !== 'object') {
             if (result.success && result.member) {
                 if (result.member.discordId === message.author.id) {
@@ -88,8 +90,8 @@ module.exports = {
         if (!args.length) {
             return messageErrorAsync(
                 message,
-                `The proper usage would be: \`/downvote @username <keyword>\`\n\n The keywords can be one of the following:\n**spam**: -10 points\n**abuse**: -10 points\n**slang**: -15 points`,
-                `<@!${message.author.id}>, the proper usage would be: \`/downvote @username <keyword>\`\n\n The keywords can be one of the following:\n**spam**: -10 points\n**abuse**: -10 points\n**slang**: -15 points`
+                `The proper usage would be: \`/downvote @username <keyword>\`\n\n The keywords can be one of the following:\n**spam**: -10 points\n**abuse**: -10 points\n**rage**: -10 points\n**slang**: -15 points`,
+                `<@!${message.author.id}>, the proper usage would be: \`/downvote @username <keyword>\`\n\n The keywords can be one of the following:\n**spam**: -10 points\n**abuse**: -10 points\n**rage**: -10 points\n**slang**: -15 points`
             );
         }
 
@@ -177,7 +179,7 @@ module.exports = {
             } else {
                 member.level = downvoteResult.level;
                 member.levelUp = downvoteResult.levelUp;
-                
+
                 memberErrorAsync(
                     message,
                     guildMember,
@@ -186,6 +188,13 @@ module.exports = {
                 );
             }
         }
+
+        let downvoteEmbed;
+        downvoteEmbed = new MessageEmbed()
+            .setTitle('Downvote successful')
+            .setColor(colors.red)
+            .addField('Downvoted user', `<@!${guildMember.user.id}>`, true)
+            .addField('Keyword used', `${args[0]}`, true);
 
         try {
             if (result.success && result.member) {
@@ -197,6 +206,8 @@ module.exports = {
                     `<@!${guildMember.id}>, you were downvoted. You need **${result.member.levelUp}** points to level up`
                 );
             } else {
+                member.addedBy.length <= 1 && (member.addedBy = 'downvote command');
+
                 await member.save();
                 memberErrorAsync(
                     message,
@@ -205,8 +216,14 @@ module.exports = {
                     `<@!${guildMember.id}>, you were downvoted. You need **${member.levelUp}** points to level up`
                 );
             }
+            botChannelAsync(message, downvoteEmbed);
         } catch (error) {
             console.error(error);
+            return messageErrorAsync(
+                message,
+                'There was an error while saving the user details with downvoted values',
+                `<@!${message.author.id}>, there was an error while saving the user details with downvoted values`
+            );
         }
     },
 };

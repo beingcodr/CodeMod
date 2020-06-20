@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const { prefix, moderation, adminRole, colors } = require('./json/config.json');
 const { moderateMessagesCommand } = require('./helpers/index');
 const downvote = require('./commands/downvote');
-const { messageErrorAsync, botChannelAsync, memberErrorAsync } = require('./helpers/message');
+const { botChannelAsync, memberErrorAsync } = require('./helpers/message');
 const fs = require('fs');
 const { addMemberEvent } = require('./helpers/member');
 const Member = require('./server/models/Member');
@@ -24,31 +24,39 @@ bot.once('ready', () => {
 });
 
 bot.on('message', (message) => {
+    let moderationCheck = process.env.CM_MODERATION || moderation;
     let args = [];
     if (message.author === bot.user) {
         return;
     } else {
-        if (moderation) {
+        if (moderationCheck) {
             let slangsUsed = moderateMessagesCommand(message);
             if (slangsUsed.length) {
                 let slangEmbed = new MessageEmbed()
-                    .setTitle('Warning for using slang')
+                    .setTitle('Slang used')
                     .setThumbnail(message.author.avatarURL())
                     .setColor(colors.red)
+                    .setURL(`${message.url}`)
                     .addField('Cursed in', `<#${message.channel.id}>`, true)
                     .addField('Warned user', `<@!${message.author.id}>`, true)
-                    .addField(
-                        'Content',
-                        `${message.content} [Message link](https://discord.com/channels/${message.guild.id}/${message.channel.id}/${message.id})`
-                    );
-                // .addField('Message Link');
-                botChannelAsync(message, slangEmbed);
-                message.reply(
-                    `**Just used \`${slangsUsed.join(', ')}\` in his/her message, take a look <@&${
-                        process.env.CM_ADMIN_ROLE || adminRole
-                    }>**`
-                );
-                args = [{ id: `${message.author.id}`, bypass: true }, 'slang'];
+                    .addField('\u200b', '\u200b')
+                    .addField('Detected slangs', `${slangsUsed.join(', ')}`, true)
+                    .addField('Message link', `[Link](${message.url})`, true)
+                    .addField('Content', `${message.content}`);
+
+                slangEmbed.length > 1000
+                    ? botChannelAsync(
+                          message,
+                          `<@!${
+                              message.author.id
+                          }> You used a slang word that's not permitted in this server\n\nCursed in : <#${
+                              message.channel.id
+                          }>\nDetected slang words: ${slangsUsed.join(
+                              ', '
+                          )}\n**Content of the message:** ${message.content}`
+                      )
+                    : botChannelAsync(message, slangEmbed);
+                args = [{ id: `${message.author.id}` }, 'slang'];
                 return downvote.execute(message, args);
             }
         }
@@ -57,7 +65,6 @@ bot.on('message', (message) => {
         let splitCommand = message.content.substr(prefix.length).split(' ');
         let commandName = splitCommand[0];
         args = splitCommand.slice(1);
-        console.log(`Args: ${args}`);
 
         const command =
             bot.commands.get(commandName) ||
@@ -127,15 +134,7 @@ bot.on('guildMemberAdd', (member) => {
 
     memberErrorAsync({}, member, data, `<@!${member.user.id}>,\n${data}`);
 
-    addMemberEvent(member).catch((err) => console.error(err));
-});
-
-bot.on('guildMemberRemove', (member) => {
-    console.log(`${member.user.username} left`);
-    Member.findOneAndDelete({ discordId: member.user.id }).catch((err) => {
-        console.log(err);
-        return;
-    });
+    return addMemberEvent(member, 'guildMemberAdd event');
 });
 
 // ! make a request to the server for updating member details in the database
