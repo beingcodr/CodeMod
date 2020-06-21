@@ -8,7 +8,7 @@ const moderateMessagesCommand = (message) => {
     let slangsUsed = [];
     moderate.forEach((msg) => {
         if (new RegExp('\\b' + msg + '\\b').test(message.content)) {
-            slangsUsed.push(msg);
+            slangsUsed.push(`\`${msg}\``);
         }
     });
     return slangsUsed;

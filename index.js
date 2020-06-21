@@ -1,9 +1,13 @@
-const { Client, MessageEmbed, Collection } = require('discord.js');
+const { Client, Collection, MessageEmbed } = require('discord.js');
 require('dotenv').config();
-const { prefix, colors, moderation, adminRole } = require('./json/config.json');
+const mongoose = require('mongoose');
+const { prefix, moderation, adminRole, colors } = require('./json/config.json');
 const { moderateMessagesCommand } = require('./helpers/index');
-const { memberCommands, adminCommands } = require('./json/commands.json');
+const downvote = require('./commands/downvote');
+const { botChannelAsync, memberErrorAsync } = require('./helpers/message');
 const fs = require('fs');
+const { addMemberEvent } = require('./helpers/member');
+const Member = require('./server/models/Member');
 const bot = new Client();
 bot.commands = new Collection();
 
@@ -20,28 +24,47 @@ bot.once('ready', () => {
 });
 
 bot.on('message', (message) => {
-    if (message.author === bot.user) {
+    let moderationCheck = process.env.CM_MODERATION || moderation;
+    let args = [];
+    if (message.author === bot.user || message.author.bot) {
         return;
     } else {
-        if (moderation) {
+        if (moderationCheck) {
             let slangsUsed = moderateMessagesCommand(message);
             if (slangsUsed.length) {
-                message.author.send(
-                    '**[Warning] This message is to notify you that your message contained a slang word which is not permitted in this server. You might get banned if you continue to voilate the rules**'
-                );
-                message.reply(
-                    `**Just used \`${slangsUsed.join(', ')}\` in his/her message, take a look <@&${
-                        process.env.CM_ADMIN_ROLE || adminRole
-                    }>**`
-                );
-                return;
+                let slangEmbed = new MessageEmbed()
+                    .setTitle('Slang used')
+                    .setThumbnail(message.author.avatarURL())
+                    .setColor(colors.red)
+                    .setURL(`${message.url}`)
+                    .addField('Cursed in', `<#${message.channel.id}>`, true)
+                    .addField('Warned user', `<@!${message.author.id}>`, true)
+                    .addField('\u200b', '\u200b')
+                    .addField('Detected slangs', `${slangsUsed.join(', ')}`, true)
+                    .addField('Message link', `[Link](${message.url})`, true)
+                    .addField('Content', `${message.content}`);
+
+                slangEmbed.length > 1000
+                    ? botChannelAsync(
+                          message,
+                          `<@!${
+                              message.author.id
+                          }> You used a slang word that's not permitted in this server\n\nCursed in : <#${
+                              message.channel.id
+                          }>\nDetected slang words: ${slangsUsed.join(
+                              ', '
+                          )}\n**Content of the message:** ${message.content}`
+                      )
+                    : botChannelAsync(message, slangEmbed);
+                args = [{ id: `${message.author.id}` }, 'slang'];
+                return downvote.execute(message, args);
             }
         }
         if (!message.content.startsWith(`${prefix}`)) return;
 
         let splitCommand = message.content.substr(prefix.length).split(' ');
         let commandName = splitCommand[0];
-        let args = splitCommand.slice(1);
+        args = splitCommand.slice(1);
 
         const command =
             bot.commands.get(commandName) ||
@@ -57,42 +80,61 @@ bot.on('message', (message) => {
             return message.reply("I can't execute that command inside DMs!");
         }
 
+        if (command.adminOnly && !message.member.hasPermission('ADMINISTRATOR')) {
+            return botChannelAsync(
+                message,
+                `<@!${message.author.id}>, you can't use \`${command.name}\` command`
+            );
+        }
+
         if (command.args && !args.length) {
             let reply = "You didn't provide any arguments!";
 
             if (command.usage)
                 reply += `\t The proper usage would be: \`${prefix}${command.name} ${command.usage}\``;
 
-            message.reply(reply);
-            return;
+            return message.reply(reply);
         }
 
         try {
             command.execute(message, args);
         } catch (error) {
-            console.error(error);
-            message.reply('There was an error trying to execute that command!');
+            botChannelAsync(
+                message,
+                `<@!${message.author.id}> There was an error trying to execute ${commandName}`
+            );
         }
     }
 });
 
 bot.on('guildMemberAdd', (member) => {
-    let memberEmbed = new MessageEmbed()
-        .setTitle('Member commands')
-        .setColor(colors.green)
-        .addFields([...memberCommands]);
+    let { commands } = member.client;
+    let data = [];
+    let isAdmin = false;
+    if (member.hasPermission(['ADMINISTRATOR'])) isAdmin = true;
 
-    let adminEmbed = new MessageEmbed()
-        .setTitle('Admin commands')
-        .setColor(colors.green)
-        .addFields([...adminCommands]);
+    data.push("Here's a list of all the available commands  ");
+    data.push(
+        isAdmin
+            ? commands
+                  .map((command) => {
+                      return `\`${command.name}\``;
+                  })
+                  .join(', ')
+            : commands
+                  .filter((command) => !command.adminOnly)
+                  .map((cmnd) => {
+                      return `\`${cmnd.name}\``;
+                  })
+                  .join(', ')
+    );
+    data.push(
+        `\n\nYou can send \`${prefix}help <commandName>\` to get info on a specific command!`
+    );
 
-    if (member.hasPermission(['ADMINISTRATOR'])) {
-        member.send(memberEmbed);
-        member.send(adminEmbed);
-    } else {
-        member.send(memberEmbed);
-    }
+    memberErrorAsync({}, member, data, `<@!${member.user.id}>,\n${data}`);
+
+    return addMemberEvent(member, 'guildMemberAdd event');
 });
 
 // ! make a request to the server for updating member details in the database
@@ -136,3 +178,7 @@ bot.on('guildMemberAdd', (member) => {
 // });
 
 bot.login(process.env.CM_TOKEN);
+
+mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true }, () =>
+    console.log('Database connection established')
+);

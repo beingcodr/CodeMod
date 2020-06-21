@@ -1,11 +1,12 @@
 {
     "prefix": "/",
     "colors": {
-        "green": "#4ecfb8",
+        "green": "#01d1c1",
         "yellow": "#FFC000",
-        "red": "#ff0000"
+        "red": "#ff3030"
     },
     "moderation": true,
     "adminRole": "713426332528148511",
-    "adminRoleTest": "714044152769151056"
+    "botChannel": "716334985891545118",
+    "ruleChannel": "713450258096586762"
 }

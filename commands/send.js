@@ -1,21 +1,23 @@
 const { MessageEmbed } = require('discord.js');
 const { colors } = require('../json/config.json');
+const { messageErrorAsync, deleteMessage } = require('../helpers/message');
 
 module.exports = {
     name: 'send',
-    description: 'lkadsjf',
+    description: 'This command sends a private message to @username specified by you',
     args: true,
-    usage: '@user your message',
+    usage: '@user <your message>',
     guildOnly: true,
     execute: async (message, args) => {
+        deleteMessage(message, 0);
         let user = message.guild.member(message.mentions.users.first());
-        if (!user) message.author.send(`There is no user as ${args[0]}`);
-
-        message
-            .delete()
-            .catch(() =>
-                console.log('[Warning]: DM to the bot cannot be deleted with `message.delete()` ')
+        if (!user)
+            return messageErrorAsync(
+                message,
+                `There is no user as **${args[0]}**`,
+                `<@!${message.author.id}>, there is no user as **${args[0]}**`
             );
+
         mentionMessage = args.slice(1).join(' ');
         let sendEmbed = new MessageEmbed()
             .setTitle(`Private message`)
@@ -26,11 +28,12 @@ module.exports = {
             .addField('\u200b', '\u200b')
             .addField('Message', mentionMessage);
 
-        message
-            .delete()
-            .catch(() =>
-                console.log('[Warning]: DM to the bot cannot be deleted with `message.delete()` ')
-            );
-        user.send(sendEmbed);
+        user.send(sendEmbed).catch(() =>
+            messageErrorAsync(
+                message,
+                "I couldn't send the message, the recipients DM is locked",
+                `<@!${message.author.id}>, I couldn't send the message, the recipients DM is locked`
+            )
+        );
     },
 };

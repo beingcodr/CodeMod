@@ -1,11 +1,14 @@
 const { MessageEmbed } = require('discord.js');
 const { colors } = require('../json/config.json');
+const { messageErrorAsync, deleteMessage } = require('../helpers/message');
 
 module.exports = {
     name: 'socialLinks',
-    description: 'dslakfjldksjf',
-    aliases: ['sociallinks'],
+    description: 'This command shows you all the social handles and initiatives of Tanay Pratap',
+    aliases: ['sociallinks', 'social', 'links'],
+    usage: ' ',
     execute: async (message, args) => {
+        deleteMessage(message, 0);
         let embed = new MessageEmbed()
             .setTitle("Tanay's social handles")
             .setColor(colors.yellow)
@@ -46,11 +49,10 @@ module.exports = {
                 '[JobChallenge](https://2020.jobchallenge.teamtanay.dev)  |  [Open Mentorship Program](https://bit.ly/mentorship-karona)  |  [Reddit Disscussion](https://www.reddit.com/r/teamtanay/ )'
             );
 
-        message
-            .delete()
-            .catch(() =>
-                console.log('[Warning]: DM to the bot cannot be deleted with `message.delete()` ')
-            );
-        message.author.send(embed);
+        messageErrorAsync(
+            message,
+            embed,
+            `<@!${message.author.id}>, I wasn't able to send Tanay's social media links`
+        );
     },
 };

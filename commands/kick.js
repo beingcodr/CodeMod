@@ -1,29 +1,40 @@
 const { MessageEmbed } = require('discord.js');
-const { colors } = require('../json/config.json');
+const { colors, prefix, ruleChannel } = require('../json/config.json');
+const { messageErrorAsync, botChannelAsync, deleteMessage } = require('../helpers/message');
 
 module.exports = {
     name: 'kick',
-    description: 'dklfj;ad',
+    description: 'This command kicks the specified user',
     guildOnly: true,
-    execute: async (message) => {
+    adminOnly: true,
+    usage: '@username',
+    execute: async (message, args) => {
+        deleteMessage(message, 0);
+        let ruleChannalId = process.env.CM_RULE_CHANNEL || ruleChannel;
         try {
-            let user = message.mentions.users.first();
+            let user = message.mentions.users.first() || args[0];
 
             if (user) {
+                if (message.author.id === user.id)
+                    return messageErrorAsync(
+                        message,
+                        `You can't kick yourself :man_shrugging:`,
+                        `<@!${message.author.id}>, you can't kick yourself :man_shrugging:`
+                    );
+
                 let admin = message.guild.member(message.author);
-                let member = message.guild.member(user);
+                let member = message.guild.member(user.id);
                 if (member && admin.hasPermission('KICK_MEMBERS')) {
                     if (member.hasPermission(['KICK_MEMBERS', 'BAN_MEMBERS'])) {
                         message.client.user.username === member.user.username
-                            ? message.reply(`You really think you can kick me? Traitor! `)
-                            : message.reply(`You can\'t kick ${member} `);
-                        message
-                            .delete()
-                            .catch(() =>
-                                console.log(
-                                    '[Warning]: DM to the bot cannot be deleted with `message.delete()` '
-                                )
-                            );
+                            ? botChannelAsync(
+                                  message,
+                                  `<@!${message.author.id}>, you really think you can kick me? Traitor! `
+                              )
+                            : botChannelAsync(
+                                  message,
+                                  `<@!${message.author.id}>, you can\'t kick ${member} `
+                              );
                         return;
                     }
 
@@ -33,47 +44,43 @@ module.exports = {
                         );
                         if (kickedMember) {
                             let kickEmbed = new MessageEmbed()
-                                .setTitle(`${user.username} is kicked from ${message.guild.name}`)
+                                .setTitle(
+                                    `${member.user.username} is kicked from ${message.guild.name}`
+                                )
                                 .setColor(colors.red)
-                                .setThumbnail(message.author.displayAvatarURL)
+                                .setThumbnail(member.user.displayAvatarURL())
                                 .addField('Kicked User', `${member}`, true)
-                                .addField('Kicked By', `<@${message.author.id}>`, true)
-                                .addField('Spammed In', `${message.channel} channel`, true)
+                                .addField('Spammed In', `<#${message.channel.id}>`, true)
                                 .addField(
                                     'Reason',
-                                    'Violation of server rules and regulations. You can learn more about the rules by typing `/rules`',
-                                    true
+                                    `Violation of server rules and regulations. You can learn more about the rules here <#${ruleChannalId}>`
                                 );
 
-                            message.channel.send(kickEmbed);
-
-                            message
-                                .delete()
-                                .catch(() =>
-                                    console.log(
-                                        '[Warning]: DM to the bot cannot be deleted with `message.delete()` '
-                                    )
-                                );
+                            botChannelAsync(message, kickEmbed);
                         }
                     } catch (error) {
-                        message.author.send(`Unable to kick ${user}`);
+                        messageErrorAsync(
+                            message,
+                            `Unable to kick ${user}`,
+                            `<@!${message.author.id}> Unable to kick ${user}`
+                        );
                         console.error(error);
                     }
-
-                    // !It seems that message.guild.channels.find() is not a function anymore
-                    // let kickChannel = message.guild.channels.find(`name`, 'kickreports');
-                    // if (!kickChannel) return message.channel.send(kickEmbed);
-
-                    // kickChannel.send(kickEmbed);
                 } else {
-                    message.reply(`You don\'t have permissions to kick anyone`);
+                    botChannelAsync(
+                        message,
+                        `<@!${message.author.id}>, you don\'t have permissions to kick anyone`
+                    );
                 }
             } else {
-                message.channel.send(
-                    `Oooo, someone was going to be kicked out. But seems like ${message.author} didn\'t specify who`
+                messageErrorAsync(
+                    message,
+                    `Proper usage would be: \`${prefix}kick @username\``,
+                    `<@!${message.author.id}>, proper usage would be: \`${prefix}kick @username\``
                 );
             }
         } catch (error) {
+            console.error(error);
             throw error;
         }
     },

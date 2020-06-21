@@ -1,13 +1,17 @@
 const { MessageEmbed } = require('discord.js');
 const { colors } = require('../json/config.json');
 const { formatDate } = require('../helpers/index');
+const { messageErrorAsync, deleteMessage } = require('../helpers/message');
 
 module.exports = {
     name: 'serverInfo',
-    description: 'kdsljf',
+    description:
+        'This command sends information about the server like no.of members, createdAt, etc',
     guildOnly: true,
     aliases: ['serverinfo'],
+    usage: ' ',
     execute: async (message, args) => {
+        deleteMessage(message, 0);
         let serverEmbed = new MessageEmbed()
             .setTitle(`${message.guild.name}'s Info`)
             .setColor(colors.green)
@@ -18,11 +22,10 @@ module.exports = {
             .addField('You joined on: ', formatDate(message.member.joinedAt), true)
             .addField('Total members: ', message.guild.memberCount, true);
 
-        message
-            .delete()
-            .catch(() =>
-                console.log('[Warning]: DM to the bot cannot be deleted with `message.delete()` ')
-            );
-        message.author.send(serverEmbed);
+        messageErrorAsync(
+            message,
+            serverEmbed,
+            `<@!${message.author.id}>, I wasn't able to send the server information`
+        );
     },
 };

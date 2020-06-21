@@ -1,29 +1,35 @@
 const { MessageEmbed } = require('discord.js');
 const { prefix, colors } = require('../json/config.json');
+const { botChannelAsync, messageErrorAsync, deleteMessage } = require('../helpers/message');
+const Member = require('../server/models/Member');
 
 module.exports = {
     name: 'ban',
-    description: 'kdslsjf;lkads',
+    description: 'This command bans the specified member of the guild',
     guildOnly: true,
+    adminOnly: true,
+    usage: '@username',
     execute: async (message, args) => {
+        deleteMessage(message, 0);
+        let ruleChannelId = process.env.CM_RULE_CHANNEL || ruleChannel;
         try {
-            let user = message.mentions.users.first();
+            let user = message.mentions.users.first() || args[0];
 
             if (user) {
                 let admin = message.guild.member(message.author);
                 let member = message.guild.member(user);
                 if (member && admin.hasPermission('BAN_MEMBERS')) {
-                    if (member.hasPermission(['KICK_MEMBERS', 'BAN_MEMBERS', 'ADMINISTRATOR'])) {
+                    if (member.hasPermission(['BAN_MEMBERS'])) {
                         message.client.user.username === member.user.username
-                            ? message.reply(`You really think you can ban me? Traitor! `)
-                            : message.reply(`You can\'t ban ${member} `);
-                        message
-                            .delete()
-                            .catch(() =>
-                                console.log(
-                                    '[Warning]: DM to the bot cannot be deleted with `message.delete()` '
-                                )
-                            );
+                            ? botChannelAsync(
+                                  message,
+                                  `<@!${message.author.id}>, you really think you can ban me? Traitor! `
+                              )
+                            : messageErrorAsync(
+                                  message,
+                                  `<@!${message.author.id}>, you can\'t ban <@!${member.user.id}>`,
+                                  `<@!${message.author.id}>, you can\'t ban <@!${member.user.id}>`
+                              );
                         return;
                     }
 
@@ -33,44 +39,44 @@ module.exports = {
                         });
                         if (banedMember) {
                             let banEmbed = new MessageEmbed()
-                                .setTitle(`${user.username} is baned from ${message.guild.name}`)
-                                .setColor(colors.green)
-                                .setThumbnail(message.author.displayAvatarURL)
-                                .addField('Baned User', `${member}`, true)
-                                .addField('Baned By', `<@${message.author.id}>`, true)
-                                .addField('Spammed In', `${message.channel} channel`, true)
+                                .setTitle(
+                                    `${member.user.username} is banned from ${message.guild.name}`
+                                )
+                                .setColor(colors.red)
+                                .setThumbnail(member.user.displayAvatarURL())
+                                .addField('Banned User', `<@!${member.user.id}>`, true)
+                                .addField('Spammed In', `<#${message.channel.id}>`, true)
                                 .addField(
                                     'Reason',
-                                    'Violation of server rules and regulations. You can learn more about the rules by typing `/rules`',
-                                    true
+                                    `Repeated violation of server rules and regulations. You can learn more about the rules by typing <#${ruleChannelId}>`,
+                                    false
                                 );
 
-                            message.channel.send(banEmbed);
-                            message
-                                .delete()
-                                .catch(() =>
-                                    console.log(
-                                        '[Warning]: DM to the bot cannot be deleted with `message.delete()` '
-                                    )
-                                );
+                            await Member.findOneAndDelete({ discordId: member.user.id }).catch(
+                                (err) => {
+                                    console.log(err);
+                                }
+                            );
+                            return botChannelAsync(message, banEmbed);
                         }
                     } catch (error) {
-                        message.author.send(`Unable to ban ${user}`);
                         console.error(error);
+                        return messageErrorAsync(
+                            message,
+                            `Unable to ban ${member.user.username}`,
+                            `Unable to ban <@!${member.user.username}>`
+                        );
                     }
                 } else {
-                    message.reply(`You don\'t have permissions to ban anyone`);
+                    return botChannelAsync(
+                        message,
+                        `<@!${message.author.id}>, you don\'t have permissions to ban anyone`
+                    );
                 }
             } else {
-                message
-                    .delete()
-                    .catch(() =>
-                        console.log(
-                            '[Warning]: DM to the bot cannot be deleted with `message.delete()` '
-                        )
-                    );
-                message.reply(
-                    `The proper usage would be: \`${prefix}ban @username days[optional]\``
+                return botChannelAsync(
+                    message,
+                    `<@!${message.author.id}>, proper usage would be: \`${prefix}ban @username\``
                 );
             }
         } catch (error) {
