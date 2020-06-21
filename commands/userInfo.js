@@ -48,7 +48,7 @@ module.exports = {
                     .addField('\u200b', '\u200b')
                     .addField('Points needed to level up', `${returnedMember.levelUp}`, true)
                     .addField('Warned', `${returnedMember.warn.length} times`, true)
-                    .addField('Warned', `${rolesArray.join(', ')}` || 'No roles');
+                    .addField('Roles', `${rolesArray.join(', ')}` || 'No roles');
 
                 messageErrorAsync(
                     message,
@@ -88,7 +88,7 @@ module.exports = {
                     .addField('\u200b', '\u200b')
                     .addField('Points needed to level up', `${returnedMember.levelUp}`, true)
                     .addField('Warned', `${returnedMember.warn.length} times`, true)
-                    .addField('Warned', `${rolesArray.join(', ')}` || 'No roles');
+                    .addField('Roles', `${rolesArray.join(', ')}` || 'No roles');
 
                 messageErrorAsync(message, userEmbed, `<@!${message.author.id}> `);
             }
