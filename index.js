@@ -26,7 +26,7 @@ bot.once('ready', () => {
 bot.on('message', (message) => {
     let moderationCheck = process.env.CM_MODERATION || moderation;
     let args = [];
-    if (message.author === bot.user) {
+    if (message.author === bot.user || message.author.bot) {
         return;
     } else {
         if (moderationCheck) {
