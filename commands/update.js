@@ -1,5 +1,6 @@
 const Member = require('../server/models/Member');
 const { messageErrorAsync, botChannelAsync, deleteMessage } = require('../helpers/message');
+const { botCount } = require('../helpers');
 
 module.exports = {
     name: 'update',
@@ -9,8 +10,12 @@ module.exports = {
     usage: ' ',
     execute: async (message, args) => {
         deleteMessage(message, 0);
+        let botCountResult;
+        botCountResult = botCount(message);
         if (message.guild.member(message.author)) {
-            let returnedMember = await Member.findOne({ discordId: message.author.id });
+            let returnedMember = await Member.findOne({
+                discordSlug: `${message.author.id}${message.guild.id}`,
+            });
             if (!returnedMember) {
                 return messageErrorAsync(
                     message,
@@ -20,12 +25,18 @@ module.exports = {
             }
 
             returnedMember.discordId = message.author.id;
+            returnedMember.discordSlug = `${message.author.id}${message.guild.id}`;
             returnedMember.discriminator = `#${message.author.discriminator}`;
             returnedMember.username = message.author.username;
             returnedMember.nickName = message.member.nickname;
             returnedMember.avatar = message.author.avatarURL();
-            returnedMember.server = message.guild.name;
-            returnedMember.joinedAt = message.guild.joinedAt;
+            returnedMember.serverDetails = {
+                serverId: message.guild.id,
+                serverName: message.guild.name,
+                memberCount: message.guild.memberCount - botCountResult,
+                botCount: botCountResult,
+                joinedAt: message.guild.joinedAt,
+            };
             returnedMember.roles = [...message.member._roles];
 
             try {

@@ -12,14 +12,42 @@ module.exports = {
     guildOnly: true,
     usage: '@username',
     execute: async (message, args) => {
-        let userEmbed;
+        let userEmbed = (returnedMember) => {
+            return new MessageEmbed()
+                .setTitle("User's info")
+                .setThumbnail(returnedMember.avatar)
+                .setColor(colors.green)
+                .addField('Username', `${returnedMember.username}`, true)
+                .addField(
+                    'Joined server on',
+                    formatDate(returnedMember.serverDetails.joinedAt),
+                    true
+                )
+                .addField('\u200b', '\u200b')
+                .addField('Level', `${returnedMember.level}`, true)
+                .addField('TotalPoints', `${returnedMember.totalPoints}`, true)
+                .addField('\u200b', '\u200b')
+                .addField('Points needed to level up', `${returnedMember.levelUp}`, true)
+                .addField('Warned', `${returnedMember.warn.length} times`, true)
+                .addField('\u200b', '\u200b')
+                .addField('Roles', `${rolesArray.join(', ')}` || 'No roles');
+        };
+        const setRoles = (returnedMember) => {
+            returnedMember.roles.forEach((role) => {
+                let guildRole = message.member.roles.cache.find(
+                    (guildRoleId) => role === guildRoleId.id
+                );
+                if (guildRole) rolesArray.push(`**${guildRole.name}**`);
+            });
+        };
         let rolesArray = [];
         deleteMessage(message, 0);
         try {
             if (!args.length) {
-                const returnedMember = await Member.findOne({ discordId: message.author.id });
+                const returnedMember = await Member.findOne({
+                    discordSlug: `${message.author.id}${message.guild.id}`,
+                });
                 if (!returnedMember) {
-                    deleteMessage(message, 0);
                     return messageErrorAsync(
                         message,
                         "You're not in the DB, try adding yourself in the database with the `/add` command",
@@ -27,32 +55,10 @@ module.exports = {
                     );
                 }
 
-                returnedMember.roles.forEach((role) => {
-                    let guildRole = message.member.roles.cache.find(
-                        (guildRoleId) => role === guildRoleId.id
-                    );
-                    console.log(guildRole);
-                    if (guildRole) rolesArray.push(`**${guildRole.name}**`);
-                });
-                console.log(rolesArray);
-
-                userEmbed = new MessageEmbed()
-                    .setTitle("User's info")
-                    .setThumbnail(returnedMember.avatar)
-                    .setColor(colors.green)
-                    .addField('Username', `${returnedMember.username}`, true)
-                    .addField('Joined server on', formatDate(returnedMember.joinedAt), true)
-                    .addField('\u200b', '\u200b')
-                    .addField('Level', `${returnedMember.level}`, true)
-                    .addField('TotalPoints', `${returnedMember.totalPoints}`, true)
-                    .addField('\u200b', '\u200b')
-                    .addField('Points needed to level up', `${returnedMember.levelUp}`, true)
-                    .addField('Warned', `${returnedMember.warn.length} times`, true)
-                    .addField('Roles', `${rolesArray.join(', ')}` || 'No roles');
-
+                setRoles(returnedMember);
                 messageErrorAsync(
                     message,
-                    userEmbed,
+                    userEmbed(returnedMember),
                     `<@!${message.author.id}> I wasn't able to send the user information`
                 );
             } else {
@@ -76,21 +82,8 @@ module.exports = {
                     );
                 }
 
-                userEmbed = new MessageEmbed()
-                    .setTitle("User's info")
-                    .setThumbnail(returnedMember.avatar)
-                    .setColor(colors.green)
-                    .addField('Username', `${returnedMember.username}`, true)
-                    .addField('Joined server on', formatDate(returnedMember.joinedAt), true)
-                    .addField('\u200b', '\u200b')
-                    .addField('Level', `${returnedMember.level}`, true)
-                    .addField('TotalPoints', `${returnedMember.totalPoints}`, true)
-                    .addField('\u200b', '\u200b')
-                    .addField('Points needed to level up', `${returnedMember.levelUp}`, true)
-                    .addField('Warned', `${returnedMember.warn.length} times`, true)
-                    .addField('Roles', `${rolesArray.join(', ')}` || 'No roles');
-
-                messageErrorAsync(message, userEmbed, `<@!${message.author.id}> `);
+                setRoles(returnedMember);
+                messageErrorAsync(message, userEmbed(returnedMember), `<@!${message.author.id}> `);
             }
         } catch (error) {
             console.log(error);

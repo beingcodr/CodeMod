@@ -1,6 +1,7 @@
 const { MessageEmbed } = require('discord.js');
 const { colors, prefix, ruleChannel } = require('../json/config.json');
 const { messageErrorAsync, botChannelAsync, deleteMessage } = require('../helpers/message');
+const update = require('./update');
 
 module.exports = {
     name: 'kick',
@@ -25,7 +26,7 @@ module.exports = {
                 let admin = message.guild.member(message.author);
                 let member = message.guild.member(user.id);
                 if (member && admin.hasPermission('KICK_MEMBERS')) {
-                    if (member.hasPermission(['KICK_MEMBERS', 'BAN_MEMBERS'])) {
+                    if (member.hasPermission(['KICK_MEMBERS', 'BAN_MEMBERS']) && !args[0].bypass) {
                         message.client.user.username === member.user.username
                             ? botChannelAsync(
                                   message,

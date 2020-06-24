@@ -5,16 +5,22 @@ const memberSchema = new Schema(
     {
         entity: { type: String, required: true },
         discordId: { type: String, required: true },
+        discordSlug: { type: String, required: true },
         discriminator: { type: String, required: true },
         username: { type: String, required: true },
         nickName: { type: String },
         avatar: { type: String },
-        server: { type: String },
+        serverDetails: {
+            serverId: { type: String, required: true, default: '' },
+            serverName: { type: String, required: true, default: '' },
+            memberCount: { type: Number, required: true, default: 0 },
+            botCount: { type: Number, required: true, default: 0 },
+            joinedAt: { type: String, required: true },
+        },
         roles: [{ type: String }],
         level: { type: Number, required: true },
         levelUp: { type: Number, required: true },
         totalPoints: { type: Number, required: true },
-        joinedAt: { type: String, required: true },
         addedBy: { type: String, required: true, default: ' ' },
         warn: [
             {

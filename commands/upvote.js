@@ -58,7 +58,9 @@ module.exports = {
             );
         }
 
-        const member = await Member.findOne({ discordId: guildMember.user.id });
+        const member = await Member.findOne({
+            discordSlug: `${guildMember.user.id}${message.guild.id}`,
+        });
         if (!member) {
             result = await addMemberEvent(guildMember, 'upvote command');
         }

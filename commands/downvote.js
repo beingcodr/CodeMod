@@ -62,7 +62,9 @@ module.exports = {
             );
         }
 
-        const member = await Member.findOne({ discordId: mentionedMember.id });
+        const member = await Member.findOne({
+            discordSlug: `${guildMember.user.id}${message.guild.id}`,
+        });
         if (!member) {
             result = await addMemberEvent(guildMember, 'downvote command');
         }

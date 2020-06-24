@@ -1,6 +1,11 @@
 const { MessageEmbed } = require('discord.js');
 const { colors } = require('../json/config.json');
-const { botChannelAsync, deleteMessage, messageErrorAsync } = require('../helpers/message');
+const {
+    botChannelAsync,
+    deleteMessage,
+    messageErrorAsync,
+    memberErrorAsync,
+} = require('../helpers/message');
 const Member = require('../server/models/Member');
 const kick = require('./kick');
 const { addMemberEvent } = require('../helpers/member');
@@ -24,6 +29,7 @@ module.exports = {
         deleteMessage(message, 0);
         let result = {};
         let savedMember = {};
+        let warnCount = 0;
 
         if (!message.member.hasPermission('ADMINISTRATOR'))
             return botChannelAsync(message, `You can't use \`warn\` command`);
@@ -62,7 +68,9 @@ module.exports = {
                 `<@!${message.author.id}>, Please provide a **reason** with the \`warn\` command`
             );
 
-        let member = await Member.findOne({ discordId: mentionedMember.id });
+        let member = await Member.findOne({
+            discordSlug: `${mentionedMember.id}${message.guild.id}`,
+        });
         if (!member) {
             result = await addMemberEvent(guildMember, 'warn command');
         }
@@ -94,9 +102,7 @@ module.exports = {
         let warnEmbed;
 
         warnEmbed = new MessageEmbed()
-            .setTitle(
-                `Warning count ${savedMember.warn.length} for **${guildMember.user.username}**`
-            )
+            .setTitle(`Warning issued for _${guildMember.user.username}_`)
             .setThumbnail(guildMember.user.avatarURL())
             .setColor(colors.red)
             .addField('Issued channel', `<#${message.channel.id}>`, true)
@@ -108,7 +114,26 @@ module.exports = {
             );
 
         botChannelAsync(message, warnEmbed);
-        args = [{ id: `${guildMember.user.id}` }];
+
+        if (savedMember.warn.length < 5) {
+            warnCount = 5 - savedMember.warn.length;
+            memberErrorAsync(
+                message,
+                guildMember,
+                `You are ${warnCount} warnings away from getting kicked`,
+                `<@${guildMember.user.id}>, you are ${warnCount} warnings away from getting kicked`
+            );
+        } else if (savedMember.warn.length > 5 && savedMember.warn.length < 10) {
+            warnCount = 10 - savedMember.warn.length;
+            memberErrorAsync(
+                message,
+                guildMember,
+                `You are ${warnCount} warnings away from getting banned`,
+                `<@${guildMember.user.id}>, you are ${warnCount} warnings away from getting banned`
+            );
+        }
+
+        args = [{ id: `${guildMember.user.id}`, bypass: true }];
         return warnValidator(message, args, savedMember.warn.length);
     },
 };
