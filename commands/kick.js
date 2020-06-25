@@ -25,6 +25,7 @@ module.exports = {
 
                 let admin = message.guild.member(message.author);
                 let member = message.guild.member(user.id);
+                // Check if mentioned person is a member and the author has permissions to kick
                 if (member && admin.hasPermission('KICK_MEMBERS')) {
                     if (member.hasPermission(['KICK_MEMBERS', 'BAN_MEMBERS']) && !args[0].bypass) {
                         message.client.user.username === member.user.username
@@ -34,7 +35,7 @@ module.exports = {
                               )
                             : botChannelAsync(
                                   message,
-                                  `<@!${message.author.id}>, you can\'t kick ${member} `
+                                  `Sorry, I can't kick admins`
                               );
                         return;
                     }

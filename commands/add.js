@@ -12,7 +12,7 @@ module.exports = {
         let result = {};
         deleteMessage(message, 0);
         if (message.guild.member(message.author)) {
-            result = await addMember(message);
+            result = await addMember(message, 'add command');
             if (result.success) {
                 return messageErrorAsync(
                     message,

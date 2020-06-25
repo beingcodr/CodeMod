@@ -67,6 +67,7 @@ const addMember = async (message, reason) => {
         return { success: false };
     }
 };
+
 const addMemberEvent = async (member, reason) => {
     let returnedMember = await Member.findOne({
         discordSlug: `${member.user.id}${member.guild.id}`,
@@ -123,6 +124,7 @@ const addMemberEvent = async (member, reason) => {
         return { success: false };
     }
 };
+
 const updateMember = async (message, member) => {
     let botCount = calculateMember(message);
 

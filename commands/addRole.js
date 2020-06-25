@@ -113,10 +113,3 @@ module.exports = {
         }
     },
 };
-
-/* 
-1. Check if there is any mentioned user.
-2. If(!mentionedUser) then assign the passed roles to the message.author after checking if the roles are valid and can be added to a member
-3. If(mentionedUser) then add the passed roles to that user after checking if the author has permissions to do so
-
-*/

@@ -17,6 +17,7 @@ const downvoteValidator = (member) => {
         let level = currentLevel === 0 ? 0 : currentLevel - 1;
         let levelUp = member.levelUp - totalLevelUp;
         return {
+            currentLevel,
             level: level,
             levelUp: currentLevel === 0 ? Math.abs(100 + levelUp) : Math.abs(levelUp),
             leveledDown: true,
@@ -172,22 +173,26 @@ module.exports = {
                 result.member.level = downvoteResult.level;
                 result.member.levelUp = downvoteResult.levelUp;
 
-                memberErrorAsync(
-                    message,
-                    guildMember,
-                    `You have been demoted to **Level ${result.member.level}**`,
-                    `<@!${result.member.discordId}>, you have been demoted to **Level ${result.member.level}**`
-                );
+                downvoteResult.currentLevel === 0
+                    ? null
+                    : memberErrorAsync(
+                          message,
+                          guildMember,
+                          `You have been demoted to **Level ${result.member.level}**`,
+                          `<@!${result.member.discordId}>, you have been demoted to **Level ${result.member.level}**`
+                      );
             } else {
                 member.level = downvoteResult.level;
                 member.levelUp = downvoteResult.levelUp;
 
-                memberErrorAsync(
-                    message,
-                    guildMember,
-                    `You have been demoted to **Level ${member.level}**`,
-                    `<@!${member.discordId}>, you have been demoted to **Level ${member.level}**`
-                );
+                downvoteResult.currentLevel === 0
+                    ? null
+                    : memberErrorAsync(
+                          message,
+                          guildMember,
+                          `You have been demoted to **Level ${member.level}**`,
+                          `<@!${member.discordId}>, you have been demoted to **Level ${member.level}**`
+                      );
             }
         }
 
