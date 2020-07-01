@@ -3,6 +3,7 @@ const { colors } = require('../json/config.json');
 const { formatDate } = require('../helpers/index');
 const { messageErrorAsync, deleteMessage } = require('../helpers/message');
 const Member = require('../server/models/Member');
+const Server = require('../server/models/Server');
 
 // me command can add the user in the database with all the args required
 module.exports = {
@@ -12,17 +13,32 @@ module.exports = {
     guildOnly: true,
     usage: '@username',
     execute: async (message, args) => {
-        let userEmbed = (returnedMember) => {
+        let hasMentions = false;
+        if (message.mentions.users.size) hasMentions = true;
+        let returnedServer = await Server.findOne({ serverId: message.guild.id });
+        if (!returnedServer) {
+            return messageErrorAsync(
+                message,
+                'This server is not registered. Please register it first with `/addServer` command',
+                `<@${message.author.id}>, this server is not registered. Please register it first with \`/addServer\` command`
+            );
+        }
+        const userEmbed = (returnedMember) => {
             return new MessageEmbed()
                 .setTitle("User's info")
-                .setThumbnail(returnedMember.avatar)
+                .setThumbnail(
+                    returnedMember.avatar
+                        ? returnedMember.avatar
+                        : hasMentions
+                        ? message.guild
+                              .member(message.mentions.users.first())
+                              .user.displayAvatarURL()
+                        : message.author.displayAvatarURL()
+                )
                 .setColor(colors.green)
                 .addField('Username', `${returnedMember.username}`, true)
-                .addField(
-                    'Joined server on',
-                    formatDate(returnedMember.serverDetails.joinedAt),
-                    true
-                )
+                .addField('Server name', `${returnedMember.serverId.name}`, true)
+                .addField('Joined server on', formatDate(returnedMember.joinedAt), true)
                 .addField('\u200b', '\u200b')
                 .addField('Level', `${returnedMember.level}`, true)
                 .addField('TotalPoints', `${returnedMember.totalPoints}`, true)
@@ -32,6 +48,7 @@ module.exports = {
                 .addField('\u200b', '\u200b')
                 .addField('Roles', `${rolesArray.join(', ')}` || 'No roles');
         };
+
         const setRoles = (returnedMember) => {
             returnedMember.roles.forEach((role) => {
                 let guildRole = message.member.roles.cache.find(
@@ -46,7 +63,7 @@ module.exports = {
             if (!args.length) {
                 const returnedMember = await Member.findOne({
                     discordSlug: `${message.author.id}${message.guild.id}`,
-                });
+                }).populate('serverId');
                 if (!returnedMember) {
                     return messageErrorAsync(
                         message,
@@ -73,7 +90,9 @@ module.exports = {
                     );
                 }
 
-                const returnedMember = await Member.findOne({ discordId: mentionedUser.id });
+                const returnedMember = await Member.findOne({
+                    discordId: mentionedUser.id,
+                }).populate('serverId');
                 if (!returnedMember) {
                     return messageErrorAsync(
                         message,

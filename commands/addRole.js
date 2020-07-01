@@ -3,10 +3,9 @@ const { updateMember } = require('../helpers/member');
 
 module.exports = {
     name: 'addRole',
-    description: 'This command allows the admins to assign roles to the members',
+    description: 'This command allows the admins to assign single/multiple roles to the members',
     guildOnly: true,
-    // adminOnly: true,
-    usage: '@username <role name>',
+    usage: `@username <role name>\` OR \`/addRole @username <rolename1, role name2,..., role namen>`,
     aliases: ['addrole', 'arole'],
     execute: async (message, args) => {
         deleteMessage(message, 0);
@@ -21,15 +20,19 @@ module.exports = {
             role.permissions.has('ADMINISTRATOR') ||
             role.permissions.has('KICK_MEMBERS') ||
             role.permissions.has('BAN_MEMBERS') ||
+            role.permissions.has('SEND_TTS_MESSAGES') ||
+            role.permissions.has('MANAGE_MESSAGES') ||
             role.permissions.has('MANAGE_ROLES') ||
             role.permissions.has('MANAGE_GUILD') ||
+            role.permissions.has('MANAGE_EMOJIS') ||
+            role.permissions.has('MANAGE_WEBHOOKS') ||
+            role.permissions.has('MANAGE_NICKNAMES') ||
             role.permissions.has('MANAGE_CHANNELS');
 
         if (message.member.hasPermission(['MANAGE_ROLES'])) {
             isAdmin = true;
         }
 
-        console.log(message.mentions);
         if (message.mentions.users.size) {
             hasMentions = true;
         }
@@ -58,7 +61,7 @@ module.exports = {
                 return unidentifiedRoles.push(roleName);
             }
 
-            // Check if the member has that role
+            // Check if the mentionedUser is a valid member
             roleMember = hasMentions
                 ? message.guild.member(mentionedUser)
                 : message.guild.member(message.author);
@@ -69,10 +72,8 @@ module.exports = {
                     `<@!${message.author.id}>, no such member found!`
                 );
             }
-            if (roleMember.roles.cache.has(guildRole)) {
-                return memberRoles.push(guildRole.name);
-            }
 
+            // Check if the role is self-assignable if not push them into the array
             if (checkRolePermission(guildRole) && !isAdmin) {
                 return nonSelfAssignableRoles.push(guildRole.name);
             }
@@ -85,21 +86,18 @@ module.exports = {
             memberRoles.forEach((role) => {
                 roleMember.roles.add(role);
             });
-            console.log(assignedRoles);
-            console.log(nonSelfAssignableRoles);
-            console.log(unidentifiedRoles);
             memberErrorAsync(
                 message,
                 roleMember,
                 `Assigned roles: **${assignedRoles.join(', ') || null}**\nNon-assignable roles: **${
                     nonSelfAssignableRoles.join(', ') || null
-                }**\nUnidentified: **${unidentifiedRoles.join(', ') || null}**`,
+                }**\nUnidentified roles: **${unidentifiedRoles.join(', ') || null}**`,
 
                 `<@!${roleMember.user.id}>,\nAssigned roles: **${
                     assignedRoles.join(', ') || null
                 }**\nNon-assignable roles: **${
                     nonSelfAssignableRoles.join(', ') || null
-                }**\nUnidentified: **${unidentifiedRoles.join(', ') || null}**`
+                }**\nUnidentified roles: **${unidentifiedRoles.join(', ') || null}**`
             );
 
             await updateMember(message, roleMember);

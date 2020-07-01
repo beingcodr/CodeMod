@@ -1,6 +1,5 @@
-const Member = require('../server/models/Member');
 const { messageErrorAsync, deleteMessage } = require('../helpers/message');
-const { addMember } = require('../helpers/member');
+const { addMember, addMentionedMember } = require('../helpers/member');
 
 module.exports = {
     name: 'add',
@@ -12,7 +11,17 @@ module.exports = {
         let result = {};
         deleteMessage(message, 0);
         if (message.guild.member(message.author)) {
-            result = await addMember(message, 'add command');
+            let hasMentions = false;
+            if (message.mentions.users.size) hasMentions = true;
+            if (hasMentions && !message.guild.member(message.author).hasPermission('ADMINISTRATOR'))
+                return messageErrorAsync(
+                    message,
+                    "You can't add others to the database.",
+                    `<@!${message.author.id}>, you can't add others to the database`
+                );
+            result = hasMentions
+                ? await addMentionedMember(message, 'add command (mentioned)')
+                : await addMember(message, 'add command');
             if (result.success) {
                 return messageErrorAsync(
                     message,
