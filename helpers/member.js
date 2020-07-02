@@ -86,6 +86,7 @@ const addMentionedMember = async (message, reason) => {
     }
     let mentionedMember = message.guild.member(message.mentions.users.first());
     if (!mentionedMember) return { success: false };
+    
     let returnedMember = await Member.findOne({
         discordSlug: `${mentionedMember.user.id}${mentionedMember.guild.id}`,
     });

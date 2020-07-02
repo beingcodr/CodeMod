@@ -19,6 +19,7 @@ module.exports = {
                     "You can't add others to the database.",
                     `<@!${message.author.id}>, you can't add others to the database`
                 );
+
             result = hasMentions
                 ? await addMentionedMember(message, 'add command (mentioned)')
                 : await addMember(message, 'add command');

@@ -14,6 +14,7 @@ module.exports = {
     aliases: ['removerole', 'rmrole'],
     execute: async (message, args) => {
         deleteMessage(message, 0);
+        let updatedWithRole = 0;
         let isAdmin = false;
         let hasMentions = false;
         let unidentifiedRoles = [];
@@ -67,7 +68,7 @@ module.exports = {
                 return unidentifiedRoles.push(roleName);
             }
 
-            // Check if the mentionedUser is a valid member
+            // Check if there is a  mentionedUser
             roleMember = hasMentions
                 ? message.guild.member(mentionedUser)
                 : message.guild.member(message.author);
@@ -79,7 +80,18 @@ module.exports = {
                 );
             }
 
-            // Check if the role is self-assignable if not push them into the array
+            // Check if the user doesn't have that role
+            const doesntHaveTheRole = roleMember.roles.cache.find(
+                (memberRole) => memberRole.name === guildRole.name
+            );
+            if (!doesntHaveTheRole)
+                return messageErrorAsync(
+                    message,
+                    `<@${roleMember.id}> doesn't have **${guildRole.name}** role`,
+                    `<@${message.author.id}>, <@${roleMember.id}> doesn't have **${guildRole.name}** role`
+                );
+
+            // Check if the role is non-removeable
             if (checkRolePermission(guildRole) && isAdmin) {
                 return nonRemoveableRoles.push(guildRole.name);
             }
@@ -91,6 +103,7 @@ module.exports = {
         try {
             memberRoles.forEach((role) => {
                 roleMember.roles.remove(role);
+                updatedWithRole += 1;
             });
             memberErrorAsync(
                 message,
@@ -106,15 +119,19 @@ module.exports = {
                 }**\nUnidentified roles: **${unidentifiedRoles.join(', ') || null}**`
             );
 
-            if (checkRolePermission(role) && isAdmin && roleMember.hasPermission('ADMINISTRATOR')) {
+            if (nonRemoveableRoles.length) {
                 return messageErrorAsync(
                     message,
-                    `You can\'t remove privilieged roles from <@${roleMember.user.id}>`,
-                    `You can\'t remove privilieged roles from <@${roleMember.user.id}>`
+                    `You can\'t remove privilieged roles \`${nonRemoveableRoles.join(
+                        ', '
+                    )}\` from <@${roleMember.user.id}>`,
+                    `You can\'t remove privilieged roles \`${nonRemoveableRoles.join(
+                        ', '
+                    )}\` from <@${roleMember.user.id}>`
                 );
             }
 
-            await updateMember(message, roleMember);
+            if (updatedWithRole > 0) await updateMember(message, roleMember);
         } catch (error) {
             console.log(error);
             return messageErrorAsync(

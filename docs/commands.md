@@ -22,10 +22,10 @@ This command sends all the commands the user can use. Optionally you can get inf
 This command sends a private message to the @username mentioned by the user  
 **Example**: `/send @rahulravindran Hello mate, what's up?`
 
-### `/add`
+### `/add` OR `/add @username`
 
-This command registers you to the database for user leveling  
-**Example**: `/add`
+This command registers you/mentioned user to the database for user leveling  
+**Example**: `/add` OR `/add @username`
 
 ### `/userInfo @username[optional]`
 
@@ -49,6 +49,16 @@ This command sends the information of the server
 ### `/botInfo` OR `/botinfo`
 
 This command sends the information of the bot
+
+### `/addRole @username <Role name>` OR `/addrole @username <Role name>`
+
+This command adds role to the specified user. The **Role name** is case sensitive  
+**Example:** `/addRole @username admin`
+
+### `/removeRole @username <Role name>` OR `/removerole @username <Role name>` OR `/rmrole @username <Role name>`
+
+This command removes role from the specified user. The **Role name** is case sensitive  
+**Example:** `/removeRole @username admin`
 
 ## Anywhere
 
@@ -92,16 +102,6 @@ This command bans the member mentioned by the user
 
 This command deletes number of latest messages specified by the user  
 **Example:** `/purge 20`
-
-### `/addRole @username <Role name>` OR `/addrole @username <Role name>`
-
-This command adds role to the specified user. The **Role name** is case sensitive  
-**Example:** `/addRole @username admin`
-
-### `/removeRole @username <Role name>` OR `/removerole @username <Role name>` OR `/rmrole @username <Role name>`
-
-This command removes role from the specified user. The **Role name** is case sensitive  
-**Example:** `/removeRole @username admin`
 
 ### `/downvote @username <keyword>` OR `/dvote @username <keyword>`
 

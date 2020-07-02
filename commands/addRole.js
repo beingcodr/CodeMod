@@ -9,6 +9,7 @@ module.exports = {
     aliases: ['addrole', 'arole'],
     execute: async (message, args) => {
         deleteMessage(message, 0);
+        let updatedWithRole = 0;
         let isAdmin = false;
         let hasMentions = false;
         let unidentifiedRoles = [];
@@ -73,6 +74,16 @@ module.exports = {
                 );
             }
 
+            const alreadyHasTheRole = roleMember.roles.cache.find(
+                (memberRole) => memberRole.name === guildRole.name
+            );
+            if (alreadyHasTheRole)
+                return messageErrorAsync(
+                    message,
+                    `<@${roleMember.id}> already has **${guildRole.name}** role`,
+                    `<@${message.author.id}>, <@${roleMember.id}> already has **${guildRole.name}** role`
+                );
+
             // Check if the role is self-assignable if not push them into the array
             if (checkRolePermission(guildRole) && !isAdmin) {
                 return nonSelfAssignableRoles.push(guildRole.name);
@@ -85,6 +96,7 @@ module.exports = {
         try {
             memberRoles.forEach((role) => {
                 roleMember.roles.add(role);
+                updatedWithRole += 1;
             });
             memberErrorAsync(
                 message,
@@ -100,7 +112,7 @@ module.exports = {
                 }**\nUnidentified roles: **${unidentifiedRoles.join(', ') || null}**`
             );
 
-            await updateMember(message, roleMember);
+            if (updatedWithRole > 0) await updateMember(message, roleMember);
         } catch (error) {
             console.log(error);
             return messageErrorAsync(
