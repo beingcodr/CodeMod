@@ -3,6 +3,7 @@ const { colors } = require('../json/config.json');
 const { formatDate } = require('../helpers/index');
 const { messageErrorAsync, deleteMessage } = require('../helpers/message');
 const Member = require('../server/models/Member');
+const Server = require('../server/models/Server');
 
 // me command can add the user in the database with all the args required
 module.exports = {
@@ -12,14 +13,58 @@ module.exports = {
     guildOnly: true,
     usage: '@username',
     execute: async (message, args) => {
-        let userEmbed;
+        let hasMentions = false;
+        if (message.mentions.users.size) hasMentions = true;
+        let returnedServer = await Server.findOne({ serverId: message.guild.id });
+        if (!returnedServer) {
+            return messageErrorAsync(
+                message,
+                'This server is not registered. Please register it first with `/addServer` command',
+                `<@${message.author.id}>, this server is not registered. Please register it first with \`/addServer\` command`
+            );
+        }
+        const userEmbed = (returnedMember) => {
+            return new MessageEmbed()
+                .setTitle("User's info")
+                .setThumbnail(
+                    returnedMember.avatar
+                        ? returnedMember.avatar
+                        : hasMentions
+                        ? message.guild
+                              .member(message.mentions.users.first())
+                              .user.displayAvatarURL()
+                        : message.author.displayAvatarURL()
+                )
+                .setColor(colors.green)
+                .addField('Username', `${returnedMember.username}`, true)
+                .addField('Server name', `${returnedMember.serverId.name}`, true)
+                .addField('Joined server on', formatDate(returnedMember.joinedAt), true)
+                .addField('\u200b', '\u200b')
+                .addField('Level', `${returnedMember.level}`, true)
+                .addField('TotalPoints', `${returnedMember.totalPoints}`, true)
+                .addField('\u200b', '\u200b')
+                .addField('Points needed to level up', `${returnedMember.levelUp}`, true)
+                .addField('Warned', `${returnedMember.warn.length} times`, true)
+                .addField('\u200b', '\u200b')
+                .addField('Roles', `${rolesArray.join(', ')}` || 'No roles');
+        };
+
+        const setRoles = (returnedMember) => {
+            returnedMember.roles.forEach((role) => {
+                let guildRole = message.member.roles.cache.find(
+                    (guildRoleId) => role === guildRoleId.id
+                );
+                if (guildRole) rolesArray.push(`**${guildRole.name}**`);
+            });
+        };
         let rolesArray = [];
         deleteMessage(message, 0);
         try {
             if (!args.length) {
-                const returnedMember = await Member.findOne({ discordId: message.author.id });
+                const returnedMember = await Member.findOne({
+                    discordSlug: `${message.author.id}${message.guild.id}`,
+                }).populate('serverId');
                 if (!returnedMember) {
-                    deleteMessage(message, 0);
                     return messageErrorAsync(
                         message,
                         "You're not in the DB, try adding yourself in the database with the `/add` command",
@@ -27,32 +72,10 @@ module.exports = {
                     );
                 }
 
-                returnedMember.roles.forEach((role) => {
-                    let guildRole = message.member.roles.cache.find(
-                        (guildRoleId) => role === guildRoleId.id
-                    );
-                    console.log(guildRole);
-                    if (guildRole) rolesArray.push(`**${guildRole.name}**`);
-                });
-                console.log(rolesArray);
-
-                userEmbed = new MessageEmbed()
-                    .setTitle("User's info")
-                    .setThumbnail(returnedMember.avatar)
-                    .setColor(colors.green)
-                    .addField('Username', `${returnedMember.username}`, true)
-                    .addField('Joined server on', formatDate(returnedMember.joinedAt), true)
-                    .addField('\u200b', '\u200b')
-                    .addField('Level', `${returnedMember.level}`, true)
-                    .addField('TotalPoints', `${returnedMember.totalPoints}`, true)
-                    .addField('\u200b', '\u200b')
-                    .addField('Points needed to level up', `${returnedMember.levelUp}`, true)
-                    .addField('Warned', `${returnedMember.warn.length} times`, true)
-                    .addField('Roles', `${rolesArray.join(', ')}` || 'No roles');
-
+                setRoles(returnedMember);
                 messageErrorAsync(
                     message,
-                    userEmbed,
+                    userEmbed(returnedMember),
                     `<@!${message.author.id}> I wasn't able to send the user information`
                 );
             } else {
@@ -67,7 +90,9 @@ module.exports = {
                     );
                 }
 
-                const returnedMember = await Member.findOne({ discordId: mentionedUser.id });
+                const returnedMember = await Member.findOne({
+                    discordId: mentionedUser.id,
+                }).populate('serverId');
                 if (!returnedMember) {
                     return messageErrorAsync(
                         message,
@@ -76,21 +101,8 @@ module.exports = {
                     );
                 }
 
-                userEmbed = new MessageEmbed()
-                    .setTitle("User's info")
-                    .setThumbnail(returnedMember.avatar)
-                    .setColor(colors.green)
-                    .addField('Username', `${returnedMember.username}`, true)
-                    .addField('Joined server on', formatDate(returnedMember.joinedAt), true)
-                    .addField('\u200b', '\u200b')
-                    .addField('Level', `${returnedMember.level}`, true)
-                    .addField('TotalPoints', `${returnedMember.totalPoints}`, true)
-                    .addField('\u200b', '\u200b')
-                    .addField('Points needed to level up', `${returnedMember.levelUp}`, true)
-                    .addField('Warned', `${returnedMember.warn.length} times`, true)
-                    .addField('Roles', `${rolesArray.join(', ')}` || 'No roles');
-
-                messageErrorAsync(message, userEmbed, `<@!${message.author.id}> `);
+                setRoles(returnedMember);
+                messageErrorAsync(message, userEmbed(returnedMember), `<@!${message.author.id}> `);
             }
         } catch (error) {
             console.log(error);

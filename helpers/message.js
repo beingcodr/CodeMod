@@ -16,14 +16,18 @@ module.exports = {
             await message.author.send(authorMessage);
             return true;
         } catch (error) {
-            message.client.channels
-                .fetch(process.env.CM_BOT_CHANNEL || botChannel)
-                .then((channel) =>
-                    channel.send(
-                        `${botChannelMessage}\n\nYour DM is locked. Please enable it **User settings > Privacy & safety > Allow messages from server members**`,
-                        { split: true }
-                    )
+            let channelMsg = message.guild.channels.cache.find(
+                (channel) => channel.id === process.env.CM_BOT_CHANNEL || channel.id === botChannel
+            );
+            if (!channelMsg)
+                return message.reply(
+                    `Seems like there is no dedicated \`botChannel\` where the bot can send messages`
                 );
+
+            channelMsg.send(
+                `${botChannelMessage}\n\nYour DM is locked. Please enable it **User settings > Privacy & safety > Allow messages from server members**`,
+                { split: true }
+            );
             return false;
         }
     },
@@ -32,22 +36,35 @@ module.exports = {
             await member.send(memberMessage);
             return true;
         } catch (error) {
-            member.client.channels
-                .fetch(process.env.CM_BOT_CHANNEL || botChannel)
-                .then((channel) =>
-                    channel.send(
-                        `${botChannelMessage}\n\nYour DM is locked. Please enable it **User settings > Privacy & safety > Allow messages from server members**`,
-                        { split: true }
-                    )
+            let channelMsg = message.guild.channels.cache.find(
+                (channel) => channel.id === process.env.CM_BOT_CHANNEL || channel.id === botChannel
+            );
+            if (!channelMsg)
+                return message.reply(
+                    `Seems like there is no dedicated \`botChannel\` where the bot can send messages`
                 );
+
+            channelMsg.send(
+                `${botChannelMessage}\n\nYour DM is locked. Please enable it **User settings > Privacy & safety > Allow messages from server members**`,
+                { split: true }
+            );
             return false;
         }
     },
     botChannelAsync: async (message, botChannelMessage) => {
-        await message.client.channels
-            .fetch(process.env.CM_BOT_CHANNEL || botChannel)
-            .then((channel) => {
-                channel.send(botChannelMessage);
-            });
+        try {
+            let channelMsg = message.guild.channels.cache.find(
+                (channel) => channel.id === process.env.CM_BOT_CHANNEL || channel.id === botChannel
+            );
+            if (!channelMsg)
+                return message.reply(
+                    `Seems like there is no dedicated \`botChannel\` where the bot can send messages`
+                );
+
+            channelMsg.send(botChannelMessage);
+        } catch (error) {
+            console.log(error);
+            return;
+        }
     },
 };

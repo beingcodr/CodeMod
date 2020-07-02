@@ -1,13 +1,12 @@
 const { Client, Collection, MessageEmbed } = require('discord.js');
 require('dotenv').config();
 const mongoose = require('mongoose');
-const { prefix, moderation, adminRole, colors } = require('./json/config.json');
+const { prefix, moderation, colors } = require('./json/config.json');
 const { moderateMessagesCommand } = require('./helpers/index');
 const downvote = require('./commands/downvote');
 const { botChannelAsync, memberErrorAsync } = require('./helpers/message');
 const fs = require('fs');
 const { addMemberEvent } = require('./helpers/member');
-const Member = require('./server/models/Member');
 const bot = new Client();
 bot.commands = new Collection();
 
@@ -38,7 +37,7 @@ bot.on('message', (message) => {
                     .setColor(colors.red)
                     .setURL(`${message.url}`)
                     .addField('Cursed in', `<#${message.channel.id}>`, true)
-                    .addField('Warned user', `<@!${message.author.id}>`, true)
+                    .addField('Warned user', `<@${message.author.id}>`, true)
                     .addField('\u200b', '\u200b')
                     .addField('Detected slangs', `${slangsUsed.join(', ')}`, true)
                     .addField('Message link', `[Link](${message.url})`, true)
@@ -136,46 +135,6 @@ bot.on('guildMemberAdd', (member) => {
 
     return addMemberEvent(member, 'guildMemberAdd event');
 });
-
-// ! make a request to the server for updating member details in the database
-// bot.on('guildMemberUpdate',  (oldMember, newMember) => {
-//     const filteredMember = members.filter((member) => member.id === newMember.user.id);
-//     if (!filteredMember.length) {
-//         filteredMember[0] = {
-//             id: newMember.user.id,
-//             discriminator: `#${newMember.user.discriminator}`,
-//             username: newMember.user.username,
-//             nickName: newMember.nickname,
-//             avatar: newMember.user.avatarURL(),
-//             server: newMember.guild.name,
-//             roles: [...newMember._roles],
-//             level: 0,
-//             totalPoints: 0,
-//         };
-//     } else {
-//         filteredMember[0] = {
-//             id: newMember.user.id,
-//             discriminator: `#${newMember.user.discriminator}`,
-//             username: newMember.user.username,
-//             nickName: newMember.nickname,
-//             avatar: newMember.user.avatarURL(),
-//             server: newMember.guild.name,
-//             roles: [...newMember._roles],
-//             level: 0,
-//             totalPoints: 0,
-//         };
-
-//         members.pop(newMember.user.id);
-//     }
-//     members.push(filteredMember[0]);
-
-//     try {
-//         fs.writeFileSync('./json/members.json', JSON.stringify(members));
-//     } catch (error) {
-//         console.error(error);
-//     }
-//     console.log(filteredMember);
-// });
 
 bot.login(process.env.CM_TOKEN);
 
