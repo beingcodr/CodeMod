@@ -189,6 +189,8 @@ const addMemberEvent = async (member, reason) => {
 
     try {
         const savedMember = await newUser.save();
+        returnedServer.members.push(savedMember.id);
+        await returnedServer.save();
         return { success: true, member: savedMember };
     } catch (error) {
         console.log(error);
