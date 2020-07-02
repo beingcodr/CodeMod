@@ -50,15 +50,15 @@ This command sends the information of the server
 
 This command sends the information of the bot
 
-### `/addRole @username <Role name>` OR `/addrole @username <Role name>`
+### `/addRole @username <Role name>` OR `/addrole @username <Role name>` OR `/addRole <Role name1>, <Role name2>` OR `/addrole <Role name1>, <Role name2>`
 
 This command adds role to the specified user. The **Role name** is case sensitive  
-**Example:** `/addRole @username admin`
+**Example:** `/addRole @username admin` OR `/addrole admin, member, advance dev`
 
-### `/removeRole @username <Role name>` OR `/removerole @username <Role name>` OR `/rmrole @username <Role name>`
+### `/removeRole @username <Role name>` OR `/removerole @username <Role name>` OR `/rmrole @username <Role name>` OR `/removeRole <Role name1>, <Role name2>` OR `/rmRole <Role name1>, <Role name2>`
 
 This command removes role from the specified user. The **Role name** is case sensitive  
-**Example:** `/removeRole @username admin`
+**Example:** `/removeRole @username admin` OR `/removerole admin, member, advance dev`
 
 ## Anywhere
 
