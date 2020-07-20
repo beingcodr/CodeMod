@@ -37,7 +37,7 @@ bot.on('message', (message) => {
                     .setColor(colors.red)
                     .setURL(`${message.url}`)
                     .addField('Cursed in', `<#${message.channel.id}>`, true)
-                    .addField('Warned user', `<@${message.author.id}>`, true)
+                    .addField('Warned user', `<@!${message.author.id}>`, true)
                     .addField('\u200b', '\u200b')
                     .addField('Detected slangs', `${slangsUsed.join(', ')}`, true)
                     .addField('Message link', `[Link](${message.url})`, true)

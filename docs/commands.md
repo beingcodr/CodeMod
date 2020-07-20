@@ -29,7 +29,7 @@ This command registers you/mentioned user to the database for user leveling
 
 ### `/userInfo @username[optional]`
 
-This command fetches information about the registered user  
+This command fetches information about the users who are registered for user-leveling  
 **Example**: `/userInfo @username[optional]`
 
 ### `/update` OR `/updateuser`
@@ -44,7 +44,8 @@ This command allows you to upvote another user for helping you/community
 
 ### `/serverInfo` OR `/serverinfo`
 
-This command sends the information of the server
+This command sends the information of the server  
+**Example:** `/serverInfo` OR `/serverinfo`
 
 ### `/botInfo` OR `/botinfo`
 
@@ -59,6 +60,11 @@ This command adds role to the specified user. The **Role name** is case sensitiv
 
 This command removes role from the specified user. The **Role name** is case sensitive  
 **Example:** `/removeRole @username admin` OR `/removerole admin, member, advance dev`
+
+### `/addServer` OR `/addserver`
+
+This command adds the current server to the database so that all the fellow member details are properly linked with the server information  
+**Example:** `/addServer` OR `/addserver`
 
 ## Anywhere
 

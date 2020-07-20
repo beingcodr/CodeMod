@@ -3,6 +3,8 @@ const { addServer } = require('../helpers/member');
 
 module.exports = {
     name: 'addServer',
+    description:
+        'This command adds the current server to the database so that all the fellow member details are properly linked with the server information ',
     aliases: ['addserver'],
     execute: async (message, args) => {
         let result = {};

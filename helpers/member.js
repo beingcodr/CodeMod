@@ -16,12 +16,7 @@ const addMember = async (message, reason) => {
     deleteMessage(message, 0);
     let returnedServer = await Server.findOne({ serverId: message.guild.id });
     if (!returnedServer) {
-        messageErrorAsync(
-            message,
-            'The server is not registered. Please register it first with `/addserver` command',
-            `<@!${message.author.id}> the server is not registered. Please register it first with \`/addserver\` command`
-        );
-        return { success: false, message: ' ' };
+        returnedServer = await addServer(message);
     }
     let returnedMember = await Member.findOne({
         discordSlug: `${message.author.id}${message.guild.id}`,
@@ -65,8 +60,10 @@ const addMember = async (message, reason) => {
 
     try {
         const savedMember = await newUser.save();
-        returnedServer.members.push(savedMember.id);
-        await returnedServer.save();
+        !returnedServer.success
+            ? returnedServer.members.push(savedMember.id)
+            : returnedServer.server.members.push(savedMember.id);
+        !returnedServer.success ? await returnedServer.save() : await returnedServer.server.save();
         return { success: true, member: savedMember };
     } catch (error) {
         return { success: false };
@@ -77,16 +74,11 @@ const addMentionedMember = async (message, reason) => {
     deleteMessage(message, 0);
     let returnedServer = await Server.findOne({ serverId: message.guild.id });
     if (!returnedServer) {
-        messageErrorAsync(
-            message,
-            'The server is not registered. Please register it first with `/addserver` command',
-            `<@!${message.author.id}> the server is not registered. Please register it first with \`/addserver\` command`
-        );
-        return { success: false, message: ' ' };
+        returnedServer = await addServer(message);
     }
     let mentionedMember = message.guild.member(message.mentions.users.first());
     if (!mentionedMember) return { success: false };
-    
+
     let returnedMember = await Member.findOne({
         discordSlug: `${mentionedMember.user.id}${mentionedMember.guild.id}`,
     });
@@ -129,8 +121,10 @@ const addMentionedMember = async (message, reason) => {
 
     try {
         const savedMember = await newUser.save();
-        returnedServer.members.push(savedMember.id);
-        await returnedServer.save();
+        !returnedServer.success
+            ? returnedServer.members.push(savedMember.id)
+            : returnedServer.server.members.push(savedMember.id);
+        !returnedServer.success ? await returnedServer.save() : await returnedServer.server.save();
         return { success: true, member: savedMember };
     } catch (error) {
         return { success: false };
@@ -140,12 +134,22 @@ const addMentionedMember = async (message, reason) => {
 const addMemberEvent = async (member, reason) => {
     let returnedServer = await Server.findOne({ serverId: member.guild.id });
     if (!returnedServer) {
-        memberErrorAsync(
-            member,
-            'The server is not registered. Please register it first with `/addserver` command',
-            `<@!${member.user.id}> the server is not registered. Please register it first with \`/addserver\` command`
-        );
-        return { success: false, message: ' ' };
+        returnedServer = await addServer({
+            guild: {
+                id: member.guild.id,
+                name: member.guild.name,
+                region: member.guild.region,
+                icon: member.guild.iconURL(),
+                memberCount: member.guild.memberCount,
+                createdAt: member.guild.createdAt,
+            },
+        });
+        // memberErrorAsync(
+        //     member,
+        //     'The server is not registered. Please register it first with `/addserver` command',
+        //     `<@!${member.user.id}> the server is not registered. Please register it first with \`/addserver\` command`
+        // );
+        // return { success: false, message: ' ' };
     }
     let returnedMember = await Member.findOne({
         discordSlug: `${member.user.id}${member.guild.id}`,
@@ -189,8 +193,10 @@ const addMemberEvent = async (member, reason) => {
 
     try {
         const savedMember = await newUser.save();
-        returnedServer.members.push(savedMember.id);
-        await returnedServer.save();
+        !returnedServer.success
+            ? returnedServer.members.push(savedMember.id)
+            : returnedServer.server.members.push(savedMember.id);
+        !returnedServer.success ? await returnedServer.save() : await returnedServer.server.save();
         return { success: true, member: savedMember };
     } catch (error) {
         console.log(error);
@@ -199,8 +205,6 @@ const addMemberEvent = async (member, reason) => {
 };
 
 const updateMember = async (message, member) => {
-    let botCount = calculateMember(message);
-
     let returnedMember = await Member.findOne({
         discordSlug: `${member.user.id}${member.guild.id}`,
     });
@@ -209,18 +213,13 @@ const updateMember = async (message, member) => {
     }
 
     returnedMember.discordId = member.user.id;
+    returnedMember.serverId = member.guild.id;
     returnedMember.discordSlug = `${member.user.id}${member.guild.id}`;
     returnedMember.discriminator = `#${member.user.discriminator}`;
     returnedMember.username = member.user.username;
     returnedMember.nickName = member.nickname;
     returnedMember.avatar = member.user.avatarURL();
-    returnedMember.serverDetails = {
-        serverId: member.guild.id,
-        serverName: member.guild.name,
-        memberCount: member.guild.memberCount - botCount,
-        botCount: botCount,
-        joinedAt: member.guild.joinedAt,
-    };
+    returnedMember.joinedAt = member.guild.joinedAt;
     returnedMember.roles = [...member._roles];
 
     try {
@@ -242,21 +241,17 @@ const updateMember = async (message, member) => {
 const addServer = async (message) => {
     const returnedServer = await Server.findOne({ serverId: message.guild.id });
     if (returnedServer) {
-        messageErrorAsync(
-            message,
-            'This server is already registered',
-            `<@${message.author.id}>, this server is already registered`
-        );
+        await updateServer(message, returnedServer);
         return { success: false, message: 'Server is already registered' };
     }
 
-    let botCountResult = calculateMember(message);
+    let botCountResult = message.id ? calculateMember(message) : 0;
 
     const newServer = new Server({
         serverId: message.guild.id,
         name: message.guild.name,
         region: message.guild.region,
-        icon: message.guild.iconURL(),
+        icon: message.id ? message.guild.iconURL() : message.guild.icon,
         memberCount: message.guild.memberCount - botCountResult,
         botCount: botCountResult,
         serverCreatedAt: message.guild.createdAt,
@@ -264,11 +259,38 @@ const addServer = async (message) => {
     });
 
     try {
-        await newServer.save();
-        return { success: true };
+        const savedServer = await newServer.save();
+        return { _id: savedServer._id, success: true, server: savedServer };
     } catch (error) {
         console.error(error);
         return { success: false };
+    }
+};
+
+const updateServer = async (message, updatedServer) => {
+    const botCountResult = calculateMember(message);
+
+    updatedServer.serverId = message.guild.id;
+    updatedServer.name = message.guild.name;
+    updatedServer.region = message.guild.region;
+    updatedServer.icon = message.guild.iconURL();
+    updatedServer.memberCount = message.guild.memberCount - botCountResult;
+    updatedServer.botCount = botCountResult;
+
+    try {
+        await updatedServer.save();
+        return messageErrorAsync(
+            message,
+            `Updated the server details`,
+            `<@!${message.author.id}>, updated the server details`
+        );
+    } catch (error) {
+        console.error(error);
+        return messageErrorAsync(
+            message,
+            `There was an error while adding/updating the server details`,
+            `<@!${message.author.id}>, there was an error while adding/updating the server details`
+        );
     }
 };
 
@@ -278,4 +300,5 @@ module.exports = {
     addMemberEvent,
     addServer,
     updateMember,
+    updateServer,
 };
