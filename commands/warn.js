@@ -109,7 +109,9 @@ module.exports = {
             .addField('Warned User', `<@!${mentionedMember.id}>`, true)
             .addField(
                 'reason',
-                `You have been warned for **${args}**\n\nContinue the same and you'll be banned from this server`,
+                `You have been warned for **${args}**\n\nContinue the same and you'll be ${
+                    savedMember.warn.length <= 5 ? 'kicked' : 'banned'
+                } from this server`,
                 false
             );
 
@@ -133,7 +135,7 @@ module.exports = {
             );
         }
 
-        args = [{ id: `${guildMember.user.id}`, bypass: true }];
+        args = [{ id: `${guildMember.user.id}`, bypass: true, guild: { id: message.guild.id } }];
         return warnValidator(message, args, savedMember.warn.length);
     },
 };

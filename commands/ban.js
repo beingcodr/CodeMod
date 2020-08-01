@@ -35,7 +35,9 @@ module.exports = {
 
                     try {
                         const banedMember = member.ban({
-                            reason: 'Repeated voilation of server rules and regulations',
+                            reason: args.length
+                                ? '**Banned by TeamTanay BOT** for multiple voilation of server rules and regulations'
+                                : 'Repeated voilation of server rules and regulations',
                         });
                         if (banedMember) {
                             let banEmbed = new MessageEmbed()

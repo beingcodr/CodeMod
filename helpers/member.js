@@ -39,9 +39,10 @@ const addMember = async (message, reason) => {
         username: message.author.username,
         nickName: message.member.nickname,
         avatar: message.author.avatarURL(),
-        joinedAt: message.guild.joinedAt,
+        joinedAt: message.member.joinedAt,
         addedBy: reason,
         warn: [],
+        kickCount: 0,
         level: 0,
         levelUp: 100,
         totalPoints: 0,
@@ -100,9 +101,10 @@ const addMentionedMember = async (message, reason) => {
         username: mentionedMember.user.username,
         nickName: mentionedMember.nickname,
         avatar: mentionedMember.user.avatarURL(),
-        joinedAt: mentionedMember.guild.joinedAt,
+        joinedAt: mentionedMember.joinedAt,
         addedBy: reason,
         warn: [],
+        kickCount: 0,
         level: 0,
         levelUp: 100,
         totalPoints: 0,
@@ -144,12 +146,6 @@ const addMemberEvent = async (member, reason) => {
                 createdAt: member.guild.createdAt,
             },
         });
-        // memberErrorAsync(
-        //     member,
-        //     'The server is not registered. Please register it first with `/addserver` command',
-        //     `<@!${member.user.id}> the server is not registered. Please register it first with \`/addserver\` command`
-        // );
-        // return { success: false, message: ' ' };
     }
     let returnedMember = await Member.findOne({
         discordSlug: `${member.user.id}${member.guild.id}`,
@@ -172,9 +168,10 @@ const addMemberEvent = async (member, reason) => {
         username: member.user.username,
         nickName: member.nickname,
         avatar: member.user.avatarURL(),
-        joinedAt: member.guild.joinedAt,
+        joinedAt: member.joinedAt,
         addedBy: reason,
         warn: [],
+        kickCount: 0,
         level: 0,
         levelUp: 100,
         totalPoints: 0,
@@ -219,7 +216,7 @@ const updateMember = async (message, member) => {
     returnedMember.username = member.user.username;
     returnedMember.nickName = member.nickname;
     returnedMember.avatar = member.user.avatarURL();
-    returnedMember.joinedAt = member.guild.joinedAt;
+    returnedMember.joinedAt = member.joinedAt;
     returnedMember.roles = [...member._roles];
 
     try {

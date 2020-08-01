@@ -25,6 +25,7 @@ const memberSchema = new Schema(
             },
             { timestamps: true },
         ],
+        kickCount: { type: Number, default: 0 },
         points: {
             contribution: { type: Number, required: true },
             error: { type: Number, required: true },

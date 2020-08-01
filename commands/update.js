@@ -30,7 +30,7 @@ module.exports = {
             returnedMember.username = message.author.username;
             returnedMember.nickName = message.member.nickname;
             returnedMember.avatar = message.author.avatarURL();
-            returnedMember.joinedAt = message.guild.joinedAt;
+            returnedMember.joinedAt = message.member.joinedAt;
             returnedMember.roles = [...message.member._roles];
 
             try {
