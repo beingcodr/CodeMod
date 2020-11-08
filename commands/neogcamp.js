@@ -1,3 +1,5 @@
+const { MessageEmbed } = require('discord.js');
+const { colors } = require('../json/config.json');
 const { GoogleSpreadsheet } = require('google-spreadsheet');
 const { deleteMessage, messageErrorAsync, botChannelAsync } = require('../helpers/message');
 const { getByDiscordTag } = require('../helpers/sheet');
@@ -24,15 +26,13 @@ module.exports = {
 
                 // Getting the first sheet in the order on the Google sheets UI
                 const sheet = doc.sheetsByTitle['Sheet2'];
-                await doc.updateProperties({ title: 'Discord TeamTanay spreadsheet' });
                 // filters out the spaces and flags from the args
                 const refinedArgs = args.filter((arg) => arg !== '');
 
                 // Collects the flags from the args
-                const flags = args.filter((arg) => arg.includes('-') && arg.length <= 2);
-                console.log('Refined args: ', refinedArgs);
-                // const flags = ['-s', '-f', '-S'];
-                console.log('Flags: ', flags);
+                const flags = args.filter((arg) => arg.includes('-') && arg.length <= 3);
+                // console.log('Refined args: ', refinedArgs);
+                // console.log('Flags: ', flags);
                 const rows = await sheet.getRows();
                 rows.forEach((row) => console.log(row.rowIndex));
 
@@ -41,35 +41,111 @@ module.exports = {
                     switch (flag) {
                         case '-s':
                         case '-submit':
-                            let user = await getByDiscordTag(rows, args[inputIndex]);
-                            console.log('innerINput', args[inputIndex]);
-                            console.log(user);
-                            if (user[0] === undefined) {
+                            let user = await getByDiscordTag(rows, message.author.tag);
+                            // console.log('User', user);
+                            if (!user.length) {
                                 sheet.addRow({
                                     discordUsername: message.author.tag,
                                     projectUrls: args[inputIndex],
                                 });
                             } else {
-                                console.log(
-                                    `The row index ${user[0].rowIndex - 1} and data ${
-                                        rows[user[0].rowIndex - 1].projectUrls
-                                    }`
-                                );
+                                // updating the row
+                                rows[user[0].rowIndex - 2].projectUrls = `${
+                                    rows[user[0].rowIndex - 2].projectUrls
+                                }, ${args[inputIndex]}`;
+                                // saving the updated row
+                                await rows[user[0].rowIndex - 2].save();
                             }
                             break;
 
                         case '-as':
-                        case '-add-sheet':
-                            await doc.addSheet({
-                                title: 'Submittions',
-                                headerValues: [
-                                    'discordUsername',
-                                    'Level',
-                                    'Github URL',
-                                    'Project URL',
-                                    'Portfolio URL',
-                                ],
-                            });
+                        case '-addsheet':
+                            if (args.length > 2) {
+                                await doc.addSheet({
+                                    title: args[inputIndex],
+                                    headerValues: [...args[inputIndex + 1].split(',')],
+                                });
+                            } else {
+                                await doc.addSheet({
+                                    title: args[inputIndex],
+                                });
+                            }
+                            break;
+
+                        // case '-r':
+                        // case '-review':
+
+                        case '-fs':
+                        case '-fetchsubmission':
+                            let hasMentions = false;
+                            let messageEmbed;
+                            if (message.mentions.users.size) hasMentions = true;
+
+                            const mentionedUser = message.mentions.users.first();
+                            let fetchedSubmission;
+                            if (hasMentions) {
+                                fetchedSubmission = rows.filter(
+                                    (row) =>
+                                        row.discordUsername ===
+                                        `${mentionedUser.username}#${mentionedUser.discriminator}`
+                                );
+                                console.log(
+                                    `Mentioned user: ${mentionedUser.username}#${mentionedUser.discriminator}`
+                                );
+                                let messageEmbed = new MessageEmbed()
+                                    .setTitle('Submission Details')
+                                    .setThumbnail(mentionedUser.avatarURL())
+                                    .setColor(colors.green)
+                                    .addField('Fetched user', `<@!${mentionedUser.id}>`, true)
+                                    .addField('\u200b', '\u200b')
+                                    .addField(
+                                        'Project links',
+                                        `${fetchedSubmission[0].projectUrls
+                                            .split(', ')
+                                            .map(
+                                                (url, index) =>
+                                                    ` [project ${index + 1}](${
+                                                        url.includes('https://' || 'http://')
+                                                            ? url
+                                                            : `https://${url}`
+                                                    })`
+                                            )}`,
+                                        true
+                                    );
+                                botChannelAsync(message, messageEmbed);
+                            } else {
+                                fetchedSubmission = rows.filter(
+                                    (row) =>
+                                        row.discordUsername ===
+                                        `${message.author.username}#${message.author.discriminator}`
+                                );
+                                console.log(
+                                    `Author: ${message.author.username}#${message.author.discriminator}`
+                                );
+                                let messageEmbed = new MessageEmbed()
+                                    .setTitle('Submission Details')
+                                    .setThumbnail(message.author.avatarURL())
+                                    .setColor(colors.green)
+                                    .addField('Fetched user', `<@!${message.author.id}>`, true)
+                                    .addField('\u200b', '\u200b')
+                                    .addField(
+                                        'Project links',
+                                        `${fetchedSubmission[0].projectUrls
+                                            .split(', ')
+                                            .map(
+                                                (url, index) =>
+                                                    ` [project ${index + 1}](${
+                                                        url.includes('https://' || 'http://')
+                                                            ? url
+                                                            : `https://${url}`
+                                                    })`
+                                            )}`,
+                                        true
+                                    );
+                                botChannelAsync(message, messageEmbed);
+                            }
+
+                            console.log('Fetched user', fetchedSubmission);
                             break;
                     }
                 });
