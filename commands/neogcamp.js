@@ -1,5 +1,6 @@
 const { GoogleSpreadsheet } = require('google-spreadsheet');
 const { deleteMessage, messageErrorAsync, botChannelAsync } = require('../helpers/message');
+const { getByDiscordTag } = require('../helpers/sheet');
 
 module.exports = {
     name: 'neogcamp',
@@ -21,23 +22,44 @@ module.exports = {
 
                 await doc.loadInfo(); // loads document properties and worksheets
 
-                // console.log('Sheet title: ', sheet.title);
+                // Getting the first sheet in the order on the Google sheets UI
+                const sheet = doc.sheetsByTitle['Sheet2'];
                 await doc.updateProperties({ title: 'Discord TeamTanay spreadsheet' });
                 // filters out the spaces and flags from the args
-                const refinedArgs = args.filter((arg) => arg !== '' && !arg.includes('-'));
+                const refinedArgs = args.filter((arg) => arg !== '');
+
                 // Collects the flags from the args
-                flags = args.filter((arg) => arg.includes('-'));
+                const flags = args.filter((arg) => arg.includes('-') && arg.length <= 2);
                 console.log('Refined args: ', refinedArgs);
+                // const flags = ['-s', '-f', '-S'];
                 console.log('Flags: ', flags);
+                const rows = await sheet.getRows();
+                rows.forEach((row) => console.log(row.rowIndex));
 
                 flags.forEach(async (flag) => {
+                    const inputIndex = +args.indexOf(flag) + 1;
                     switch (flag) {
                         case '-s':
-                        case '--submit':
+                        case '-submit':
+                            let user = await getByDiscordTag(rows, args[inputIndex]);
+                            console.log('innerINput', args[inputIndex]);
+                            console.log(user);
+                            if (user[0] === undefined) {
+                                sheet.addRow({
+                                    discordUsername: message.author.tag,
+                                    projectUrls: args[inputIndex],
+                                });
+                            } else {
+                                console.log(
+                                    `The row index ${user[0].rowIndex - 1} and data ${
+                                        rows[user[0].rowIndex - 1].projectUrls
+                                    }`
+                                );
+                            }
                             break;
 
                         case '-as':
-                        case '--add-sheet':
+                        case '-add-sheet':
                             await doc.addSheet({
                                 title: 'Submittions',
                                 headerValues: [
