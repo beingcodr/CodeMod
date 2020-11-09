@@ -1,8 +1,12 @@
-const { MessageEmbed } = require('discord.js');
-const { colors } = require('../json/config.json');
 const { GoogleSpreadsheet } = require('google-spreadsheet');
+const { adminRole } = require('../json/config.json');
 const { deleteMessage, messageErrorAsync, botChannelAsync } = require('../helpers/message');
-const { getByDiscordTag } = require('../helpers/sheet');
+const {
+    getByDiscordTag,
+    fetchSubmission,
+    submitReview,
+    recordSubmissions,
+} = require('../helpers/sheet');
 
 module.exports = {
     name: 'neogcamp',
@@ -25,12 +29,12 @@ module.exports = {
                 await doc.loadInfo(); // loads document properties and worksheets
 
                 // Getting the first sheet in the order on the Google sheets UI
-                const sheet = doc.sheetsByTitle['Sheet2'];
+                const sheet = doc.sheetsByTitle['Submissions'];
                 // filters out the spaces and flags from the args
                 const refinedArgs = args.filter((arg) => arg !== '');
 
                 // Collects the flags from the args
-                const flags = args.filter((arg) => arg.includes('-') && arg.length <= 3);
+                const flags = args.filter((arg) => arg.includes('-') && arg.length <= 5);
                 // console.log('Refined args: ', refinedArgs);
                 // console.log('Flags: ', flags);
                 const rows = await sheet.getRows();
@@ -38,32 +42,155 @@ module.exports = {
 
                 flags.forEach(async (flag) => {
                     const inputIndex = +args.indexOf(flag) + 1;
+                    let isSuccessful = false;
                     switch (flag) {
-                        case '-s':
-                        case '-submit':
-                            let user = await getByDiscordTag(rows, message.author.tag);
-                            // console.log('User', user);
-                            if (!user.length) {
-                                sheet.addRow({
-                                    discordUsername: message.author.tag,
-                                    projectUrls: args[inputIndex],
-                                });
-                            } else {
-                                // updating the row
-                                rows[user[0].rowIndex - 2].projectUrls = `${
-                                    rows[user[0].rowIndex - 2].projectUrls
-                                }, ${args[inputIndex]}`;
-                                // saving the updated row
-                                await rows[user[0].rowIndex - 2].save();
+                        case '-sp1':
+                        case '-sp1R':
+                        case '-sp2':
+                        case '-sp2R':
+                        case '-sp3':
+                        case '-sp3R':
+                        case '-sp4':
+                        case '-sp4R':
+                        case '-sp5':
+                        case '-sp5R':
+                        case '-sp6':
+                        case '-sp6R':
+                        case '-sp7':
+                        case '-sp7R':
+                        case '-sp8':
+                        case '-sp8R':
+                        case '-sp9':
+                        case '-sp9R':
+                        case '-sp10':
+                        case '-sp10R':
+                            if (flag === '-sp1' || flag === '-sp1R') {
+                                isSuccessful = await recordSubmissions(
+                                    message,
+                                    args[inputIndex],
+                                    'project1',
+                                    rows,
+                                    flag
+                                );
+                            } else if (flag === '-sp2' || flag === 'sp2R') {
+                                isSuccessful = await recordSubmissions(
+                                    message,
+                                    args[inputIndex],
+                                    'project2',
+                                    rows,
+                                    flag
+                                );
+                            } else if (flag === '-sp2' || flag === 'sp2R') {
+                                isSuccessful = await recordSubmissions(
+                                    message,
+                                    args[inputIndex],
+                                    'project3',
+                                    rows,
+                                    flag
+                                );
+                            } else if (flag === '-sp2' || flag === 'sp2R') {
+                                isSuccessful = await recordSubmissions(
+                                    message,
+                                    args[inputIndex],
+                                    'project4',
+                                    rows,
+                                    flag
+                                );
+                            } else if (flag === '-sp2' || flag === 'sp2R') {
+                                isSuccessful = await recordSubmissions(
+                                    message,
+                                    args[inputIndex],
+                                    'project5',
+                                    rows,
+                                    flag
+                                );
+                            } else if (flag === '-sp2' || flag === 'sp2R') {
+                                isSuccessful = await recordSubmissions(
+                                    message,
+                                    args[inputIndex],
+                                    'project6',
+                                    rows,
+                                    flag
+                                );
+                            } else if (flag === '-sp2' || flag === 'sp2R') {
+                                isSuccessful = await recordSubmissions(
+                                    message,
+                                    args[inputIndex],
+                                    'project7',
+                                    rows,
+                                    flag
+                                );
+                            } else if (flag === '-sp2' || flag === 'sp2R') {
+                                isSuccessful = await recordSubmissions(
+                                    message,
+                                    args[inputIndex],
+                                    'project8',
+                                    rows,
+                                    flag
+                                );
+                            } else if (flag === '-sp2' || flag === 'sp2R') {
+                                isSuccessful = await recordSubmissions(
+                                    message,
+                                    args[inputIndex],
+                                    'project9',
+                                    rows,
+                                    flag
+                                );
+                            } else if (flag === '-sp2' || flag === 'sp2R') {
+                                isSuccessful = await recordSubmissions(
+                                    message,
+                                    args[inputIndex],
+                                    'project10',
+                                    rows,
+                                    flag
+                                );
                             }
+
+                            // This is final message for submission status
+                            if (typeof isSuccessful !== 'string')
+                                botChannelAsync(
+                                    message,
+                                    `${!isSuccessful ? '❗' : ''}<@!${
+                                        message.author.id
+                                    }>, Your submission ${
+                                        isSuccessful
+                                            ? 'has been recorded!'
+                                            : `was not recorded.\n\nPlease try again later, if the problem still persists tag **@OG Admin** for further assistance`
+                                    }`
+                                );
+                            break;
+
+                        case '-gh':
+                        case '-ghR':
+                            if (flag === '-gh' || flag === 'ghR') {
+                                isSuccessful = await recordSubmissions(
+                                    message,
+                                    args[inputIndex],
+                                    'githubUsername',
+                                    rows,
+                                    flag
+                                );
+                            }
+
+                            // This is final message for submission status
+                            if (typeof isSuccessful !== 'string')
+                                botChannelAsync(
+                                    message,
+                                    `${!isSuccessful ? '❗' : ''}<@!${
+                                        message.author.id
+                                    }>, Your submission ${
+                                        isSuccessful
+                                            ? 'has been recorded!'
+                                            : `was not recorded.\n\nPlease try again later, if the problem still persists tag **@OG Admin** for further assistance`
+                                    }`
+                                );
                             break;
 
                         case '-as':
-                        case '-addsheet':
                             if (args.length > 2) {
                                 await doc.addSheet({
                                     title: args[inputIndex],
-                                    headerValues: [...args[inputIndex + 1].split(',')],
+                                    headerValues: [...args.slice(2).join('').split(',')],
                                 });
                             } else {
                                 await doc.addSheet({
@@ -72,80 +199,21 @@ module.exports = {
                             }
                             break;
 
-                        // case '-r':
-                        // case '-review':
+                        case '-r':
+                            if (
+                                !message.guild.member(message.author).hasPermission('ADMINISTRATOR')
+                            )
+                                return botChannelAsync(
+                                    message,
+                                    `<@!${message.author.id}>, Only admins can review projects`
+                                );
+
+                            await submitReview(message, args.slice(inputIndex));
+                            break;
 
                         case '-fs':
                         case '-fetchsubmission':
-                            let hasMentions = false;
-                            let messageEmbed;
-                            if (message.mentions.users.size) hasMentions = true;
-
-                            const mentionedUser = message.mentions.users.first();
-                            let fetchedSubmission;
-                            if (hasMentions) {
-                                fetchedSubmission = rows.filter(
-                                    (row) =>
-                                        row.discordUsername ===
-                                        `${mentionedUser.username}#${mentionedUser.discriminator}`
-                                );
-                                console.log(
-                                    `Mentioned user: ${mentionedUser.username}#${mentionedUser.discriminator}`
-                                );
-                                let messageEmbed = new MessageEmbed()
-                                    .setTitle('Submission Details')
-                                    .setThumbnail(mentionedUser.avatarURL())
-                                    .setColor(colors.green)
-                                    .addField('Fetched user', `<@!${mentionedUser.id}>`, true)
-                                    .addField('\u200b', '\u200b')
-                                    .addField(
-                                        'Project links',
-                                        `${fetchedSubmission[0].projectUrls
-                                            .split(', ')
-                                            .map(
-                                                (url, index) =>
-                                                    ` [project ${index + 1}](${
-                                                        url.includes('https://' || 'http://')
-                                                            ? url
-                                                            : `https://${url}`
-                                                    })`
-                                            )}`,
-                                        true
-                                    );
-                                botChannelAsync(message, messageEmbed);
-                            } else {
-                                fetchedSubmission = rows.filter(
-                                    (row) =>
-                                        row.discordUsername ===
-                                        `${message.author.username}#${message.author.discriminator}`
-                                );
-                                console.log(
-                                    `Author: ${message.author.username}#${message.author.discriminator}`
-                                );
-                                let messageEmbed = new MessageEmbed()
-                                    .setTitle('Submission Details')
-                                    .setThumbnail(message.author.avatarURL())
-                                    .setColor(colors.green)
-                                    .addField('Fetched user', `<@!${message.author.id}>`, true)
-                                    .addField('\u200b', '\u200b')
-                                    .addField(
-                                        'Project links',
-                                        `${fetchedSubmission[0].projectUrls
-                                            .split(', ')
-                                            .map(
-                                                (url, index) =>
-                                                    ` [project ${index + 1}](${
-                                                        url.includes('https://' || 'http://')
-                                                            ? url
-                                                            : `https://${url}`
-                                                    })`
-                                            )}`,
-                                        true
-                                    );
-                                botChannelAsync(message, messageEmbed);
-                            }
-
-                            console.log('Fetched user', fetchedSubmission);
+                            await fetchSubmission(message, rows);
                             break;
                     }
                 });

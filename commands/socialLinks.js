@@ -41,12 +41,12 @@ module.exports = {
             .addField('\u200b', '\u200b')
             .addField(
                 'PODCASTS',
-                '[TeaWithTanay](https://teawithtanay.com)  |  [ProductFM](https://bit.ly/product-fm)  |  [ThinkingWithTanay](https://bit.ly/thinkingwithtanay)',
+                '[TeaWithTanay](https://open.spotify.com/show/3dDVSp6sK7EGfw09jkvIl8)  |  [ProductFM](https://open.spotify.com/show/4Hyj2sZx0v8mgEbePLZTHG)  |  [ThinkingWithTanay](https://open.spotify.com/show/4IZCzLuBT6QezvViXlOgxO)  |  [Developer Duvidha](https://open.spotify.com/show/5PabW1rGCv7tKelY8JOCm3)',
                 false
             )
             .addField(
                 'INITIATIVES',
-                '[JobChallenge](https://2020.jobchallenge.teamtanay.dev)  |  [Open Mentorship Program](https://bit.ly/mentorship-karona)  |  [Reddit Disscussion](https://www.reddit.com/r/teamtanay/ )'
+                '[ElevateLabs](https://elevatelabs.tech)  |  [JobChallenge](https://2020.jobchallenge.teamtanay.dev)  |  [Open Mentorship Program](https://bit.ly/mentorship-karona)  |  [Reddit Disscussion](https://www.reddit.com/r/teamtanay/ )'
             );
 
         messageErrorAsync(
