@@ -1,12 +1,6 @@
 const { GoogleSpreadsheet } = require('google-spreadsheet');
-const { adminRole } = require('../json/config.json');
 const { deleteMessage, messageErrorAsync, botChannelAsync } = require('../helpers/message');
-const {
-    getByDiscordTag,
-    fetchSubmission,
-    submitReview,
-    recordSubmissions,
-} = require('../helpers/sheet');
+const { fetchSubmission, submitReview, recordSubmissions } = require('../helpers/sheet');
 
 module.exports = {
     name: 'neogcamp',
@@ -29,7 +23,7 @@ module.exports = {
                 await doc.loadInfo(); // loads document properties and worksheets
 
                 // Getting the first sheet in the order on the Google sheets UI
-                const sheet = doc.sheetsByTitle['Submissions'];
+                const submissionSheet = doc.sheetsByTitle['Submissions'];
                 // filters out the spaces and flags from the args
                 const refinedArgs = args.filter((arg) => arg !== '');
 
@@ -37,7 +31,7 @@ module.exports = {
                 const flags = args.filter((arg) => arg.includes('-') && arg.length <= 5);
                 // console.log('Refined args: ', refinedArgs);
                 // console.log('Flags: ', flags);
-                const rows = await sheet.getRows();
+                const rows = await submissionSheet.getRows();
                 rows.forEach((row) => console.log(row.rowIndex));
 
                 flags.forEach(async (flag) => {
@@ -70,7 +64,8 @@ module.exports = {
                                     args[inputIndex],
                                     'project1',
                                     rows,
-                                    flag
+                                    flag,
+                                    submissionSheet
                                 );
                             } else if (flag === '-sp2' || flag === 'sp2R') {
                                 isSuccessful = await recordSubmissions(
@@ -78,7 +73,8 @@ module.exports = {
                                     args[inputIndex],
                                     'project2',
                                     rows,
-                                    flag
+                                    flag,
+                                    submissionSheet
                                 );
                             } else if (flag === '-sp2' || flag === 'sp2R') {
                                 isSuccessful = await recordSubmissions(
@@ -86,7 +82,8 @@ module.exports = {
                                     args[inputIndex],
                                     'project3',
                                     rows,
-                                    flag
+                                    flag,
+                                    submissionSheet
                                 );
                             } else if (flag === '-sp2' || flag === 'sp2R') {
                                 isSuccessful = await recordSubmissions(
@@ -94,7 +91,8 @@ module.exports = {
                                     args[inputIndex],
                                     'project4',
                                     rows,
-                                    flag
+                                    flag,
+                                    submissionSheet
                                 );
                             } else if (flag === '-sp2' || flag === 'sp2R') {
                                 isSuccessful = await recordSubmissions(
@@ -102,7 +100,8 @@ module.exports = {
                                     args[inputIndex],
                                     'project5',
                                     rows,
-                                    flag
+                                    flag,
+                                    submissionSheet
                                 );
                             } else if (flag === '-sp2' || flag === 'sp2R') {
                                 isSuccessful = await recordSubmissions(
@@ -110,7 +109,8 @@ module.exports = {
                                     args[inputIndex],
                                     'project6',
                                     rows,
-                                    flag
+                                    flag,
+                                    submissionSheet
                                 );
                             } else if (flag === '-sp2' || flag === 'sp2R') {
                                 isSuccessful = await recordSubmissions(
@@ -118,7 +118,8 @@ module.exports = {
                                     args[inputIndex],
                                     'project7',
                                     rows,
-                                    flag
+                                    flag,
+                                    submissionSheet
                                 );
                             } else if (flag === '-sp2' || flag === 'sp2R') {
                                 isSuccessful = await recordSubmissions(
@@ -126,7 +127,8 @@ module.exports = {
                                     args[inputIndex],
                                     'project8',
                                     rows,
-                                    flag
+                                    flag,
+                                    submissionSheet
                                 );
                             } else if (flag === '-sp2' || flag === 'sp2R') {
                                 isSuccessful = await recordSubmissions(
@@ -134,7 +136,8 @@ module.exports = {
                                     args[inputIndex],
                                     'project9',
                                     rows,
-                                    flag
+                                    flag,
+                                    submissionSheet
                                 );
                             } else if (flag === '-sp2' || flag === 'sp2R') {
                                 isSuccessful = await recordSubmissions(
@@ -142,7 +145,8 @@ module.exports = {
                                     args[inputIndex],
                                     'project10',
                                     rows,
-                                    flag
+                                    flag,
+                                    submissionSheet
                                 );
                             }
 
@@ -168,7 +172,8 @@ module.exports = {
                                     args[inputIndex],
                                     'githubUsername',
                                     rows,
-                                    flag
+                                    flag,
+                                    submissionSheet
                                 );
                             }
 
@@ -187,6 +192,14 @@ module.exports = {
                             break;
 
                         case '-as':
+                            if (
+                                !message.guild.member(message.author).hasPermission('ADMINISTRATOR')
+                            )
+                                return botChannelAsync(
+                                    message,
+                                    `<@!${message.author.id}>, Only admins can review projects`
+                                );
+
                             if (args.length > 2) {
                                 await doc.addSheet({
                                     title: args[inputIndex],
@@ -199,7 +212,16 @@ module.exports = {
                             }
                             break;
 
-                        case '-r':
+                        case '-rp1':
+                        case '-rp2':
+                        case '-rp3':
+                        case '-rp4':
+                        case '-rp5':
+                        case '-rp6':
+                        case '-rp7':
+                        case '-rp8':
+                        case '-rp9':
+                        case '-rp10':
                             if (
                                 !message.guild.member(message.author).hasPermission('ADMINISTRATOR')
                             )
@@ -208,7 +230,7 @@ module.exports = {
                                     `<@!${message.author.id}>, Only admins can review projects`
                                 );
 
-                            await submitReview(message, args.slice(inputIndex));
+                            await submitReview(message, args);
                             break;
 
                         case '-fs':

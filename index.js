@@ -19,10 +19,18 @@ commandFiles.forEach((file) => {
 
 bot.once('ready', () => {
     console.log('The bot is now ready to receive commands');
-    bot.user.setActivity('messages', { type: 'WATCHING' });
+    bot.user.setActivity('messages', { type: 'LISTENING' });
 });
 
 bot.on('message', (message) => {
+    // const checkMessage = async (message) => {
+    //     const msgggg = await message.guild.channels.cache
+    //         .get('775203477172912139')
+    //         .messages.fetch('775688813120061471');
+
+    //     console.log('cehcking: ', msgggg.delete());
+    // };
+    // checkMessage(message);
     let moderationCheck = process.env.CM_MODERATION || moderation;
     let args = [];
     if (message.author === bot.user || message.author.bot) {

@@ -1,6 +1,6 @@
 const { MessageEmbed } = require('discord.js');
 const { colors } = require('../json/config.json');
-const { botChannelAsync } = require('./message');
+const { botChannelAsync, submissionChannelAsync } = require('./message');
 
 const cliChecklist = [
     'functionality 1',
@@ -17,6 +17,19 @@ const portfolioChecklist = [
     'portfolio functionality 5',
 ];
 
+const projectNames = [
+    'cliapp',
+    'portfolio',
+    'portfolio',
+    'portfolio',
+    'portfolio',
+    'portfolio',
+    'portfolio',
+    'portfolio',
+    'portfolio',
+    'portfolio',
+];
+
 const getByDiscordTag = async (rows, tag) => {
     const user = rows.filter((row) => {
         return row.discordTag === tag;
@@ -24,13 +37,66 @@ const getByDiscordTag = async (rows, tag) => {
     return user;
 };
 
+const formatReviewParam = (checklistLength, reviewParam) => {
+    if (checklistLength !== reviewParam.length) {
+        if (reviewParam.length < checklistLength) {
+            return reviewParam.padEnd(checklistLength, '0');
+        } else if (reviewParam.length > checklistLength) {
+            return reviewParam.substring(0, checklistLength);
+        }
+    }
+    return true;
+};
+
+const processReview = async (message, mentionedUser, checklist, args) => {
+    let reviewParam;
+    let reviewCount = 0;
+    reviewParam = formatReviewParam(checklist.length, args);
+    console.log('ReviewParam: ', reviewParam);
+    // Updating the reviewCount to see if the project satisfies the checklist
+    // If yes then this submittion is counted a valid project submission against NeogCamp eligibility
+    reviewParam.split('').forEach((arg) => {
+        if (+arg >= 1) {
+            reviewCount += 1;
+        }
+    });
+    return botChannelAsync(
+        message,
+        `<@!${mentionedUser.id}>, your latest submission has been reviewed\n\n${reviewParam
+            .split('')
+            .map((arg, index) => {
+                return `${+arg >= 1 ? '✅    ' : '❌    '}${checklist[index]}`;
+            })
+            .join('\n\n')}\n\n${
+            reviewCount === checklist.length
+                ? `You're ${1} project away from qualifying for NeogCamp level 1`
+                : `**Please integrate the functionalities marked with ❌ and re-submit the project.**\n\nYou may use the command \`/nc -rsp<project-num>\`.\n**For example:** \`/nc -rsp1\` for re-submitting \`project 1\`, \`/nc -rsp2\` for re-submitting \`project 2\` and so on.`
+        }`
+    );
+};
+
 module.exports = {
     getByDiscordTag,
-    recordSubmissions: async (message, args, projectNum, rows, flag) => {
+    recordSubmissions: async (message, args, projectNum, rows, flag, sheet) => {
         try {
             let user = await getByDiscordTag(rows, message.author.tag);
             // let user = await getByDiscordTag(rows, args);
             // console.log('User', user);
+
+            let submissionEmbed = new MessageEmbed()
+                .setTitle(
+                    `✅   ${!user.length ? 'New Submission!!' : 'Replaced hosted-url (submission)'}`
+                )
+                .setThumbnail(message.author.avatarURL() || message.author.displayAvatarURL())
+                .setColor(colors.green)
+                .addField('User', `<@!${message.author.id}>`, true)
+                .addField('\u200b', '\u200b')
+                .addField(
+                    'Project',
+                    `${projectNames[+projectNum.slice(projectNum.length - 1) - 1]}`,
+                    true
+                )
+                .addField('Project link', `[Go to project](${args})`, true);
 
             if (!user.length) {
                 await sheet.addRow({
@@ -38,6 +104,7 @@ module.exports = {
                     discordTag: message.author.tag,
                     [`${projectNum}`]: args,
                 });
+                submissionChannelAsync(message, submissionEmbed);
                 return true;
             } else {
                 const isAvailable =
@@ -51,7 +118,7 @@ module.exports = {
                 if (isAvailable) {
                     botChannelAsync(
                         message,
-                        `<@!${message.author.id}>, You've already submitted ${projectNum}\n\nIf you wish to replace the existing project URL, use the command \`/nc ${flag}R <new-hosted-url>\``
+                        `<@!${message.author.id}>, You've already submitted ${projectNum}\n\nIf you wish to replace the existing project URL, use the command \`/nc ${flag}R ${args}\``
                     );
                     return 'true';
                 }
@@ -60,6 +127,7 @@ module.exports = {
                 rows[user[0].rowIndex - 2][`${projectNum}`] = `${args}`;
                 // saving the updated row
                 await rows[user[0].rowIndex - 2].save();
+                submissionChannelAsync(message, submissionEmbed);
                 return true;
             }
         } catch (error) {
@@ -121,71 +189,68 @@ module.exports = {
             botChannelAsync(message, error.message);
         }
     },
-    submitReview: async (message, args) => {
+    submitReview: async (message, args, doc) => {
         let mentionedUser;
         if (!message.mentions.users.size)
-            // ! This has to be the neogcampPrivateChannel
-            return botChannelAsync(
+            return submissionChannelAsync(
                 message,
-                `<@!${message.author.id}>, please @tag a valid user to submit the review`
+                `<@!${message.author.id}>, please **@tag** a valid user to submit the review`
             );
 
-        const formatReviewParam = (checklistLength, reviewParam) => {
-            if (checklistLength !== reviewParam.length) {
-                if (reviewParam.length < checklistLength) {
-                    return reviewParam.padEnd(checklistLength, '0');
-                } else if (reviewParam.length > checklistLength) {
-                    return reviewParam.substring(0, checklistLength);
-                }
-            }
-            return true;
-        };
-
         mentionedUser = message.mentions.users.first();
+        // *console.log
         console.log('pure args', args);
-        args = args.filter((arg) => arg !== '').slice(1);
+        args = args.filter((arg) => arg !== '');
+        // *console.log
         console.log(`Review args: ${args}`);
         let projectName = args[0];
 
-        let reviewParam;
         switch (projectName) {
-            case 'cliapp':
-                reviewParam = formatReviewParam(cliChecklist.length, args.slice(1).join(''));
-                botChannelAsync(
-                    message,
-                    `<@!${
-                        mentionedUser.id
-                    }>, your latest submission has been reviewed\n\n${reviewParam
-                        .split('')
-                        .map(
-                            (arg, index) =>
-                                `${+arg >= 1 ? '✅    ' : '❌    '}${cliChecklist[index]}`
-                        )
-                        .join('\n\n')}`
-                );
+            case '-rp1':
+                reviewCount = processReview(message, mentionedUser, cliChecklist, args[2]);
                 break;
 
-            case 'portfolio':
-                reviewParam = formatReviewParam(portfolioChecklist.length, args.slice(1).join(''));
-                botChannelAsync(
-                    message,
-                    `<@!${
-                        mentionedUser.id
-                    }>, your latest submission has been reviewed\n\n${reviewParam
-                        .split('')
-                        .map(
-                            (arg, index) =>
-                                `${+arg >= 1 ? '✅    ' : '❌    '}${portfolioChecklist[index]}`
-                        )
-                        .join('\n\n')}`
-                );
+            case '-rp2':
+                reviewCount = processReview(message, mentionedUser, portfolioChecklist, args[2]);
+                break;
+            // !Update the checklist parameter to appropriate project checklists
+            case '-rp3':
+                reviewCount = processReview(message, mentionedUser, portfolioChecklist, args[2]);
+                break;
+            // !Update the checklist parameter to appropriate project checklists
+            case '-rp4':
+                reviewCount = processReview(message, mentionedUser, portfolioChecklist, args[2]);
+                break;
+            // !Update the checklist parameter to appropriate project checklists
+            case '-rp5':
+                reviewCount = processReview(message, mentionedUser, portfolioChecklist, args[2]);
+                break;
+            // !Update the checklist parameter to appropriate project checklists
+            case '-rp6':
+                reviewCount = processReview(message, mentionedUser, portfolioChecklist, args[2]);
+                break;
+            // !Update the checklist parameter to appropriate project checklists
+            case '-rp7':
+                reviewCount = processReview(message, mentionedUser, portfolioChecklist, args[2]);
+                break;
+            // !Update the checklist parameter to appropriate project checklists
+            case '-rp8':
+                reviewCount = processReview(message, mentionedUser, portfolioChecklist, args[2]);
+                break;
+            // !Update the checklist parameter to appropriate project checklists
+            case '-rp9':
+                reviewCount = processReview(message, mentionedUser, portfolioChecklist, args[2]);
+                break;
+            // !Update the checklist parameter to appropriate project checklists
+            case '-rp10':
+                reviewCount = processReview(message, mentionedUser, portfolioChecklist, args[2]);
                 break;
 
             default:
                 // ! This has to be the neogcampPrivateChannel
                 botChannelAsync(
                     message,
-                    `<@!${message.author.id}>, Please enter a valid project name\nFor example: cliapp, portfolio,etc are valid project names as of now`
+                    `<@!${message.author.id}>, Please pass valid **flags**\nFor example: \`-rp1\` for project 1, \`-rp2\` for project 2 and so on`
                 );
                 break;
         }

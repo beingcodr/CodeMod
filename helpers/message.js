@@ -1,4 +1,4 @@
-const { botChannel } = require('../json/config.json');
+const { botChannel, submissionChannel } = require('../json/config.json');
 
 module.exports = {
     deleteMessage: (message, time) => {
@@ -62,6 +62,24 @@ module.exports = {
                 );
 
             channelMsg.send(botChannelMessage);
+        } catch (error) {
+            console.log(error);
+            return;
+        }
+    },
+    submissionChannelAsync: async (message, submissionChannelMessage) => {
+        try {
+            let channelMsg = message.guild.channels.cache.find(
+                (channel) =>
+                    channel.id === process.env.CM_SUBMISSION_CHANNEL ||
+                    channel.id === submissionChannel
+            );
+            if (!channelMsg)
+                return message.reply(
+                    `Seems like there is no dedicated \`submissionChannel\` where the bot can send submissions`
+                );
+
+            channelMsg.send(submissionChannelMessage);
         } catch (error) {
             console.log(error);
             return;
