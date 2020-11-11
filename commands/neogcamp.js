@@ -29,10 +29,10 @@ module.exports = {
 
                 // Collects the flags from the args
                 const flags = args.filter((arg) => arg.includes('-') && arg.length <= 5);
-                // console.log('Refined args: ', refinedArgs);
-                // console.log('Flags: ', flags);
+                //* console.log('Refined args: ', refinedArgs);
+                //* console.log('Flags: ', flags);
                 const rows = await submissionSheet.getRows();
-                rows.forEach((row) => console.log(row.rowIndex));
+                // * rows.forEach((row) => console.log(row.rowIndex));
 
                 flags.forEach(async (flag) => {
                     const inputIndex = +args.indexOf(flag) + 1;
@@ -67,7 +67,7 @@ module.exports = {
                                     flag,
                                     submissionSheet
                                 );
-                            } else if (flag === '-sp2' || flag === 'sp2R') {
+                            } else if (flag === '-sp2' || flag === '-sp2R') {
                                 isSuccessful = await recordSubmissions(
                                     message,
                                     args[inputIndex],
@@ -76,7 +76,7 @@ module.exports = {
                                     flag,
                                     submissionSheet
                                 );
-                            } else if (flag === '-sp2' || flag === 'sp2R') {
+                            } else if (flag === '-sp3' || flag === '-sp3R') {
                                 isSuccessful = await recordSubmissions(
                                     message,
                                     args[inputIndex],
@@ -85,7 +85,7 @@ module.exports = {
                                     flag,
                                     submissionSheet
                                 );
-                            } else if (flag === '-sp2' || flag === 'sp2R') {
+                            } else if (flag === '-sp4' || flag === '-sp4R') {
                                 isSuccessful = await recordSubmissions(
                                     message,
                                     args[inputIndex],
@@ -94,7 +94,7 @@ module.exports = {
                                     flag,
                                     submissionSheet
                                 );
-                            } else if (flag === '-sp2' || flag === 'sp2R') {
+                            } else if (flag === '-sp5' || flag === '-sp5R') {
                                 isSuccessful = await recordSubmissions(
                                     message,
                                     args[inputIndex],
@@ -103,7 +103,7 @@ module.exports = {
                                     flag,
                                     submissionSheet
                                 );
-                            } else if (flag === '-sp2' || flag === 'sp2R') {
+                            } else if (flag === '-sp6' || flag === '-sp6R') {
                                 isSuccessful = await recordSubmissions(
                                     message,
                                     args[inputIndex],
@@ -112,7 +112,7 @@ module.exports = {
                                     flag,
                                     submissionSheet
                                 );
-                            } else if (flag === '-sp2' || flag === 'sp2R') {
+                            } else if (flag === '-sp7' || flag === '-sp7R') {
                                 isSuccessful = await recordSubmissions(
                                     message,
                                     args[inputIndex],
@@ -121,7 +121,7 @@ module.exports = {
                                     flag,
                                     submissionSheet
                                 );
-                            } else if (flag === '-sp2' || flag === 'sp2R') {
+                            } else if (flag === '-sp8' || flag === '-sp8R') {
                                 isSuccessful = await recordSubmissions(
                                     message,
                                     args[inputIndex],
@@ -130,7 +130,7 @@ module.exports = {
                                     flag,
                                     submissionSheet
                                 );
-                            } else if (flag === '-sp2' || flag === 'sp2R') {
+                            } else if (flag === '-sp9' || flag === '-sp9R') {
                                 isSuccessful = await recordSubmissions(
                                     message,
                                     args[inputIndex],
@@ -139,7 +139,7 @@ module.exports = {
                                     flag,
                                     submissionSheet
                                 );
-                            } else if (flag === '-sp2' || flag === 'sp2R') {
+                            } else if (flag === '-sp10' || flag === '-sp10R') {
                                 isSuccessful = await recordSubmissions(
                                     message,
                                     args[inputIndex],
@@ -234,7 +234,6 @@ module.exports = {
                             break;
 
                         case '-fs':
-                        case '-fetchsubmission':
                             await fetchSubmission(message, rows);
                             break;
                     }

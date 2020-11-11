@@ -37,6 +37,20 @@ const getByDiscordTag = async (rows, tag) => {
     return user;
 };
 
+const getValidProjects = (submission) => {
+    validProjects = [];
+    console.log('Inside the getValidProjects function');
+    for (let i = 1; i <= 10; i++) {
+        console.log('Inside the getValidProjects for loop');
+        console.log('for loop submission value', submission[`project${i}`]);
+        if (submission[`project${i}`] !== undefined || submission[`project${i}`] !== '') {
+            console.log('for loop pushed submission value', submission[`project${i}`]);
+            validProjects.push({ name: `project${i}`, link: submission[`project${i}`] });
+        }
+    }
+    return validProjects;
+};
+
 const formatReviewParam = (checklistLength, reviewParam) => {
     if (checklistLength !== reviewParam.length) {
         if (reviewParam.length < checklistLength) {
@@ -80,13 +94,28 @@ module.exports = {
     recordSubmissions: async (message, args, projectNum, rows, flag, sheet) => {
         try {
             let user = await getByDiscordTag(rows, message.author.tag);
+            const regexURLValidation = ((message, url) => {
+                let regex = new RegExp(
+                    'https?://(?:www.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9].[^s]{2,}|www.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9].[^s]{2,}|https?://(?:www.|(?!www))[a-zA-Z0-9]+.[^s]{2,}|www.[a-zA-Z0-9]+.[^s]{2,}'
+                );
+                if (!url.match(regex)) {
+                    botChannelAsync(
+                        message,
+                        `<@!${message.author.id}>, Please enter a valid URL.\n\n**For example:** \`https://hosted-url.com\` OR \`https://www.hosted-url.com\``
+                    );
+                    return false;
+                }
+                return true;
+            })(message, args);
+
+            if (!regexURLValidation) {
+                return 'false';
+            }
             // let user = await getByDiscordTag(rows, args);
             // console.log('User', user);
 
             let submissionEmbed = new MessageEmbed()
-                .setTitle(
-                    `✅   ${!user.length ? 'New Submission!!' : 'Replaced hosted-url (submission)'}`
-                )
+                .setTitle(`✅   New Submission!!`)
                 .setThumbnail(message.author.avatarURL() || message.author.displayAvatarURL())
                 .setColor(colors.green)
                 .addField('User', `<@!${message.author.id}>`, true)
@@ -107,6 +136,13 @@ module.exports = {
                 submissionChannelAsync(message, submissionEmbed);
                 return true;
             } else {
+                console.log(
+                    'Flag: ',
+                    flag
+                        .split('')
+                        .slice(flag.length - 1)
+                        .join('')
+                );
                 const isAvailable =
                     rows[user[0].rowIndex - 2][`${projectNum}`] !== undefined &&
                     flag
@@ -148,30 +184,35 @@ module.exports = {
             // fetching the row that matches the discordTag
             fetchedSubmission = rows.filter(
                 (row) =>
-                    row.discordUsername ===
-                    `${mentionedUser.username}#${mentionedUser.discriminator}`
+                    row.discordTag === `${mentionedUser.username}#${mentionedUser.discriminator}`
             );
+
+            console.log('fetchedSubmission', fetchedSubmission);
+            console.log('getValidProjects', getValidProjects(fetchedSubmission));
 
             if (fetchedSubmission.length) {
                 // Constructing a common message embed for both cases
                 messageEmbed = new MessageEmbed()
                     .setTitle('✅   Submission Details')
-                    .setThumbnail(mentionedUser.avatarURL())
+                    .setThumbnail(mentionedUser.avatarURL() || mentionedUser.displayAvatarURL())
                     .setColor(colors.green)
                     .addField('Fetched user', `<@!${mentionedUser.id}>`, true)
                     .addField('\u200b', '\u200b')
                     .addField(
+                        'Github Profile',
+                        `${
+                            fetchedSubmission[0].githubUsername !== undefined
+                                ? `[${fetchedSubmission[0].githubUsername}](https://github.com/${fetchedSubmission[0].githubUsername})`
+                                : 'No profile linked'
+                        }`
+                    )
+                    .addField(
                         'Project links',
-                        `${fetchedSubmission[0].projectUrls
-                            .split(', ')
-                            .map(
-                                (url, index) =>
-                                    ` [project ${index + 1}](${
-                                        url.includes('https://' || 'http://')
-                                            ? url
-                                            : `https://${url}`
-                                    })`
-                            )}`,
+                        `${getValidProjects(fetchedSubmission[0])
+                            .map((project) => {
+                                return `[${project.name}](${project.link})`;
+                            })
+                            .join(', ')}`,
                         true
                     );
             } else {
