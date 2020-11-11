@@ -24,6 +24,18 @@ module.exports = {
 
                 // Getting the first sheet in the order on the Google sheets UI
                 const submissionSheet = doc.sheetsByTitle['Submissions'];
+                let reviewSheet = doc.sheetsByTitle['Reviewed'];
+                if (reviewSheet === undefined)
+                    reviewSheet = await doc.addSheet({
+                        title: 'Reviewed',
+                        headerValues: [
+                            'discordId',
+                            'discordTag',
+                            'totalProjectsReviewed',
+                            'lastUpdatedOn',
+                            'projectsReviewed',
+                        ],
+                    });
                 // filters out the spaces and flags from the args
                 const refinedArgs = args.filter((arg) => arg !== '');
 
@@ -31,11 +43,12 @@ module.exports = {
                 const flags = args.filter((arg) => arg.includes('-') && arg.length <= 5);
                 //* console.log('Refined args: ', refinedArgs);
                 //* console.log('Flags: ', flags);
-                const rows = await submissionSheet.getRows();
+                const submissionRows = await submissionSheet.getRows();
+                const reviewRows = await reviewSheet.getRows();
                 // * rows.forEach((row) => console.log(row.rowIndex));
 
                 flags.forEach(async (flag) => {
-                    const inputIndex = +args.indexOf(flag) + 1;
+                    const inputIndex = +refinedArgs.indexOf(flag) + 1;
                     let isSuccessful = false;
                     switch (flag) {
                         case '-sp1':
@@ -61,90 +74,100 @@ module.exports = {
                             if (flag === '-sp1' || flag === '-sp1R') {
                                 isSuccessful = await recordSubmissions(
                                     message,
-                                    args[inputIndex],
+                                    refinedArgs[inputIndex],
                                     'project1',
-                                    rows,
+                                    submissionRows,
+                                    reviewRows,
                                     flag,
                                     submissionSheet
                                 );
                             } else if (flag === '-sp2' || flag === '-sp2R') {
                                 isSuccessful = await recordSubmissions(
                                     message,
-                                    args[inputIndex],
+                                    refinedArgs[inputIndex],
                                     'project2',
-                                    rows,
+                                    submissionRows,
+                                    reviewRows,
                                     flag,
                                     submissionSheet
                                 );
                             } else if (flag === '-sp3' || flag === '-sp3R') {
                                 isSuccessful = await recordSubmissions(
                                     message,
-                                    args[inputIndex],
+                                    refinedArgs[inputIndex],
                                     'project3',
-                                    rows,
+                                    submissionRows,
+                                    reviewRows,
                                     flag,
                                     submissionSheet
                                 );
                             } else if (flag === '-sp4' || flag === '-sp4R') {
                                 isSuccessful = await recordSubmissions(
                                     message,
-                                    args[inputIndex],
+                                    refinedArgs[inputIndex],
                                     'project4',
-                                    rows,
+                                    submissionRows,
+                                    reviewRows,
                                     flag,
                                     submissionSheet
                                 );
                             } else if (flag === '-sp5' || flag === '-sp5R') {
                                 isSuccessful = await recordSubmissions(
                                     message,
-                                    args[inputIndex],
+                                    refinedArgs[inputIndex],
                                     'project5',
-                                    rows,
+                                    submissionRows,
+                                    reviewRows,
                                     flag,
                                     submissionSheet
                                 );
                             } else if (flag === '-sp6' || flag === '-sp6R') {
                                 isSuccessful = await recordSubmissions(
                                     message,
-                                    args[inputIndex],
+                                    refinedArgs[inputIndex],
                                     'project6',
-                                    rows,
+                                    submissionRows,
+                                    reviewRows,
                                     flag,
                                     submissionSheet
                                 );
                             } else if (flag === '-sp7' || flag === '-sp7R') {
                                 isSuccessful = await recordSubmissions(
                                     message,
-                                    args[inputIndex],
+                                    refinedArgs[inputIndex],
                                     'project7',
-                                    rows,
+                                    submissionRows,
+                                    reviewRows,
                                     flag,
                                     submissionSheet
                                 );
                             } else if (flag === '-sp8' || flag === '-sp8R') {
                                 isSuccessful = await recordSubmissions(
                                     message,
-                                    args[inputIndex],
+                                    refinedArgs[inputIndex],
                                     'project8',
-                                    rows,
+                                    submissionRows,
+                                    reviewRows,
                                     flag,
                                     submissionSheet
                                 );
                             } else if (flag === '-sp9' || flag === '-sp9R') {
                                 isSuccessful = await recordSubmissions(
                                     message,
-                                    args[inputIndex],
+                                    refinedArgs[inputIndex],
                                     'project9',
-                                    rows,
+                                    submissionRows,
+                                    reviewRows,
                                     flag,
                                     submissionSheet
                                 );
                             } else if (flag === '-sp10' || flag === '-sp10R') {
                                 isSuccessful = await recordSubmissions(
                                     message,
-                                    args[inputIndex],
+                                    refinedArgs[inputIndex],
                                     'project10',
-                                    rows,
+                                    submissionRows,
+                                    reviewRows,
                                     flag,
                                     submissionSheet
                                 );
@@ -166,12 +189,41 @@ module.exports = {
 
                         case '-gh':
                         case '-ghR':
-                            if (flag === '-gh' || flag === 'ghR') {
+                            if (flag === '-gh' || flag === '-ghR') {
                                 isSuccessful = await recordSubmissions(
                                     message,
-                                    args[inputIndex],
+                                    refinedArgs[inputIndex],
                                     'githubUsername',
-                                    rows,
+                                    submissionRows,
+                                    reviewRows,
+                                    flag,
+                                    submissionSheet
+                                );
+                            }
+
+                            // This is final message for submission status
+                            if (typeof isSuccessful !== 'string')
+                                botChannelAsync(
+                                    message,
+                                    `${!isSuccessful ? '❗' : ''}<@!${
+                                        message.author.id
+                                    }>, Your submission ${
+                                        isSuccessful
+                                            ? 'has been recorded!'
+                                            : `was not recorded.\n\nPlease try again later, if the problem still persists tag **@OG Admin** for further assistance`
+                                    }`
+                                );
+                            break;
+
+                        case '-pf':
+                        case '-pfR':
+                            if (flag === '-pf' || flag === '-pfR') {
+                                isSuccessful = await recordSubmissions(
+                                    message,
+                                    refinedArgs[inputIndex],
+                                    'portfolioUrl',
+                                    submissionRows,
+                                    reviewRows,
                                     flag,
                                     submissionSheet
                                 );
@@ -197,17 +249,17 @@ module.exports = {
                             )
                                 return botChannelAsync(
                                     message,
-                                    `<@!${message.author.id}>, Only admins can review projects`
+                                    `<@!${message.author.id}>, Only admins can add sheets to Google Spreadsheet`
                                 );
 
-                            if (args.length > 2) {
+                            if (refinedArgs.length > 2) {
                                 await doc.addSheet({
-                                    title: args[inputIndex],
-                                    headerValues: [...args.slice(2).join('').split(',')],
+                                    title: refinedArgs[inputIndex],
+                                    headerValues: [...refinedArgs.slice(2).join('').split(',')],
                                 });
                             } else {
                                 await doc.addSheet({
-                                    title: args[inputIndex],
+                                    title: refinedArgs[inputIndex],
                                 });
                             }
                             break;
@@ -230,11 +282,11 @@ module.exports = {
                                     `<@!${message.author.id}>, Only admins can review projects`
                                 );
 
-                            await submitReview(message, args);
+                            await submitReview(message, refinedArgs, submissionRows, reviewSheet);
                             break;
 
                         case '-fs':
-                            await fetchSubmission(message, rows);
+                            await fetchSubmission(message, submissionRows, reviewRows);
                             break;
                     }
                 });
