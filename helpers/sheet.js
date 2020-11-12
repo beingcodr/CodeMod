@@ -10,6 +10,7 @@ const cliChecklist = [
     'functionality 4',
     'functionality 5',
 ];
+
 const portfolioChecklist = [
     'portfolio functionality 1',
     'portfolio functionality 2',
@@ -56,8 +57,9 @@ const formatReviewParam = (checklistLength, reviewParam) => {
         } else if (reviewParam.length > checklistLength) {
             return reviewParam.substring(0, checklistLength);
         }
+    } else {
+        return reviewParam;
     }
-    return true;
 };
 
 const processReview = async (
@@ -106,7 +108,10 @@ const processReview = async (
             });
         } else {
             // This piece of code checks if this project of a user has already been reviewed or not
-            if (user[0].projectsReviewed.includes(`${projectNum}`))
+            if (
+                user[0].projectsReviewed !== undefined &&
+                user[0].projectsReviewed.includes(`${projectNum}`)
+            )
                 return botChannelAsync(
                     message,
                     `<@!${message.author.id}>, ${projectNum} has been reviewed previously`
@@ -117,8 +122,10 @@ const processReview = async (
                 +reviewRows[user[0].rowIndex - 2].totalProjectsReviewed + 1;
             reviewRows[user[0].rowIndex - 2].lastUpdatedOn = new Date();
             reviewRows[user[0].rowIndex - 2].projectsReviewed = `${
-                reviewRows[user[0].rowIndex - 2].projectsReviewed
-            }, ${projectNum}`;
+                reviewRows[user[0].rowIndex - 2].projectsReviewed === undefined
+                    ? ''
+                    : `${reviewRows[user[0].rowIndex - 2].projectsReviewed}, `
+            }${projectNum}`;
             // saving the updated row
             await reviewRows[user[0].rowIndex - 2].save();
         }
@@ -142,6 +149,8 @@ const processReview = async (
 };
 
 module.exports = {
+    cliChecklist,
+    portfolioChecklist,
     getByDiscordTag,
     recordSubmissions: async (
         message,
@@ -155,6 +164,13 @@ module.exports = {
         try {
             let user = getByDiscordTag(submissionRows, message.author.tag);
             let reviewRecord = getByDiscordTag(reviewRows, message.author.tag);
+            if (args === undefined) {
+                botChannelAsync(
+                    message,
+                    `<@!${message.author.id}>, No URL was found. Please pass in your projects' hosted URL`
+                );
+                return 'false';
+            }
             const regexURLValidation = ((message, url) => {
                 let regex = new RegExp(
                     'https?://(?:www.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9].[^s]{2,}|www.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9].[^s]{2,}|https?://(?:www.|(?!www))[a-zA-Z0-9]+.[^s]{2,}|www.[a-zA-Z0-9]+.[^s]{2,}'
@@ -182,7 +198,7 @@ module.exports = {
                 .addField('User', `<@!${message.author.id}>`, true)
                 .addField('\u200b', '\u200b')
                 .addField(
-                    'Project',
+                    `${projectNum}`,
                     `${projectNames[+projectNum.slice(projectNum.length - 1) - 1]}`,
                     true
                 )
@@ -196,11 +212,11 @@ module.exports = {
                     lastUpdatedOn: new Date(),
                     [`${projectNum}`]: args,
                 });
-                submissionChannelAsync(message, submissionEmbed);
+                if (projectNum !== 'portfolioUrl') submissionChannelAsync(message, submissionEmbed);
                 return true;
             } else {
                 const isAvailable =
-                    submissionRows[user[0].rowIndex - 2][`${projectNum}`] !== undefined &&
+                    submissionRows[user[0].rowIndex - 2][`${projectNum}`].length > 0 &&
                     flag
                         .split('')
                         .slice(flag.length - 1)
@@ -220,6 +236,7 @@ module.exports = {
                 // If the project is reviewed then the user can't change the hosted URL
                 if (
                     reviewRecord.length > 0 &&
+                    reviewRecord[0].projectsReviewed !== undefined &&
                     reviewRecord[0].projectsReviewed.includes(`${projectNum}`)
                 ) {
                     botChannelAsync(
@@ -233,7 +250,7 @@ module.exports = {
                 submissionRows[user[0].rowIndex - 2].lastUpdatedOn = new Date();
                 // saving the updated row
                 await submissionRows[user[0].rowIndex - 2].save();
-                submissionChannelAsync(message, submissionEmbed);
+                if (projectNum !== 'portfolioUrl') submissionChannelAsync(message, submissionEmbed);
                 return true;
             }
         } catch (error) {
@@ -273,7 +290,7 @@ module.exports = {
                     .addField(
                         'Github Profile',
                         `${
-                            fetchedSubmission[0].githubUsername !== undefined
+                            fetchedSubmission[0].githubUsername.length > 0
                                 ? `[${fetchedSubmission[0].githubUsername}](https://github.com/${fetchedSubmission[0].githubUsername})`
                                 : 'No profile linked'
                         }`,
@@ -502,6 +519,59 @@ module.exports = {
                     `<@!${message.author.id}>, Please pass valid **flags**\nFor example: \`-rp1\` for project 1, \`-rp2\` for project 2 and so on`
                 );
                 break;
+        }
+    },
+    fetchChecklist: (message, projectNum, checklist) => {
+        submissionChannelAsync(
+            message,
+            `Here's the checklist for reviewing ${
+                projectNames[projectNum.substring(projectNum.length - 1) - 1]
+            }:\n\n${checklist.map((item) => `📝    **${item}**\n\n`).join('')}`
+        );
+    },
+    resubmission: (message, projectNum, submissionRows) => {
+        const submissionRecord = getByDiscordTag(submissionRows, message.author.tag);
+
+        if (!submissionRecord.length) {
+            return botChannelAsync(
+                message,
+                `<@!${message.author.id}>, You don't have any submissions to resubmit-. Please submit a project with the command \`/nc -sp1 https://hosted-url.com\` for project 1 i.e. CLI app`
+            );
+        } else {
+            if (
+                submissionRows[submissionRecord[0].rowIndex - 2][`${projectNum}`] === undefined ||
+                submissionRows[submissionRecord[0].rowIndex - 2][`${projectNum}`].length <= 0
+            )
+                return botChannelAsync(
+                    message,
+                    `<@!${message.author.id}>, There is no submission for **${
+                        projectNames[projectNum.substring(projectNum.length - 1) - 1]
+                    }**. Submit the project with the command \`/nc -sp${projectNum.substring(
+                        projectNum.length - 1
+                    )} https://hosted-url.com\``
+                );
+
+            let submissionEmbed = new MessageEmbed()
+                .setTitle(`✅   Re-Submission!!`)
+                .setThumbnail(message.author.avatarURL() || message.author.displayAvatarURL())
+                .setColor(colors.green)
+                .addField('User', `<@!${message.author.id}>`, true)
+                .addField('\u200b', '\u200b')
+                .addField(
+                    `${projectNum}`,
+                    `${projectNames[+projectNum.slice(projectNum.length - 1) - 1]}`,
+                    true
+                )
+                .addField(
+                    'Project link',
+                    `[Review project](${
+                        submissionRows[submissionRecord[0].rowIndex - 2][`${projectNum}`]
+                    })`,
+                    true
+                );
+
+            botChannelAsync(message, `<@!${message.author.id}>, Your re-submission is recorded.`);
+            submissionChannelAsync(message, submissionEmbed);
         }
     },
 };

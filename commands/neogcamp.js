@@ -1,6 +1,14 @@
 const { GoogleSpreadsheet } = require('google-spreadsheet');
 const { deleteMessage, messageErrorAsync, botChannelAsync } = require('../helpers/message');
-const { fetchSubmission, submitReview, recordSubmissions } = require('../helpers/sheet');
+const {
+    fetchSubmission,
+    submitReview,
+    recordSubmissions,
+    getByDiscordTag,
+    fetchChecklist,
+    cliChecklist,
+    resubmission,
+} = require('../helpers/sheet');
 
 module.exports = {
     name: 'neogcamp',
@@ -188,21 +196,44 @@ module.exports = {
                             break;
 
                         case '-gh':
-                        case '-ghR':
-                            if (flag === '-gh' || flag === '-ghR') {
-                                isSuccessful = await recordSubmissions(
+                            let regex = new RegExp(/^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i);
+                            if (!refinedArgs[1].match(regex)) {
+                                botChannelAsync(
                                     message,
-                                    refinedArgs[inputIndex],
-                                    'githubUsername',
-                                    submissionRows,
-                                    reviewRows,
-                                    flag,
-                                    submissionSheet
+                                    `<@!${message.author.id}>, \`${refinedArgs[1]}\` is an invalid Github username\n\n**Username may only contain:**\n1. Alphanumeric characters or single hyphens\n2. Cannot begin or end with a hyphen\n3. Cannot have more than one consecutive hypens\n4. Total number of characters can be no more than 39 characters`
                                 );
+                                isSuccessful = 'false';
                             }
 
-                            // This is final message for submission status
+                            if (typeof isSuccessful !== 'string') {
+                                const submissionRecord = getByDiscordTag(
+                                    submissionRows,
+                                    message.author.tag
+                                );
+
+                                if (!submissionRecord.length) {
+                                    // the submissionRecord array is empty
+                                    await submissionSheet.addRow({
+                                        discordId: message.author.id,
+                                        discordTag: message.author.tag,
+                                        lastUpdatedOn: new Date(),
+                                        githubUsername: refinedArgs[1],
+                                    });
+                                } else {
+                                    submissionRows[
+                                        submissionRecord[0].rowIndex - 2
+                                    ].githubUsername = `${refinedArgs[1]}`;
+                                    submissionRows[
+                                        submissionRecord[0].rowIndex - 2
+                                    ].lastUpdatedOn = new Date();
+
+                                    await submissionRows[submissionRecord[0].rowIndex - 2].save();
+                                }
+                                isSuccessful = true;
+                            }
+
                             if (typeof isSuccessful !== 'string')
+                                // This is final message for submission status
                                 botChannelAsync(
                                     message,
                                     `${!isSuccessful ? '❗' : ''}<@!${
@@ -287,6 +318,35 @@ module.exports = {
 
                         case '-fs':
                             await fetchSubmission(message, submissionRows, reviewRows);
+                            break;
+
+                        // !Update the checklist
+                        case '-fcl1':
+                        case '-fcl2':
+                        case '-fcl3':
+                        case '-fcl4':
+                        case '-fcl5':
+                        case '-fcl6':
+                            if (flag === '-fcl1') fetchChecklist(message, 'project1', cliChecklist);
+                            if (flag === '-fcl2') fetchChecklist(message, 'project2', cliChecklist);
+                            if (flag === '-fcl3') fetchChecklist(message, 'project3', cliChecklist);
+                            if (flag === '-fcl4') fetchChecklist(message, 'project4', cliChecklist);
+                            if (flag === '-fcl5') fetchChecklist(message, 'project5', cliChecklist);
+                            if (flag === '-fcl6') fetchChecklist(message, 'project6', cliChecklist);
+                            break;
+
+                        case '-rsp1':
+                        case '-rsp2':
+                        case '-rsp3':
+                        case '-rsp4':
+                        case '-rsp5':
+                        case '-rsp6':
+                            if (flag === '-rsp1') resubmission(message, 'project1', submissionRows);
+                            if (flag === '-rsp2') resubmission(message, 'project2', submissionRows);
+                            if (flag === '-rsp3') resubmission(message, 'project3', submissionRows);
+                            if (flag === '-rsp4') resubmission(message, 'project4', submissionRows);
+                            if (flag === '-rsp5') resubmission(message, 'project5', submissionRows);
+                            if (flag === '-rsp6') resubmission(message, 'project6', submissionRows);
                             break;
                     }
                 });
