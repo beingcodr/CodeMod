@@ -1,7 +1,7 @@
 const { Client, Collection, MessageEmbed } = require('discord.js');
 require('dotenv').config();
 const mongoose = require('mongoose');
-const { prefix, moderation, colors } = require('./json/config.json');
+const { prefix, moderation, colors, submissionChannel } = require('./json/config.json');
 const { moderateMessagesCommand } = require('./helpers/index');
 const downvote = require('./commands/downvote');
 const { botChannelAsync, memberErrorAsync } = require('./helpers/message');
@@ -31,6 +31,17 @@ bot.on('message', (message) => {
     //     console.log('cehcking: ', msgggg.delete());
     // };
     // checkMessage(message);
+    // console.log(
+    //     'Message: ',
+    //     message.embeds.map((embed) => embed.fields.map((field) => field.name))
+    // );
+    console.log(
+        'submission channel msg: ',
+        message.client.channels
+            .fetch(process.env.CM_SUBMISSION_CHANNEL || submissionChannel)
+            .then((channel) => channel.type) 
+            .catch((error) => console.log(error))
+    );
     let moderationCheck = process.env.CM_MODERATION || moderation;
     let args = [];
     if (message.author === bot.user || message.author.bot) {

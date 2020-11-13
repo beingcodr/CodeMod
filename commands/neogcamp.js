@@ -71,14 +71,12 @@ module.exports = {
                         case '-sp5R':
                         case '-sp6':
                         case '-sp6R':
-                        case '-sp7':
-                        case '-sp7R':
-                        case '-sp8':
-                        case '-sp8R':
-                        case '-sp9':
-                        case '-sp9R':
-                        case '-sp10':
-                        case '-sp10R':
+                        case '-sb1':
+                        case '-sb1R':
+                        case '-sb2':
+                        case '-sb2R':
+                        case '-sb3':
+                        case '-sb3R':
                             if (flag === '-sp1' || flag === '-sp1R') {
                                 isSuccessful = await recordSubmissions(
                                     message,
@@ -139,41 +137,31 @@ module.exports = {
                                     flag,
                                     submissionSheet
                                 );
-                            } else if (flag === '-sp7' || flag === '-sp7R') {
+                            } else if (flag === '-sb1' || flag === '-sb1R') {
                                 isSuccessful = await recordSubmissions(
                                     message,
                                     refinedArgs[inputIndex],
-                                    'project7',
+                                    'blog1',
                                     submissionRows,
                                     reviewRows,
                                     flag,
                                     submissionSheet
                                 );
-                            } else if (flag === '-sp8' || flag === '-sp8R') {
+                            } else if (flag === '-sb2' || flag === '-sb2R') {
                                 isSuccessful = await recordSubmissions(
                                     message,
                                     refinedArgs[inputIndex],
-                                    'project8',
+                                    'blog2',
                                     submissionRows,
                                     reviewRows,
                                     flag,
                                     submissionSheet
                                 );
-                            } else if (flag === '-sp9' || flag === '-sp9R') {
+                            } else if (flag === '-sb3' || flag === '-sb3R') {
                                 isSuccessful = await recordSubmissions(
                                     message,
                                     refinedArgs[inputIndex],
-                                    'project9',
-                                    submissionRows,
-                                    reviewRows,
-                                    flag,
-                                    submissionSheet
-                                );
-                            } else if (flag === '-sp10' || flag === '-sp10R') {
-                                isSuccessful = await recordSubmissions(
-                                    message,
-                                    refinedArgs[inputIndex],
-                                    'project10',
+                                    'blog3',
                                     submissionRows,
                                     reviewRows,
                                     flag,
@@ -301,10 +289,10 @@ module.exports = {
                         case '-rp4':
                         case '-rp5':
                         case '-rp6':
-                        case '-rp7':
-                        case '-rp8':
-                        case '-rp9':
-                        case '-rp10':
+                            // case '-rp7':
+                            // case '-rp8':
+                            // case '-rp9':
+                            // case '-rp10':
                             if (
                                 !message.guild.member(message.author).hasPermission('ADMINISTRATOR')
                             )
@@ -348,6 +336,12 @@ module.exports = {
                             if (flag === '-rsp5') resubmission(message, 'project5', submissionRows);
                             if (flag === '-rsp6') resubmission(message, 'project6', submissionRows);
                             break;
+
+                        default:
+                            return botChannelAsync(
+                                message,
+                                `<@!${message.author.id}>, \`${flag}\` is not a valid flag. Read the docs to know about all the valid flags`
+                            );
                     }
                 });
             } else {

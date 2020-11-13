@@ -41,13 +41,22 @@ const getByDiscordTag = (rows, tag) => {
 
 const getValidProjects = (submission) => {
     let validProjects = [];
-    for (let i = 1; i <= 10; i++) {
+    for (let i = 1; i <= 6; i++) {
         validProjects = [
             ...validProjects,
             { name: `project${i}`, link: submission[`project${i}`] },
         ];
     }
     return validProjects;
+};
+
+const getValidBlogs = (submission) => {
+    let validBlogs = [];
+    for (let i = 1; i <= 3; i++) {
+        if (submission[`blog${i}`] !== undefined && submission[`blog${i}`].length > 0)
+            validBlogs = [...validBlogs, { name: `Blog ${i}`, link: submission[`blog${i}`] }];
+    }
+    return validBlogs;
 };
 
 const formatReviewParam = (checklistLength, reviewParam) => {
@@ -77,7 +86,7 @@ const processReview = async (
     console.log('ReviewParam: ', reviewParam);
     const reviewRows = await reviewSheet.getRows();
     const submissionRecord = getByDiscordTag(submissionRows, `${mentionedUser.tag}`);
-    const user = getByDiscordTag(reviewRows, `${mentionedUser.tag}`);
+    const reviewRecord = getByDiscordTag(reviewRows, `${mentionedUser.tag}`);
     // Updating the reviewCount to see if the project satisfies the checklist
     // If yes then this submittion is counted a valid project submission against NeogCamp eligibility
     reviewParam.split('').forEach((arg) => {
@@ -92,13 +101,13 @@ const processReview = async (
         submissionRecord[0][`${projectNum}`] === undefined ||
         submissionRecord[0][`${projectNum}`].length <= 0
     )
-        return botChannelAsync(
+        return submissionChannelAsync(
             message,
             `<@!${message.author.id}>, There is no project URL for ${projectNum}, you can't review it`
         );
 
     if (reviewCount === checklist.length) {
-        if (!user.length) {
+        if (!reviewRecord.length) {
             await reviewSheet.addRow({
                 discordId: mentionedUser.id,
                 discordTag: `${mentionedUser.username}#${mentionedUser.discriminator}`,
@@ -109,25 +118,25 @@ const processReview = async (
         } else {
             // This piece of code checks if this project of a user has already been reviewed or not
             if (
-                user[0].projectsReviewed !== undefined &&
-                user[0].projectsReviewed.includes(`${projectNum}`)
+                reviewRecord[0].projectsReviewed !== undefined &&
+                reviewRecord[0].projectsReviewed.includes(`${projectNum}`)
             )
-                return botChannelAsync(
+                return submissionChannelAsync(
                     message,
                     `<@!${message.author.id}>, ${projectNum} has been reviewed previously`
                 );
 
             // updating the row
-            reviewRows[user[0].rowIndex - 2].totalProjectsReviewed =
-                +reviewRows[user[0].rowIndex - 2].totalProjectsReviewed + 1;
-            reviewRows[user[0].rowIndex - 2].lastUpdatedOn = new Date();
-            reviewRows[user[0].rowIndex - 2].projectsReviewed = `${
-                reviewRows[user[0].rowIndex - 2].projectsReviewed === undefined
+            reviewRows[reviewRecord[0].rowIndex - 2].totalProjectsReviewed =
+                +reviewRows[reviewRecord[0].rowIndex - 2].totalProjectsReviewed + 1;
+            reviewRows[reviewRecord[0].rowIndex - 2].lastUpdatedOn = new Date();
+            reviewRows[reviewRecord[0].rowIndex - 2].projectsReviewed = `${
+                reviewRows[reviewRecord[0].rowIndex - 2].projectsReviewed === undefined
                     ? ''
-                    : `${reviewRows[user[0].rowIndex - 2].projectsReviewed}, `
+                    : `${reviewRows[reviewRecord[0].rowIndex - 2].projectsReviewed}, `
             }${projectNum}`;
             // saving the updated row
-            await reviewRows[user[0].rowIndex - 2].save();
+            await reviewRows[reviewRecord[0].rowIndex - 2].save();
         }
     }
     return botChannelAsync(
@@ -140,8 +149,10 @@ const processReview = async (
             .join('\n\n')}\n\n${
             reviewCount === checklist.length
                 ? `🥳   **You're ${
-                      10 -
-                      (!user.length ? 1 : reviewRows[user[0].rowIndex - 2].totalProjectsReviewed)
+                      6 -
+                      (!reviewRecord.length
+                          ? 1
+                          : reviewRows[reviewRecord[0].rowIndex - 2].totalProjectsReviewed)
                   } project away from qualifying for NeogCamp level 1**`
                 : `**Please integrate the functionalities marked with ❌ and re-submit the project.**\n\nYou may use the command \`/nc -rsp<project-num>\`.\n**For example:** \`/nc -rsp1\` for re-submitting \`project 1\`, \`/nc -rsp2\` for re-submitting \`project 2\` and so on.`
         }`
@@ -162,7 +173,7 @@ module.exports = {
         sheet
     ) => {
         try {
-            let user = getByDiscordTag(submissionRows, message.author.tag);
+            let submissionRecord = getByDiscordTag(submissionRows, message.author.tag);
             let reviewRecord = getByDiscordTag(reviewRows, message.author.tag);
             if (args === undefined) {
                 botChannelAsync(
@@ -202,9 +213,15 @@ module.exports = {
                     `${projectNames[+projectNum.slice(projectNum.length - 1) - 1]}`,
                     true
                 )
-                .addField('Project link', `[Review project](${args})`, true);
+                .addField(
+                    `${projectNum.startsWith('p') ? 'Project' : 'Blog'} link`,
+                    `[Review ${projectNum.startsWith('p') ? 'project' : 'blog'}](${
+                        submissionRows[submissionRecord[0].rowIndex - 2][`${projectNum}`]
+                    })`,
+                    true
+                );
 
-            if (!user.length) {
+            if (!submissionRecord.length) {
                 // the user array is empty
                 await sheet.addRow({
                     discordId: message.author.id,
@@ -216,7 +233,7 @@ module.exports = {
                 return true;
             } else {
                 const isAvailable =
-                    submissionRows[user[0].rowIndex - 2][`${projectNum}`].length > 0 &&
+                    submissionRows[submissionRecord[0].rowIndex - 2][`${projectNum}`].length > 0 &&
                     flag
                         .split('')
                         .slice(flag.length - 1)
@@ -246,10 +263,10 @@ module.exports = {
                     return 'false';
                 }
                 // updating the row
-                submissionRows[user[0].rowIndex - 2][`${projectNum}`] = `${args}`;
-                submissionRows[user[0].rowIndex - 2].lastUpdatedOn = new Date();
+                submissionRows[submissionRecord[0].rowIndex - 2][`${projectNum}`] = `${args}`;
+                submissionRows[submissionRecord[0].rowIndex - 2].lastUpdatedOn = new Date();
                 // saving the updated row
-                await submissionRows[user[0].rowIndex - 2].save();
+                await submissionRows[submissionRecord[0].rowIndex - 2].save();
                 if (projectNum !== 'portfolioUrl') submissionChannelAsync(message, submissionEmbed);
                 return true;
             }
@@ -281,6 +298,8 @@ module.exports = {
             );
 
             if (fetchedSubmission.length) {
+                const validBlogs = getValidBlogs(fetchedSubmission[0]);
+                console.log(validBlogs);
                 // Constructing a common message embed for both cases
                 messageEmbed = new MessageEmbed()
                     .setTitle('✅   Submission Details')
@@ -324,6 +343,23 @@ module.exports = {
                                     }](${project.link})`
                             )
                             .join(', ')}`,
+                        true
+                    )
+                    .addField(
+                        'Blog links',
+                        `${
+                            validBlogs.length > 0
+                                ? validBlogs
+                                      .filter((validBlog) => {
+                                          if (validBlog.link === undefined) return;
+                                          if (validBlog.link.length > 0) {
+                                              return validBlog;
+                                          }
+                                      })
+                                      .map((blog) => `[${blog.name}](${blog.link})`)
+                                      .join(', ')
+                                : 'No blogs'
+                        }`,
                         true
                     )
                     .addField(
@@ -393,7 +429,7 @@ module.exports = {
 
         switch (projectName) {
             case '-rp1':
-                reviewCount = processReview(
+                await processReview(
                     message,
                     'project1',
                     mentionedUser,
@@ -405,7 +441,7 @@ module.exports = {
                 break;
 
             case '-rp2':
-                reviewCount = processReview(
+                await processReview(
                     message,
                     'project2',
                     mentionedUser,
@@ -417,7 +453,7 @@ module.exports = {
                 break;
             // !Update the checklist parameter to appropriate project checklists
             case '-rp3':
-                reviewCount = processReview(
+                await processReview(
                     message,
                     'project3',
                     mentionedUser,
@@ -429,7 +465,7 @@ module.exports = {
                 break;
             // !Update the checklist parameter to appropriate project checklists
             case '-rp4':
-                reviewCount = processReview(
+                await processReview(
                     message,
                     'project4',
                     mentionedUser,
@@ -441,7 +477,7 @@ module.exports = {
                 break;
             // !Update the checklist parameter to appropriate project checklists
             case '-rp5':
-                reviewCount = processReview(
+                await processReview(
                     message,
                     'project5',
                     mentionedUser,
@@ -453,57 +489,9 @@ module.exports = {
                 break;
             // !Update the checklist parameter to appropriate project checklists
             case '-rp6':
-                reviewCount = processReview(
+                await processReview(
                     message,
                     'project6',
-                    mentionedUser,
-                    portfolioChecklist,
-                    args[2],
-                    submissionRows,
-                    reviewSheet
-                );
-                break;
-            // !Update the checklist parameter to appropriate project checklists
-            case '-rp7':
-                reviewCount = processReview(
-                    message,
-                    'project7',
-                    mentionedUser,
-                    portfolioChecklist,
-                    args[2],
-                    submissionRows,
-                    reviewSheet
-                );
-                break;
-            // !Update the checklist parameter to appropriate project checklists
-            case '-rp8':
-                reviewCount = processReview(
-                    message,
-                    'project8',
-                    mentionedUser,
-                    portfolioChecklist,
-                    args[2],
-                    submissionRows,
-                    reviewSheet
-                );
-                break;
-            // !Update the checklist parameter to appropriate project checklists
-            case '-rp9':
-                reviewCount = processReview(
-                    message,
-                    'project9',
-                    mentionedUser,
-                    portfolioChecklist,
-                    args[2],
-                    submissionRows,
-                    reviewSheet
-                );
-                break;
-            // !Update the checklist parameter to appropriate project checklists
-            case '-rp10':
-                reviewCount = processReview(
-                    message,
-                    'project10',
                     mentionedUser,
                     portfolioChecklist,
                     args[2],
@@ -514,7 +502,7 @@ module.exports = {
 
             default:
                 // ! This has to be the neogcampPrivateChannel
-                botChannelAsync(
+                submissionChannelAsync(
                     message,
                     `<@!${message.author.id}>, Please pass valid **flags**\nFor example: \`-rp1\` for project 1, \`-rp2\` for project 2 and so on`
                 );
@@ -563,8 +551,8 @@ module.exports = {
                     true
                 )
                 .addField(
-                    'Project link',
-                    `[Review project](${
+                    `${projectNum.startsWith('p') ? 'Project' : 'Blog'} link`,
+                    `[Review ${projectNum.startsWith('p') ? 'project' : 'blog'}](${
                         submissionRows[submissionRecord[0].rowIndex - 2][`${projectNum}`]
                     })`,
                     true
