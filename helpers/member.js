@@ -1,6 +1,11 @@
 const Member = require('../server/models/Member');
 const Server = require('../server/models/Server');
-const { messageErrorAsync, memberErrorAsync, deleteMessage } = require('../helpers/message');
+const {
+    messageErrorAsync,
+    memberErrorAsync,
+    deleteMessage,
+    botChannelAsync,
+} = require('../helpers/message');
 
 const calculateMember = (message) => {
     let botCount = 0;
@@ -209,8 +214,11 @@ const updateMember = async (message, member) => {
         returnedMember = await addMemberEvent(member, 'addRole command');
     }
 
+    let returnedServer = await Server.findOne({ serverId: member.guild.id });
+    if (!returnedServer) returnedServer = await addServer(message);
+
     returnedMember.discordId = member.user.id;
-    returnedMember.serverId = member.guild.id;
+    returnedMember.serverId = returnedServer.id;
     returnedMember.discordSlug = `${member.user.id}${member.guild.id}`;
     returnedMember.discriminator = `#${member.user.discriminator}`;
     returnedMember.username = member.user.username;
@@ -230,7 +238,7 @@ const updateMember = async (message, member) => {
         console.log(error);
         return botChannelAsync(
             message,
-            `There was an error while updating <@!${member.user.id}>'s details`
+            `There was an error while updating <@!${member.user.id}>'s details\n\n**Error message:** ${error.message}`
         );
     }
 };

@@ -63,20 +63,20 @@ module.exports = {
                         case '-sp1R':
                         case '-sp2':
                         case '-sp2R':
-                        case '-sp3':
-                        case '-sp3R':
-                        case '-sp4':
-                        case '-sp4R':
-                        case '-sp5':
-                        case '-sp5R':
-                        case '-sp6':
-                        case '-sp6R':
-                        case '-sb1':
-                        case '-sb1R':
-                        case '-sb2':
-                        case '-sb2R':
-                        case '-sb3':
-                        case '-sb3R':
+                            // case '-sp3':
+                            // case '-sp3R':
+                            // case '-sp4':
+                            // case '-sp4R':
+                            // case '-sp5':
+                            // case '-sp5R':
+                            // case '-sp6':
+                            // case '-sp6R':
+                            // case '-sb1':
+                            // case '-sb1R':
+                            // case '-sb2':
+                            // case '-sb2R':
+                            // case '-sb3':
+                            // case '-sb3R':
                             if (flag === '-sp1' || flag === '-sp1R') {
                                 isSuccessful = await recordSubmissions(
                                     message,
@@ -97,77 +97,78 @@ module.exports = {
                                     flag,
                                     submissionSheet
                                 );
-                            } else if (flag === '-sp3' || flag === '-sp3R') {
-                                isSuccessful = await recordSubmissions(
-                                    message,
-                                    refinedArgs[inputIndex],
-                                    'project3',
-                                    submissionRows,
-                                    reviewRows,
-                                    flag,
-                                    submissionSheet
-                                );
-                            } else if (flag === '-sp4' || flag === '-sp4R') {
-                                isSuccessful = await recordSubmissions(
-                                    message,
-                                    refinedArgs[inputIndex],
-                                    'project4',
-                                    submissionRows,
-                                    reviewRows,
-                                    flag,
-                                    submissionSheet
-                                );
-                            } else if (flag === '-sp5' || flag === '-sp5R') {
-                                isSuccessful = await recordSubmissions(
-                                    message,
-                                    refinedArgs[inputIndex],
-                                    'project5',
-                                    submissionRows,
-                                    reviewRows,
-                                    flag,
-                                    submissionSheet
-                                );
-                            } else if (flag === '-sp6' || flag === '-sp6R') {
-                                isSuccessful = await recordSubmissions(
-                                    message,
-                                    refinedArgs[inputIndex],
-                                    'project6',
-                                    submissionRows,
-                                    reviewRows,
-                                    flag,
-                                    submissionSheet
-                                );
-                            } else if (flag === '-sb1' || flag === '-sb1R') {
-                                isSuccessful = await recordSubmissions(
-                                    message,
-                                    refinedArgs[inputIndex],
-                                    'blog1',
-                                    submissionRows,
-                                    reviewRows,
-                                    flag,
-                                    submissionSheet
-                                );
-                            } else if (flag === '-sb2' || flag === '-sb2R') {
-                                isSuccessful = await recordSubmissions(
-                                    message,
-                                    refinedArgs[inputIndex],
-                                    'blog2',
-                                    submissionRows,
-                                    reviewRows,
-                                    flag,
-                                    submissionSheet
-                                );
-                            } else if (flag === '-sb3' || flag === '-sb3R') {
-                                isSuccessful = await recordSubmissions(
-                                    message,
-                                    refinedArgs[inputIndex],
-                                    'blog3',
-                                    submissionRows,
-                                    reviewRows,
-                                    flag,
-                                    submissionSheet
-                                );
                             }
+                            // else if (flag === '-sp3' || flag === '-sp3R') {
+                            //     isSuccessful = await recordSubmissions(
+                            //         message,
+                            //         refinedArgs[inputIndex],
+                            //         'project3',
+                            //         submissionRows,
+                            //         reviewRows,
+                            //         flag,
+                            //         submissionSheet
+                            //     );
+                            // } else if (flag === '-sp4' || flag === '-sp4R') {
+                            //     isSuccessful = await recordSubmissions(
+                            //         message,
+                            //         refinedArgs[inputIndex],
+                            //         'project4',
+                            //         submissionRows,
+                            //         reviewRows,
+                            //         flag,
+                            //         submissionSheet
+                            //     );
+                            // } else if (flag === '-sp5' || flag === '-sp5R') {
+                            //     isSuccessful = await recordSubmissions(
+                            //         message,
+                            //         refinedArgs[inputIndex],
+                            //         'project5',
+                            //         submissionRows,
+                            //         reviewRows,
+                            //         flag,
+                            //         submissionSheet
+                            //     );
+                            // } else if (flag === '-sp6' || flag === '-sp6R') {
+                            //     isSuccessful = await recordSubmissions(
+                            //         message,
+                            //         refinedArgs[inputIndex],
+                            //         'project6',
+                            //         submissionRows,
+                            //         reviewRows,
+                            //         flag,
+                            //         submissionSheet
+                            //     );
+                            // } else if (flag === '-sb1' || flag === '-sb1R') {
+                            //     isSuccessful = await recordSubmissions(
+                            //         message,
+                            //         refinedArgs[inputIndex],
+                            //         'blog1',
+                            //         submissionRows,
+                            //         reviewRows,
+                            //         flag,
+                            //         submissionSheet
+                            //     );
+                            // } else if (flag === '-sb2' || flag === '-sb2R') {
+                            //     isSuccessful = await recordSubmissions(
+                            //         message,
+                            //         refinedArgs[inputIndex],
+                            //         'blog2',
+                            //         submissionRows,
+                            //         reviewRows,
+                            //         flag,
+                            //         submissionSheet
+                            //     );
+                            // } else if (flag === '-sb3' || flag === '-sb3R') {
+                            //     isSuccessful = await recordSubmissions(
+                            //         message,
+                            //         refinedArgs[inputIndex],
+                            //         'blog3',
+                            //         submissionRows,
+                            //         reviewRows,
+                            //         flag,
+                            //         submissionSheet
+                            //     );
+                            // }
 
                             // This is final message for submission status
                             if (typeof isSuccessful !== 'string')
@@ -285,14 +286,13 @@ module.exports = {
 
                         case '-rp1':
                         case '-rp2':
-                        case '-rp3':
-                        case '-rp4':
-                        case '-rp5':
-                        case '-rp6':
+                            // case '-rp3':
+                            // case '-rp4':
+                            // case '-rp5':
+                            // case '-rp6':
                             // case '-rp7':
                             // case '-rp8':
                             // case '-rp9':
-                            // case '-rp10':
                             if (
                                 !message.guild.member(message.author).hasPermission('ADMINISTRATOR')
                             )

@@ -35,13 +35,13 @@ bot.on('message', (message) => {
     //     'Message: ',
     //     message.embeds.map((embed) => embed.fields.map((field) => field.name))
     // );
-    console.log(
-        'submission channel msg: ',
-        message.client.channels
-            .fetch(process.env.CM_SUBMISSION_CHANNEL || submissionChannel)
-            .then((channel) => channel.type) 
-            .catch((error) => console.log(error))
-    );
+    // console.log(
+    //     'submission channel msg: ',
+    //     message.client.channels
+    //         .fetch(process.env.CM_SUBMISSION_CHANNEL || submissionChannel)
+    //         .then((channel) => channel.type) 
+    //         .catch((error) => console.log(error))
+    // );
     let moderationCheck = process.env.CM_MODERATION || moderation;
     let args = [];
     if (message.author === bot.user || message.author.bot) {

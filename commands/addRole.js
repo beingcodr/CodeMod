@@ -17,6 +17,7 @@ module.exports = {
         let assignedRoles = [];
         let memberRoles = [];
         let roleMember = {};
+        let mentionedUser = message.mentions.users.first() || message.author;
         let checkRolePermission = (role) =>
             role.permissions.has('ADMINISTRATOR') ||
             role.permissions.has('KICK_MEMBERS') ||
@@ -46,13 +47,13 @@ module.exports = {
                 `<@!${message.author.id}>, specify a role!`
             );
         } else if (roleNames.length === 1) {
+            roleNames = roleNames.join('').split(',');
             roleNamesSet = new Set(roleNames);
         } else {
-            roleNames = roleNames.join(' ').split(', ');
+            roleNames = roleNames.join('').split(',');
             roleNamesSet = new Set(roleNames);
         }
 
-        let mentionedUser = message.mentions.users.first();
         roleNamesSet.forEach((roleName) => {
             // Check if the role exists on the server
             let guildRole = message.guild.roles.cache.find(
@@ -63,9 +64,8 @@ module.exports = {
             }
 
             // Check if the mentionedUser is a valid member
-            roleMember = hasMentions
-                ? message.guild.member(mentionedUser)
-                : message.guild.member(message.author);
+            roleMember = message.guild.member(mentionedUser);
+
             if (!roleMember) {
                 return messageErrorAsync(
                     message,
@@ -104,8 +104,7 @@ module.exports = {
                 `Assigned roles: **${assignedRoles.join(', ') || null}**\nNon-assignable roles: **${
                     nonSelfAssignableRoles.join(', ') || null
                 }**\nUnidentified roles: **${unidentifiedRoles.join(', ') || null}**`,
-
-                `<@!${roleMember.user.id}>,\nAssigned roles: **${
+                `<@!${mentionedUser.id}>,\nAssigned roles: **${
                     assignedRoles.join(', ') || null
                 }**\nNon-assignable roles: **${
                     nonSelfAssignableRoles.join(', ') || null
@@ -114,11 +113,11 @@ module.exports = {
 
             if (updatedWithRole > 0) await updateMember(message, roleMember);
         } catch (error) {
-            console.log(error);
+            console.error(error);
             return messageErrorAsync(
                 message,
-                `There was an error while adding role`,
-                `<@!${message.author.id}>, there was an error while adding role`
+                `Error occured in addRole command: ${error.message}`,
+                `<@!${message.author.id}>, Error occured in addRole command: ${error.message}`
             );
         }
     },

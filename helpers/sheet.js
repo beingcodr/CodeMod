@@ -1,5 +1,7 @@
 const { MessageEmbed } = require('discord.js');
 const moment = require('moment');
+const addRole = require('../commands/addRole');
+const removeRole = require('../commands/removeRole');
 const { colors, submissionChannel } = require('../json/config.json');
 const { botChannelAsync, submissionChannelAsync } = require('./message');
 
@@ -20,16 +22,15 @@ const portfolioChecklist = [
 ];
 
 const projectNames = [
-    'cliapp',
-    'portfolio',
-    'portfolio',
-    'portfolio',
-    'portfolio',
-    'portfolio',
-    'portfolio',
-    'portfolio',
-    'portfolio',
-    'portfolio',
+    'CLI_QUIZ LIVE',
+    'CUSTOM CLI_QUIZ',
+    'HOSTING YOUR SITE',
+    'ADDING DETAILS TO YOUR PORTFOLIO LIVE',
+    'ADDING BLOG TO YOUR PORTFOLIO',
+    'VANILLA JS TRANSLATOR LIVE',
+    'CUSTOM TRANSLATOR APP',
+    'FIRST REACT APP',
+    'REACT QUIZ APP',
 ];
 
 const getByDiscordTag = (rows, tag) => {
@@ -41,7 +42,7 @@ const getByDiscordTag = (rows, tag) => {
 
 const getValidProjects = (submission) => {
     let validProjects = [];
-    for (let i = 1; i <= 6; i++) {
+    for (let i = 1; i <= 9; i++) {
         validProjects = [
             ...validProjects,
             { name: `project${i}`, link: submission[`project${i}`] },
@@ -138,6 +139,13 @@ const processReview = async (
             // saving the updated row
             await reviewRows[reviewRecord[0].rowIndex - 2].save();
         }
+
+        addNeoGCampRole(
+            message,
+            !reviewRecord.length
+                ? 1
+                : +reviewRows[reviewRecord[0].rowIndex - 2].totalProjectsReviewed
+        );
     }
     return botChannelAsync(
         message,
@@ -149,7 +157,7 @@ const processReview = async (
             .join('\n\n')}\n\n${
             reviewCount === checklist.length
                 ? `🥳   **You're ${
-                      6 -
+                      9 -
                       (!reviewRecord.length
                           ? 1
                           : reviewRows[reviewRecord[0].rowIndex - 2].totalProjectsReviewed)
@@ -157,6 +165,85 @@ const processReview = async (
                 : `**Please integrate the functionalities marked with ❌ and re-submit the project.**\n\nYou may use the command \`/nc -rsp<project-num>\`.\n**For example:** \`/nc -rsp1\` for re-submitting \`project 1\`, \`/nc -rsp2\` for re-submitting \`project 2\` and so on.`
         }`
     );
+};
+
+const addNeoGCampRole = (message, totalProjectsReviewed) => {
+    console.log('in the addneworole');
+    console.log('totalprojectsreviewed: ', totalProjectsReviewed);
+    const roles = [
+        'markOne',
+        'markTwo',
+        'markThree',
+        'markFour',
+        'markFive',
+        'markSix',
+        'markSeven',
+        'markEight',
+        'markNine',
+    ];
+
+    let addRoleArgs =
+        totalProjectsReviewed === 1
+            ? ['', 'markOne']
+            : totalProjectsReviewed === 2
+            ? ['', 'markTwo']
+            : totalProjectsReviewed === 3
+            ? ['', 'markThree']
+            : totalProjectsReviewed === 4
+            ? ['', 'markFour']
+            : totalProjectsReviewed === 5
+            ? ['', 'markFive']
+            : totalProjectsReviewed === 6
+            ? ['', 'markSix']
+            : totalProjectsReviewed === 7
+            ? ['', 'markSeven']
+            : totalProjectsReviewed === 8
+            ? ['', 'markEight']
+            : totalProjectsReviewed === 9
+            ? ['', 'markNine']
+            : null;
+    let removeRoleArgs =
+        totalProjectsReviewed === 1
+            ? ['', '']
+            : totalProjectsReviewed === 2
+            ? ['', 'markOne']
+            : totalProjectsReviewed === 3
+            ? ['', 'markTwo']
+            : totalProjectsReviewed === 4
+            ? ['', 'markThree']
+            : totalProjectsReviewed === 5
+            ? ['', 'markFour']
+            : totalProjectsReviewed === 6
+            ? ['', 'markFive']
+            : totalProjectsReviewed === 7
+            ? ['', 'markSix']
+            : totalProjectsReviewed === 8
+            ? ['', 'markSeven']
+            : totalProjectsReviewed === 9
+            ? ['', 'markEight']
+            : null;
+
+    console.log('addroleargs: ', addRoleArgs, '  removeroleargs: ', removeRoleArgs);
+    switch (totalProjectsReviewed) {
+        case 1:
+        case 2:
+            removeRole.execute(message, removeRoleArgs);
+            addRole.execute(message, addRoleArgs);
+            break;
+
+        default:
+            submissionChannelAsync(
+                message,
+                `<@!${
+                    message.author.id
+                }>, The value \`totalProjectsReviewed\` looks sketchy, please take a look at the [Google doc](https://docs.google.com/spreadsheets/d/1NRIpnhKhkzQByutTASg9O8lSKd9dQuJoWv9vM7WbpSM/) (**Reviewed** sheet) for **${
+                    message.mentions.users.first().tag
+                }**. I was not able to assign/remove a role for <@!${
+                    message.mentions.users.first().id
+                }>`
+            );
+            break;
+    }
 };
 
 module.exports = {
@@ -258,7 +345,7 @@ module.exports = {
                 ) {
                     botChannelAsync(
                         message,
-                        `<@!${message.author.id}>, This project has passed the review and you can't change the hosted URL for it anymore.\n\nIn case your reason falls under any of the below reasons then you can tag **@OG Admins** to look into it:\n\n1. You messed up deployment and redeployed with another domain\n2. Added a custom domain\n3. Generated new credentials/app for deployment (firebase)`
+                        `<@!${message.author.id}>, This project has passed the review and you can't change the hosted URL for it anymore.\n\nIn case your reason falls under any of the below reasons then you can tag **@OG Admins** to look into it:\n\n1. You messed up deployment and redeployed with another domain\n2. Added a custom domain\n3. Generated new credentials/app for deployment (firebase)\n\n> _**Note:** If you still wish to change the URL do keep in mind that the project will be flagged for the review process again_`
                     );
                     return 'false';
                 }
@@ -345,23 +432,23 @@ module.exports = {
                             .join(', ')}`,
                         true
                     )
-                    .addField(
-                        'Blog links',
-                        `${
-                            validBlogs.length > 0
-                                ? validBlogs
-                                      .filter((validBlog) => {
-                                          if (validBlog.link === undefined) return;
-                                          if (validBlog.link.length > 0) {
-                                              return validBlog;
-                                          }
-                                      })
-                                      .map((blog) => `[${blog.name}](${blog.link})`)
-                                      .join(', ')
-                                : 'No blogs'
-                        }`,
-                        true
-                    )
+                    // .addField(
+                    //     'Blog links',
+                    //     `${
+                    //         validBlogs.length > 0
+                    // ? validBlogs
+                    //                   .filter((validBlog) => {
+                    //                       if (validBlog.link === undefined) return;
+                    //                       if (validBlog.link.length > 0) {
+                    //                           return validBlog;
+                    //                       }
+                    //                   })
+                    //                   .map((blog) => `[${blog.name}](${blog.link})`)
+                    //                   .join(', ')
+                    //             : 'No blogs'
+                    //     }`,
+                    //     true
+                    // )
                     .addField(
                         'Last submitted on',
                         `${
@@ -387,7 +474,8 @@ module.exports = {
                                 : 'No reviews'
                         }`,
                         true
-                    );
+                    )
+                    .addField('\u200b', '\u200b');
             } else {
                 botChannelAsync(
                     message,
@@ -445,60 +533,60 @@ module.exports = {
                     message,
                     'project2',
                     mentionedUser,
-                    portfolioChecklist,
+                    cliChecklist,
                     args[2],
                     submissionRows,
                     reviewSheet
                 );
                 break;
             // !Update the checklist parameter to appropriate project checklists
-            case '-rp3':
-                await processReview(
-                    message,
-                    'project3',
-                    mentionedUser,
-                    portfolioChecklist,
-                    args[2],
-                    submissionRows,
-                    reviewSheet
-                );
-                break;
+            // case '-rp3':
+            //     await processReview(
+            //         message,
+            //         'project3',
+            //         mentionedUser,
+            //         portfolioChecklist,
+            //         args[2],
+            //         submissionRows,
+            //         reviewSheet
+            //     );
+            //     break;
             // !Update the checklist parameter to appropriate project checklists
-            case '-rp4':
-                await processReview(
-                    message,
-                    'project4',
-                    mentionedUser,
-                    portfolioChecklist,
-                    args[2],
-                    submissionRows,
-                    reviewSheet
-                );
-                break;
+            // case '-rp4':
+            //     await processReview(
+            //         message,
+            //         'project4',
+            //         mentionedUser,
+            //         portfolioChecklist,
+            //         args[2],
+            //         submissionRows,
+            //         reviewSheet
+            //     );
+            //     break;
             // !Update the checklist parameter to appropriate project checklists
-            case '-rp5':
-                await processReview(
-                    message,
-                    'project5',
-                    mentionedUser,
-                    portfolioChecklist,
-                    args[2],
-                    submissionRows,
-                    reviewSheet
-                );
-                break;
+            // case '-rp5':
+            //     await processReview(
+            //         message,
+            //         'project5',
+            //         mentionedUser,
+            //         portfolioChecklist,
+            //         args[2],
+            //         submissionRows,
+            //         reviewSheet
+            //     );
+            //     break;
             // !Update the checklist parameter to appropriate project checklists
-            case '-rp6':
-                await processReview(
-                    message,
-                    'project6',
-                    mentionedUser,
-                    portfolioChecklist,
-                    args[2],
-                    submissionRows,
-                    reviewSheet
-                );
-                break;
+            // case '-rp6':
+            //     await processReview(
+            //         message,
+            //         'project6',
+            //         mentionedUser,
+            //         portfolioChecklist,
+            //         args[2],
+            //         submissionRows,
+            //         reviewSheet
+            //     );
+            //     break;
 
             default:
                 // ! This has to be the neogcampPrivateChannel

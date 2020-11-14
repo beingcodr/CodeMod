@@ -58,7 +58,7 @@ module.exports = {
             roleNamesSet = new Set(roleNames);
         }
 
-        let mentionedUser = message.mentions.users.first();
+        let mentionedUser = message.mentions.users.first() || message.author.id;
         roleNamesSet.forEach((roleName) => {
             // Check if the role exists on the server
             let guildRole = message.guild.roles.cache.find(
@@ -69,9 +69,8 @@ module.exports = {
             }
 
             // Check if there is a  mentionedUser
-            roleMember = hasMentions
-                ? message.guild.member(mentionedUser)
-                : message.guild.member(message.author);
+            roleMember = message.guild.member(mentionedUser);
+
             if (!roleMember) {
                 return messageErrorAsync(
                     message,
@@ -112,7 +111,7 @@ module.exports = {
                     nonRemoveableRoles.join(', ') || null
                 }**\nUnidentified roles: **${unidentifiedRoles.join(', ') || null}**`,
 
-                `<@!${roleMember.user.id}>,\nRemoved roles: **${
+                `<@!${mentionedUser.id}>,\nRemoved roles: **${
                     removedRoles.join(', ') || null
                 }**\nNon-removable roles: **${
                     nonRemoveableRoles.join(', ') || null
@@ -133,11 +132,11 @@ module.exports = {
 
             if (updatedWithRole > 0) await updateMember(message, roleMember);
         } catch (error) {
-            console.log(error);
+            console.error(error);
             return messageErrorAsync(
                 message,
-                'There was an error while removing the role',
-                `<@!${message.author.id}>, there was an error while removing the role`
+                `Error occured in removeRole command: ${error.message}`,
+                `<@!${message.author.id}>, Error occured in removeRole command: ${error.message}`
             );
         }
     },
