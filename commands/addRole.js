@@ -98,20 +98,22 @@ module.exports = {
                 roleMember.roles.add(role);
                 updatedWithRole += 1;
             });
-            memberErrorAsync(
-                message,
-                roleMember,
-                `Assigned roles: **${assignedRoles.join(', ') || null}**\nNon-assignable roles: **${
-                    nonSelfAssignableRoles.join(', ') || null
-                }**\nUnidentified roles: **${unidentifiedRoles.join(', ') || null}**`,
-                `<@!${mentionedUser.id}>,\nAssigned roles: **${
-                    assignedRoles.join(', ') || null
-                }**\nNon-assignable roles: **${
-                    nonSelfAssignableRoles.join(', ') || null
-                }**\nUnidentified roles: **${unidentifiedRoles.join(', ') || null}**`
-            );
+            // ! Deprecated the notification for the updated user to avoid unecessary notifications
+            // memberErrorAsync(
+            //     message,
+            //     roleMember,
+            //     `Assigned roles: **${assignedRoles.join(', ') || null}**\nNon-assignable roles: **${
+            //         nonSelfAssignableRoles.join(', ') || null
+            //     }**\nUnidentified roles: **${unidentifiedRoles.join(', ') || null}**`,
+            //     `<@!${mentionedUser.id}>,\nAssigned roles: **${
+            //         assignedRoles.join(', ') || null
+            //     }**\nNon-assignable roles: **${
+            //         nonSelfAssignableRoles.join(', ') || null
+            //     }**\nUnidentified roles: **${unidentifiedRoles.join(', ') || null}**`
+            // );
 
-            if (updatedWithRole > 0) await updateMember(message, roleMember);
+            // ! Enable this after the Neogcamp initiative ends
+            // if (updatedWithRole > 0) await updateMember(message, roleMember);
         } catch (error) {
             console.error(error);
             return messageErrorAsync(

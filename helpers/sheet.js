@@ -43,10 +43,11 @@ const getByDiscordTag = (rows, tag) => {
 const getValidProjects = (submission) => {
     let validProjects = [];
     for (let i = 1; i <= 9; i++) {
-        validProjects = [
-            ...validProjects,
-            { name: `project${i}`, link: submission[`project${i}`] },
-        ];
+        if (submission[`project${i}`] !== undefined && submission[`project${i}`].length > 0)
+            validProjects = [
+                ...validProjects,
+                { name: `project${i}`, link: submission[`project${i}`] },
+            ];
     }
     return validProjects;
 };
@@ -161,15 +162,13 @@ const processReview = async (
                       (!reviewRecord.length
                           ? 1
                           : reviewRows[reviewRecord[0].rowIndex - 2].totalProjectsReviewed)
-                  } project away from qualifying for NeogCamp level 1**`
+                  } project away from qualifying for NeogCamp level 1**\n\nIn case your role wasn't upgraded to the next level. Feel free to tag **@OG Admins**`
                 : `**Please integrate the functionalities marked with ❌ and re-submit the project.**\n\nYou may use the command \`/nc -rsp<project-num>\`.\n**For example:** \`/nc -rsp1\` for re-submitting \`project 1\`, \`/nc -rsp2\` for re-submitting \`project 2\` and so on.`
         }`
     );
 };
 
 const addNeoGCampRole = (message, totalProjectsReviewed) => {
-    console.log('in the addneworole');
-    console.log('totalprojectsreviewed: ', totalProjectsReviewed);
     const roles = [
         'markOne',
         'markTwo',
@@ -223,11 +222,10 @@ const addNeoGCampRole = (message, totalProjectsReviewed) => {
             ? ['', 'markEight']
             : null;
 
-    console.log('addroleargs: ', addRoleArgs, '  removeroleargs: ', removeRoleArgs);
     switch (totalProjectsReviewed) {
         case 1:
         case 2:
-            removeRole.execute(message, removeRoleArgs);
+            if (totalProjectsReviewed > 1) removeRole.execute(message, removeRoleArgs);
             addRole.execute(message, addRoleArgs);
             break;
 
@@ -276,7 +274,7 @@ module.exports = {
                 if (!url.match(regex)) {
                     botChannelAsync(
                         message,
-                        `<@!${message.author.id}>, Please enter a valid URL.\n\n**For example:** \`https://hosted-url.com\` OR \`https://www.hosted-url.com\``
+                        `<@!${message.author.id}>, Please enter a valid URL.\n\n**For example:** \`http://hosted-url.com\` OR \`https://www.hosted-url.com\``
                     );
                     return false;
                 }
@@ -300,13 +298,7 @@ module.exports = {
                     `${projectNames[+projectNum.slice(projectNum.length - 1) - 1]}`,
                     true
                 )
-                .addField(
-                    `${projectNum.startsWith('p') ? 'Project' : 'Blog'} link`,
-                    `[Review ${projectNum.startsWith('p') ? 'project' : 'blog'}](${
-                        submissionRows[submissionRecord[0].rowIndex - 2][`${projectNum}`]
-                    })`,
-                    true
-                );
+                .addField(`Project link`, `[Review project](${args})`, true);
 
             if (!submissionRecord.length) {
                 // the user array is empty
@@ -331,7 +323,7 @@ module.exports = {
                 if (isAvailable) {
                     botChannelAsync(
                         message,
-                        `<@!${message.author.id}>, You've already submitted ${projectNum}\n\nIf you wish to replace the existing project URL, use the command \`/nc ${flag}R ${args}\``
+                        `<@!${message.author.id}>, You've already submitted ${projectNum}\n\nIf you wish to replace the existing project URL, use the command \`/nc ${flag}R https://hosted-url.com\``
                     );
                     return 'true';
                 }
@@ -385,8 +377,9 @@ module.exports = {
             );
 
             if (fetchedSubmission.length) {
-                const validBlogs = getValidBlogs(fetchedSubmission[0]);
-                console.log(validBlogs);
+                // const validBlogs = getValidBlogs(fetchedSubmission[0]);
+                const validProjects = getValidProjects(fetchedSubmission[0]);
+                console.log(validProjects);
                 // Constructing a common message embed for both cases
                 messageEmbed = new MessageEmbed()
                     .setTitle('✅   Submission Details')
@@ -403,6 +396,16 @@ module.exports = {
                         true
                     )
                     .addField(
+                        'Portfolio',
+                        `${
+                            fetchedSubmission[0].portfolioUrl.length > 0
+                                ? `[${fetchedSubmission[0].portfolioUrl}](${fetchedSubmission[0].portfolioUrl})`
+                                : 'No portfolio linked'
+                        }`,
+                        true
+                    )
+                    .addField('\u200b', '\u200b')
+                    .addField(
                         'Total projects reviewed',
                         `${
                             fetchedReview.length > 0
@@ -411,25 +414,29 @@ module.exports = {
                         }`,
                         true
                     )
-                    .addField('\u200b', '\u200b')
                     .addField(
                         'Project links',
-                        `${getValidProjects(fetchedSubmission[0])
-                            .filter((validProject) => {
-                                if (validProject.link === undefined) return;
-                                if (validProject.link.length > 0) {
-                                    return validProject;
-                                }
-                            })
-                            .map(
-                                (project) =>
-                                    `[${
-                                        projectNames[
-                                            +project.name.slice(project.name.length - 1) - 1
-                                        ]
-                                    }](${project.link})`
-                            )
-                            .join(', ')}`,
+                        `${
+                            validProjects.length > 0
+                                ? validProjects
+                                      .filter((validProject) => {
+                                          if (validProject.link === undefined) return;
+                                          if (validProject.link.length > 0) {
+                                              return validProject;
+                                          }
+                                      })
+                                      .map(
+                                          (project) =>
+                                              `[${
+                                                  projectNames[
+                                                      +project.name.slice(project.name.length - 1) -
+                                                          1
+                                                  ]
+                                              }](${project.link})`
+                                      )
+                                      .join(', ')
+                                : 'No projects'
+                        }`,
                         true
                     )
                     // .addField(
@@ -514,6 +521,15 @@ module.exports = {
         // *console.log
         console.log(`Review args: ${args}`);
         let projectName = args[0];
+
+        if (args.length === 4 && args[3] !== undefined) {
+            console.log('About to delete the review Message');
+            const reviewSubmissionEmbed = await message.guild.channels.cache
+                .get(process.env.CM_SUBMISSION_CHANNEL || submissionChannel)
+                .messages.fetch(args[3]);
+            console.log(reviewSubmissionEmbed);
+            reviewSubmissionEmbed.delete();
+        }
 
         switch (projectName) {
             case '-rp1':

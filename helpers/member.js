@@ -229,11 +229,13 @@ const updateMember = async (message, member) => {
 
     try {
         await returnedMember.save();
-        messageErrorAsync(
-            message,
-            `Successfully updated <@!${member.user.id}>'s details to the database`,
-            `**Updated <@!${member.user.id}>'s details in the database.**`
-        );
+        // ! Deprecated this notification because it was sent to the reviewer everytime the review
+        // ! passes and roles and updated to the database
+        // messageErrorAsync(
+        //     message,
+        //     `Successfully updated <@!${member.user.id}>'s details to the database`,
+        //     `**Updated <@!${member.user.id}>'s details in the database.**`
+        // );
     } catch (error) {
         console.log(error);
         return botChannelAsync(

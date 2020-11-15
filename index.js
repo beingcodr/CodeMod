@@ -23,13 +23,6 @@ bot.once('ready', () => {
 });
 
 bot.on('message', (message) => {
-    // const checkMessage = async (message) => {
-    //     const msgggg = await message.guild.channels.cache
-    //         .get('775203477172912139')
-    //         .messages.fetch('775688813120061471');
-
-    //     console.log('cehcking: ', msgggg.delete());
-    // };
     // checkMessage(message);
     // console.log(
     //     'Message: ',
@@ -39,7 +32,7 @@ bot.on('message', (message) => {
     //     'submission channel msg: ',
     //     message.client.channels
     //         .fetch(process.env.CM_SUBMISSION_CHANNEL || submissionChannel)
-    //         .then((channel) => channel.type) 
+    //         .then((channel) => channel.type)
     //         .catch((error) => console.log(error))
     // );
     let moderationCheck = process.env.CM_MODERATION || moderation;

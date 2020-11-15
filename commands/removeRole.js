@@ -27,7 +27,7 @@ module.exports = {
             role.permissions.has('ADMINISTRATOR') ||
             role.permissions.has('KICK_MEMBERS') ||
             role.permissions.has('BAN_MEMBERS') ||
-            role.permissions.has('SEND_TTS_MESSAGES') ||
+            // role.permissions.has('SEND_TTS_MESSAGES') ||
             role.permissions.has('MANAGE_MESSAGES') ||
             role.permissions.has('MANAGE_ROLES') ||
             role.permissions.has('MANAGE_GUILD') ||
@@ -104,19 +104,20 @@ module.exports = {
                 roleMember.roles.remove(role);
                 updatedWithRole += 1;
             });
-            memberErrorAsync(
-                message,
-                roleMember,
-                `Removed roles: **${removedRoles.join(', ') || null}**\nNon-removable roles: **${
-                    nonRemoveableRoles.join(', ') || null
-                }**\nUnidentified roles: **${unidentifiedRoles.join(', ') || null}**`,
+            // ! Deprecated the notification for the updated user to avoid unecessary notifications
+            // memberErrorAsync(
+            //     message,
+            //     roleMember,
+            //     `Removed roles: **${removedRoles.join(', ') || null}**\nNon-removable roles: **${
+            //         nonRemoveableRoles.join(', ') || null
+            //     }**\nUnidentified roles: **${unidentifiedRoles.join(', ') || null}**`,
 
-                `<@!${mentionedUser.id}>,\nRemoved roles: **${
-                    removedRoles.join(', ') || null
-                }**\nNon-removable roles: **${
-                    nonRemoveableRoles.join(', ') || null
-                }**\nUnidentified roles: **${unidentifiedRoles.join(', ') || null}**`
-            );
+            //     `<@!${mentionedUser.id}>,\nRemoved roles: **${
+            //         removedRoles.join(', ') || null
+            //     }**\nNon-removable roles: **${
+            //         nonRemoveableRoles.join(', ') || null
+            //     }**\nUnidentified roles: **${unidentifiedRoles.join(', ') || null}**`
+            // );
 
             if (nonRemoveableRoles.length) {
                 return messageErrorAsync(
@@ -130,7 +131,8 @@ module.exports = {
                 );
             }
 
-            if (updatedWithRole > 0) await updateMember(message, roleMember);
+            // ! Enable this after the Neogcamp initiative ends
+            // if (updatedWithRole > 0) await updateMember(message, roleMember);
         } catch (error) {
             console.error(error);
             return messageErrorAsync(
