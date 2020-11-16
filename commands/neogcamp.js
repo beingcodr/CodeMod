@@ -16,6 +16,7 @@ const {
 module.exports = {
     name: 'neogcamp',
     description: 'This command lets you submit your projects for review',
+    adminOnly: true,
     guildOnly: true,
     aliases: ['NC', 'nc', 'codecamp'],
     usage: '-s <URL-to-your-hosted-project>',
