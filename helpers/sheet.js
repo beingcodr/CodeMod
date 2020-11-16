@@ -6,11 +6,14 @@ const { colors, submissionChannel } = require('../json/config.json');
 const { botChannelAsync, submissionChannelAsync } = require('./message');
 
 const cliChecklist = [
-    'functionality 1',
-    'functionality 2',
-    'functionality 3',
-    'functionality 4',
-    'functionality 5',
+    'Follow all the exercises Tanay covered in the live',
+    'Replicate the app Tanay made in the live session and make it personal to you',
+];
+
+const cliChecklist2 = [
+    'Choose a topic of your choice to make a quiz app',
+    'Install and use `chalk` npm package',
+    'Add a highscore feature',
 ];
 
 const portfolioChecklist = [
@@ -19,6 +22,19 @@ const portfolioChecklist = [
     'portfolio functionality 3',
     'portfolio functionality 4',
     'portfolio functionality 5',
+];
+
+// neogcamp roles
+const roles = [
+    'markOne',
+    'markTwo',
+    'markThree',
+    'markFour',
+    'markFive',
+    'markSix',
+    'markSeven',
+    'markEight',
+    'markNine',
 ];
 
 const projectNames = [
@@ -125,7 +141,9 @@ const processReview = async (
             )
                 return submissionChannelAsync(
                     message,
-                    `<@!${message.author.id}>, ${projectNum} has been reviewed previously`
+                    `<@!${message.author.id}>, ${projectNum} i.e. **${
+                        projectNames[projectNum.slice(projectNum.length - 1) - 1]
+                    }** for <@!${mentionedUser.id}> has been reviewed previously`
                 );
 
             // updating the row
@@ -162,25 +180,19 @@ const processReview = async (
                       (!reviewRecord.length
                           ? 1
                           : reviewRows[reviewRecord[0].rowIndex - 2].totalProjectsReviewed)
-                  } project away from qualifying for NeogCamp level 1**\n\nIn case your role wasn't upgraded to the next level. Feel free to tag **@OG Admins**`
-                : `**Please integrate the functionalities marked with ❌ and re-submit the project.**\n\nYou may use the command \`/nc -rsp<project-num>\`.\n**For example:** \`/nc -rsp1\` for re-submitting \`project 1\`, \`/nc -rsp2\` for re-submitting \`project 2\` and so on.`
+                  } project away from qualifying for NeogCamp level 1**\n\nIn case your role wasn't upgraded to **${
+                      !reviewRecord.length
+                          ? roles[1 - 1]
+                          : roles[
+                                reviewRows[reviewRecord[0].rowIndex - 2].totalProjectsReviewed - 1
+                            ]
+                  }**. Feel free to tag **@OG Admins**`
+                : `**Please integrate the functionalities marked with ❌ and re-submit the project.**\n\nYou may use the command \`/nc -rs<project-num>\`.\n**For example:** \`/nc -rs1\` for re-submitting \`project 1\`, \`/nc -rs2\` for re-submitting \`project 2\` and so on.`
         }`
     );
 };
 
 const addNeoGCampRole = (message, totalProjectsReviewed) => {
-    const roles = [
-        'markOne',
-        'markTwo',
-        'markThree',
-        'markFour',
-        'markFive',
-        'markSix',
-        'markSeven',
-        'markEight',
-        'markNine',
-    ];
-
     let addRoleArgs =
         totalProjectsReviewed === 1
             ? ['', 'markOne']
@@ -246,6 +258,7 @@ const addNeoGCampRole = (message, totalProjectsReviewed) => {
 
 module.exports = {
     cliChecklist,
+    cliChecklist2,
     portfolioChecklist,
     getByDiscordTag,
     recordSubmissions: async (
@@ -376,10 +389,9 @@ module.exports = {
                     row.discordTag === `${mentionedUser.username}#${mentionedUser.discriminator}`
             );
 
-            if (fetchedSubmission.length) {
+            if (fetchedSubmission.length > 0) {
                 // const validBlogs = getValidBlogs(fetchedSubmission[0]);
                 const validProjects = getValidProjects(fetchedSubmission[0]);
-                console.log(validProjects);
                 // Constructing a common message embed for both cases
                 messageEmbed = new MessageEmbed()
                     .setTitle('✅   Submission Details')
@@ -462,7 +474,7 @@ module.exports = {
                             fetchedSubmission.length > 0
                                 ? fetchedSubmission[0].lastUpdatedOn !== undefined
                                     ? `${moment(fetchedSubmission[0].lastUpdatedOn).format(
-                                          'Do MMM YYYY hh:mm A'
+                                          'Do MMM YY'
                                       )}`
                                     : 'No submissions'
                                 : 'No submissions'
@@ -475,7 +487,7 @@ module.exports = {
                             fetchedReview.length > 0
                                 ? fetchedReview[0].lastUpdatedOn !== undefined
                                     ? `${moment(fetchedReview[0].lastUpdatedOn).format(
-                                          'Do MMM YYYY hh:mm A'
+                                          'Do MMM YY'
                                       )}`
                                     : 'No reviews'
                                 : 'No reviews'
@@ -484,7 +496,7 @@ module.exports = {
                     )
                     .addField('\u200b', '\u200b');
             } else {
-                botChannelAsync(
+                return botChannelAsync(
                     message,
                     `<@!${message.author.id}>, There is no entry ${
                         hasMentions
@@ -494,10 +506,15 @@ module.exports = {
                 );
             }
 
-            botChannelAsync(message, messageEmbed);
+            if (
+                message.channel.id === process.env.CM_SUBMISSION_CHANNEL ||
+                message.channel.id === submissionChannel
+            )
+                submissionChannelAsync(message, messageEmbed);
+            else botChannelAsync(message, messageEmbed);
         } catch (error) {
             console.error(error);
-            botChannelAsync(message, error.message);
+            botChannelAsync(message, `Error occured in fetchSubmission function: ${error.message}`);
         }
     },
     submitReview: async (message, args, submissionRows, reviewSheet) => {
@@ -532,7 +549,7 @@ module.exports = {
         }
 
         switch (projectName) {
-            case '-rp1':
+            case '-r1':
                 await processReview(
                     message,
                     'project1',
@@ -544,12 +561,12 @@ module.exports = {
                 );
                 break;
 
-            case '-rp2':
+            case '-r2':
                 await processReview(
                     message,
                     'project2',
                     mentionedUser,
-                    cliChecklist,
+                    cliChecklist2,
                     args[2],
                     submissionRows,
                     reviewSheet
@@ -608,18 +625,33 @@ module.exports = {
                 // ! This has to be the neogcampPrivateChannel
                 submissionChannelAsync(
                     message,
-                    `<@!${message.author.id}>, Please pass valid **flags**\nFor example: \`-rp1\` for project 1, \`-rp2\` for project 2 and so on`
+                    `<@!${message.author.id}>, Please pass valid **flags**\nFor example: \`-r1\` for project 1, \`-r2\` for project 2 and so on`
                 );
                 break;
         }
     },
     fetchChecklist: (message, projectNum, checklist) => {
-        submissionChannelAsync(
-            message,
-            `Here's the checklist for reviewing ${
-                projectNames[projectNum.substring(projectNum.length - 1) - 1]
-            }:\n\n${checklist.map((item) => `📝    **${item}**\n\n`).join('')}`
-        );
+        if (
+            message.channel.id === process.env.CM_SUBMISSION_CHANNEL ||
+            message.channel.id === submissionChannel
+        )
+            submissionChannelAsync(
+                message,
+                `Here's the checklist for ${projectNum} i.e. **${
+                    projectNames[projectNum.substring(projectNum.length - 1) - 1]
+                }:**\n\n${checklist
+                    .map((item, index) => `**${index + 1}.     📝   ${item}**\n\n`)
+                    .join('')}`
+            );
+        else
+            botChannelAsync(
+                message,
+                `Here's the checklist for ${projectNum} i.e. **${
+                    projectNames[projectNum.substring(projectNum.length - 1) - 1]
+                }:**\n\n${checklist
+                    .map((item, index) => `**${index + 1}.     📝   ${item}**\n\n`)
+                    .join('')}`
+            );
     },
     resubmission: (message, projectNum, submissionRows) => {
         const submissionRecord = getByDiscordTag(submissionRows, message.author.tag);

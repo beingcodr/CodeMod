@@ -9,6 +9,7 @@ const {
     getByDiscordTag,
     fetchChecklist,
     cliChecklist,
+    cliChecklist2,
     resubmission,
 } = require('../helpers/sheet');
 
@@ -18,13 +19,14 @@ module.exports = {
     guildOnly: true,
     aliases: ['NC', 'nc', 'codecamp'],
     usage: '-s <URL-to-your-hosted-project>',
+    cooldown: 5,
     execute: async (message, args) => {
         deleteMessage(message, 0);
         console.log('Args: ', args);
 
         try {
             if (message.guild.member(message.author)) {
-                const doc = new GoogleSpreadsheet('1NRIpnhKhkzQByutTASg9O8lSKd9dQuJoWv9vM7WbpSM');
+                const doc = new GoogleSpreadsheet(process.env.GOOGLE_DOC_ID);
                 await doc.useServiceAccountAuth({
                     client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
                     private_key: process.env.GOOGLE_PRIVATE_KEY,
@@ -83,10 +85,10 @@ module.exports = {
                     const inputIndex = +refinedArgs.indexOf(flag) + 1;
                     let isSuccessful = false;
                     switch (flag) {
-                        case '-sp1':
-                        case '-sp1R':
-                        case '-sp2':
-                        case '-sp2R':
+                        case '-p1':
+                        case '-p1R':
+                        case '-p2':
+                        case '-p2R':
                             // case '-sp3':
                             // case '-sp3R':
                             // case '-sp4':
@@ -101,7 +103,7 @@ module.exports = {
                             // case '-sb2R':
                             // case '-sb3':
                             // case '-sb3R':
-                            if (flag === '-sp1' || flag === '-sp1R') {
+                            if (flag === '-p1' || flag === '-p1R') {
                                 isSuccessful = await recordSubmissions(
                                     message,
                                     refinedArgs[inputIndex],
@@ -111,7 +113,7 @@ module.exports = {
                                     flag,
                                     submissionSheet
                                 );
-                            } else if (flag === '-sp2' || flag === '-sp2R') {
+                            } else if (flag === '-p2' || flag === '-p2R') {
                                 isSuccessful = await recordSubmissions(
                                     message,
                                     refinedArgs[inputIndex],
@@ -302,8 +304,8 @@ module.exports = {
                         //     }
                         //     break;
 
-                        case '-rp1':
-                        case '-rp2':
+                        case '-r1':
+                        case '-r2':
                             // case '-rp3':
                             // case '-rp4':
                             // case '-rp5':
@@ -327,8 +329,8 @@ module.exports = {
                             break;
 
                         // !Update the checklist
-                        case '-fcl1':
-                        case '-fcl2':
+                        case '-fc1':
+                        case '-fc2':
                             // case '-fcl3':
                             // case '-fcl4':
                             // case '-fcl5':
@@ -336,8 +338,8 @@ module.exports = {
                             // case '-fcl7':
                             // case '-fcl8':
                             // case '-fcl9':
-                            if (flag === '-fcl1') fetchChecklist(message, 'project1', cliChecklist);
-                            if (flag === '-fcl2') fetchChecklist(message, 'project2', cliChecklist);
+                            if (flag === '-fc1') fetchChecklist(message, 'project1', cliChecklist);
+                            if (flag === '-fc2') fetchChecklist(message, 'project2', cliChecklist2);
                             // if (flag === '-fcl3') fetchChecklist(message, 'project3', cliChecklist);
                             // if (flag === '-fcl4') fetchChecklist(message, 'project4', cliChecklist);
                             // if (flag === '-fcl5') fetchChecklist(message, 'project5', cliChecklist);
@@ -347,8 +349,8 @@ module.exports = {
                             // if (flag === '-fcl9') fetchChecklist(message, 'project9', cliChecklist);
                             break;
 
-                        case '-rsp1':
-                        case '-rsp2':
+                        case '-rs1':
+                        case '-rs2':
                             // case '-rsp3':
                             // case '-rsp4':
                             // case '-rsp5':
@@ -356,8 +358,8 @@ module.exports = {
                             // case '-rsp7':
                             // case '-rsp8':
                             // case '-rsp9':
-                            if (flag === '-rsp1') resubmission(message, 'project1', submissionRows);
-                            if (flag === '-rsp2') resubmission(message, 'project2', submissionRows);
+                            if (flag === '-rs1') resubmission(message, 'project1', submissionRows);
+                            if (flag === '-rs2') resubmission(message, 'project2', submissionRows);
                             // if (flag === '-rsp3') resubmission(message, 'project3', submissionRows);
                             // if (flag === '-rsp4') resubmission(message, 'project4', submissionRows);
                             // if (flag === '-rsp5') resubmission(message, 'project5', submissionRows);

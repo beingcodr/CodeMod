@@ -9,6 +9,7 @@ const fs = require('fs');
 const { addMemberEvent } = require('./helpers/member');
 const bot = new Client();
 bot.commands = new Collection();
+const cooldowns = new Collection();
 
 const commandFiles = fs.readdirSync('./commands').filter((file) => file.endsWith('.js'));
 
@@ -35,6 +36,7 @@ bot.on('message', (message) => {
     //         .then((channel) => channel.type)
     //         .catch((error) => console.log(error))
     // );
+
     let moderationCheck = process.env.CM_MODERATION || moderation;
     let args = [];
     if (message.author === bot.user || message.author.bot) {
@@ -77,6 +79,7 @@ bot.on('message', (message) => {
         let commandName = splitCommand[0];
         args = splitCommand.slice(1);
 
+        // Retriving the command user typed
         const command =
             bot.commands.get(commandName) ||
             bot.commands.find((cmd) => cmd.aliases && cmd.aliases.includes(commandName));
@@ -87,10 +90,36 @@ bot.on('message', (message) => {
             );
         }
 
+        // Setting up the cooldown logic
+        if (!cooldowns.has(command.name)) {
+            cooldowns.set(command.name, new Collection());
+        }
+
+        const now = Date.now();
+        const timestamps = cooldowns.get(command.name);
+        const cooldownAmount = (command.cooldown || 5) * 1000;
+
+        if (timestamps.has(message.author.id)) {
+            const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
+
+            if (now < expirationTime) {
+                const timeLeft = (expirationTime - now) / 1000;
+                return message.reply(
+                    `please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${
+                        command.name
+                    }\` command.`
+                );
+            }
+        }
+        timestamps.set(message.author.id, now);
+        setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
+
+        // Checking if the command is `guildOnly` and the channel is not a DM
         if (command.guildOnly && message.channel.type !== 'text') {
             return message.reply("I can't execute that command inside DMs!");
         }
 
+        // Checking if the command is `adminOnly`
         if (command.adminOnly && !message.member.hasPermission('ADMINISTRATOR')) {
             return botChannelAsync(
                 message,
@@ -98,6 +127,7 @@ bot.on('message', (message) => {
             );
         }
 
+        // Checking if the command has mandatory requirement of arguments and are the args passed
         if (command.args && !args.length) {
             let reply = "You didn't provide any arguments!";
 
