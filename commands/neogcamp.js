@@ -28,10 +28,7 @@ module.exports = {
         try {
             if (message.guild.member(message.author)) {
                 const doc = new GoogleSpreadsheet(process.env.GOOGLE_DOC_ID);
-                await doc.useServiceAccountAuth({
-                    client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-                    private_key: process.env.GOOGLE_PRIVATE_KEY,
-                });
+                await doc.useServiceAccountAuth(require('../json/client_secret.json'));
 
                 await doc.loadInfo(); // loads document properties and worksheets
 
